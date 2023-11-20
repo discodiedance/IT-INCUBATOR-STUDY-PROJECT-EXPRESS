@@ -3,7 +3,7 @@ import { PostType } from "../types/post/output";
 
 export class PostRepository {
   static getAllPosts() {
-    return db.blogs;
+    return db.posts;
   }
   static getPostById(id: string) {
     const post = db.posts.find((p) => p.id == id);

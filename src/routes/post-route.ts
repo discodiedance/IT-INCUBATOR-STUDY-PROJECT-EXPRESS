@@ -80,7 +80,6 @@ postRoute.put(
 postRoute.delete(
   "/:id",
   authMiddleware,
-  postValidation(),
   (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
     const post = PostRepository.getPostById(id);
