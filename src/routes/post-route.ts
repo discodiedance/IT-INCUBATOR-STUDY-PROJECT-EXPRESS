@@ -20,18 +20,14 @@ postRoute.get("/", (req: Request, res: Response) => {
   res.send(posts);
 });
 
-postRoute.get(
-  "/:id",
-  authMiddleware,
-  (req: RequestWithParams<Params>, res: Response) => {
-    const id = req.params.id;
-    const post = PostRepository.getPostById(id);
-    if (!post) {
-      res.sendStatus(404);
-    }
-    res.send(post);
+postRoute.get("/:id", (req: RequestWithParams<Params>, res: Response) => {
+  const id = req.params.id;
+  const post = PostRepository.getPostById(id);
+  if (!post) {
+    res.sendStatus(404);
   }
-);
+  res.send(post);
+});
 
 postRoute.post(
   "/",

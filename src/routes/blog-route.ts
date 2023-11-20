@@ -20,21 +20,17 @@ blogRoute.get("/", (req: Request, res: Response) => {
   return res.send(blogs);
 });
 
-blogRoute.get(
-  "/:id",
-  authMiddleware,
-  (req: RequestWithParams<Params>, res: Response) => {
-    const id = req.params.id;
-    const blog = BlogRepository.getBlogById(id);
+blogRoute.get("/:id", (req: RequestWithParams<Params>, res: Response) => {
+  const id = req.params.id;
+  const blog = BlogRepository.getBlogById(id);
 
-    if (!blog) {
-      res.sendStatus(404);
-      return;
-    }
-
-    return res.send(blog);
+  if (!blog) {
+    res.sendStatus(404);
+    return;
   }
-);
+
+  return res.send(blog);
+});
 
 blogRoute.post(
   "/",
