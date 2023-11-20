@@ -17,7 +17,7 @@ export const blogRoute = Router({});
 blogRoute.get("/", (req: Request, res: Response) => {
   const blogs = BlogRepository.getAllBlogs();
 
-  res.send(blogs);
+  return res.send(blogs);
 });
 
 blogRoute.get(
@@ -29,9 +29,10 @@ blogRoute.get(
 
     if (!blog) {
       res.sendStatus(404);
+      return;
     }
 
-    res.send(blog);
+    return res.send(blog);
   }
 );
 

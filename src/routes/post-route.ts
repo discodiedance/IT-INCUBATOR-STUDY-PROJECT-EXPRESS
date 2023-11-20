@@ -76,6 +76,8 @@ postRoute.put(
       (post.shortDescription = shortDescription),
       (post.content = content),
       (post.blogId = blogId);
+
+    return res.sendStatus(204);
   }
 );
 
