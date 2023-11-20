@@ -14,7 +14,6 @@ export class PostRepository {
     return post;
   }
   static createNewPost(createdPost: PostType) {
-    const newPost = db.posts.push(createdPost);
-    return newPost;
+    db.posts.push(createdPost);
   }
 }

@@ -35,7 +35,7 @@ blogRoute.get("/:id", (req: RequestWithParams<Params>, res: Response) => {
 blogRoute.post(
   "/",
   authMiddleware,
-  blogValidation,
+  blogValidation(),
   (req: RequestWithBody<BlogBody>, res: Response) => {
     let { name, description, websiteUrl } = req.body;
 
@@ -55,7 +55,7 @@ blogRoute.post(
 blogRoute.put(
   "/:id",
   authMiddleware,
-  blogValidation,
+  blogValidation(),
   (req: RequestWithBodyAndParams<Params, BlogBody>, res: Response) => {
     const id = req.params.id;
     let blog = BlogRepository.getBlogById(id);
@@ -76,7 +76,7 @@ blogRoute.put(
 blogRoute.delete(
   "/:id",
   authMiddleware,
-  blogValidation,
+  blogValidation(),
   (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
     const blog = BlogRepository.getBlogById(id);

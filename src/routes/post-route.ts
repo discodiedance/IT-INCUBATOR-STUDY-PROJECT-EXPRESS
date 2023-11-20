@@ -32,7 +32,7 @@ postRoute.get("/:id", (req: RequestWithParams<Params>, res: Response) => {
 postRoute.post(
   "/",
   authMiddleware,
-  postValidation,
+  postValidation(),
   (req: RequestWithBody<PostBody>, res: Response) => {
     let { title, shortDescription, content, blogId } = req.body;
 
@@ -58,7 +58,7 @@ postRoute.post(
 postRoute.put(
   "/:id",
   authMiddleware,
-  postValidation,
+  postValidation(),
   (req: RequestWithBodyAndParams<Params, PostBody>, res: Response) => {
     const id = req.params.id;
     let post = PostRepository.getPostById(id);
@@ -80,7 +80,7 @@ postRoute.put(
 postRoute.delete(
   "/:id",
   authMiddleware,
-  postValidation,
+  postValidation(),
   (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
     const post = PostRepository.getPostById(id);

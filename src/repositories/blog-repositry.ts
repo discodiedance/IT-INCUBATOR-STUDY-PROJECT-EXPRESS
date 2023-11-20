@@ -15,7 +15,6 @@ export class BlogRepository {
   }
 
   static createBlog(createdBlog: BlogType) {
-    const newBlog = db.blogs.push(createdBlog);
-    return newBlog;
+    db.blogs.push(createdBlog);
   }
 }
