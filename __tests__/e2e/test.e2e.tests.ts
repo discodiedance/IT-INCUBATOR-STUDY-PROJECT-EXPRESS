@@ -1,20 +1,12 @@
 import request from "supertest";
 import { app } from "./../../src/settings";
 
-describe("/blogs", () => {
+describe("/testing", () => {
   beforeAll(async () => {
-    await request(app).delete("/testing-all-data");
+    await request(app).delete("/testing/all-data").expect(204);
   });
-});
-
-describe("/posts", () => {
-  beforeAll(async () => {
-    await request(app).delete("/testing-all-data");
-  });
-});
-
-describe("/videos", () => {
-  beforeAll(async () => {
-    await request(app).delete("/testing-all-data");
+  it("Get status 200 and found empty array of blogs, posts, videos", async () => {
+    await request(app).get("/blogs").expect(200, []);
+    await request(app).get("/posts").expect(200, []);
   });
 });

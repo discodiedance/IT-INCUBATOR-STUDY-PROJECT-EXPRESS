@@ -194,11 +194,6 @@ videoRoute.put(
   }
 );
 
-videoRoute.delete("/testing/all-data", (req: Request, res: Response) => {
-  db.videos.length = 0;
-  res.sendStatus(204);
-});
-
 videoRoute.delete(
   "/videos/:id",
   (req: RequestWithParams<Params>, res: Response) => {

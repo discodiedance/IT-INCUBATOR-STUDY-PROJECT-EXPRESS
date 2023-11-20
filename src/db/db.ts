@@ -1,12 +1,4 @@
-import { BlogType } from "../types/blog/output";
-import { PostType } from "../types/post/output";
-import { VideoType } from "../types/video/output";
-
-type DBType = {
-  videos: VideoType[];
-  blogs: BlogType[];
-  posts: PostType[];
-};
+import { DBType } from "../types/common";
 
 export const db: DBType = {
   videos: [
