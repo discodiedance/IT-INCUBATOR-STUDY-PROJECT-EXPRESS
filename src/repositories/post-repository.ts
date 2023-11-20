@@ -1,4 +1,5 @@
 import { db } from "../db/db";
+import { PostType } from "../types/post/output";
 
 export class PostRepository {
   static getAllPosts() {
@@ -11,5 +12,9 @@ export class PostRepository {
       return null;
     }
     return post;
+  }
+  static createNewPost(createdPost: PostType) {
+    const newPost = db.posts.push(createdPost);
+    return newPost;
   }
 }

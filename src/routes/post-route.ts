@@ -5,10 +5,13 @@ import {
   Params,
   RequestWithBodyAndParams,
   RequestWithParams,
+  RequestWithBody,
 } from "../types/common";
 import { PostBody } from "../types/post/input";
-import { postPostValidation } from "../validators/post-validator";
+import { postValidation } from "../middlewares/post/post-middleware";
 import { db } from "../db/db";
+import { BlogRepository } from "../repositories/blog-repositry";
+import { randomUUID } from "crypto";
 
 export const postRoute = Router({});
 
@@ -31,25 +34,35 @@ postRoute.get(
 );
 
 postRoute.post(
-  "/:id",
+  "/",
   authMiddleware,
-  postPostValidation,
-  (req: RequestWithParams<Params>, res: Response) => {
-    const id = req.params.id;
-    const post = PostRepository.getPostById(id);
+  postValidation,
+  (req: RequestWithBody<PostBody>, res: Response) => {
+    let { title, shortDescription, content, blogId } = req.body;
 
-    if (!post) {
-      res.sendStatus(404);
-    }
+    const blog = BlogRepository.getBlogById(blogId);
 
-    res.send(post);
+    if (!blog) return res.sendStatus(404);
+
+    const newPost = {
+      id: randomUUID(),
+      title,
+      shortDescription,
+      content,
+      blogId,
+      blogName: blog.name,
+    };
+
+    PostRepository.createNewPost(newPost);
+
+    return res.status(201).send(newPost);
   }
 );
 
 postRoute.put(
   "/:id",
   authMiddleware,
-  postPostValidation,
+  postValidation,
   (req: RequestWithBodyAndParams<Params, PostBody>, res: Response) => {
     const id = req.params.id;
     let post = PostRepository.getPostById(id);
@@ -69,7 +82,7 @@ postRoute.put(
 postRoute.delete(
   "/:id",
   authMiddleware,
-  postPostValidation,
+  postValidation,
   (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
     const post = PostRepository.getPostById(id);

@@ -1,7 +1,8 @@
 import { body } from "express-validator";
 import { BlogRepository } from "../../repositories/blog-repositry";
+import { inputModelValidation } from "../inputModel/input-model-validation";
 
-export const blogIdValidation = body("blogId")
+const blogIdValidation = body("blogId")
   .isString()
   .trim()
   .custom((value) => {
@@ -14,20 +15,28 @@ export const blogIdValidation = body("blogId")
   })
   .withMessage("Incorrect blogId!");
 
-export const titleValidation = body("title")
+const titleValidation = body("title")
   .isString()
   .trim()
   .isLength({ min: 5, max: 30 })
   .withMessage("Incorrect title!");
 
-export const shortDescriptionValidation = body("shortDescription")
+const shortDescriptionValidation = body("shortDescription")
   .isString()
   .trim()
   .isLength({ min: 5, max: 100 })
   .withMessage("Incorrect short description!");
 
-export const contentValidatorValidation = body("content")
+const contentValidatorValidation = body("content")
   .isString()
   .trim()
   .isLength({ min: 5, max: 1000 })
   .withMessage("Incorrect content!");
+
+export const postValidation = () => [
+  blogIdValidation,
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidatorValidation,
+  inputModelValidation,
+];

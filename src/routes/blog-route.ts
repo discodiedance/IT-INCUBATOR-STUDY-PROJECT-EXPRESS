@@ -4,11 +4,13 @@ import {
   Params,
   RequestWithBodyAndParams,
   RequestWithParams,
+  RequestWithBody,
 } from "../types/common";
 import { BlogBody } from "../types/blog/input";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
-import { blogPostValidation } from "../validators/blogs-validator";
+import { blogValidation } from "../middlewares/blog/blog-middleware";
 import { db } from "./../db/db";
+import { randomUUID } from "crypto";
 
 export const blogRoute = Router({});
 
@@ -34,25 +36,29 @@ blogRoute.get(
 );
 
 blogRoute.post(
-  "/:id",
+  "/",
   authMiddleware,
-  blogPostValidation,
-  (req: RequestWithParams<Params>, res: Response) => {
-    const id = req.params.id;
-    const blog = BlogRepository.getBlogById(id);
+  blogValidation,
+  (req: RequestWithBody<BlogBody>, res: Response) => {
+    let { name, description, websiteUrl } = req.body;
 
-    if (!blog) {
-      res.sendStatus(404);
-    }
+    const newBlog = {
+      id: randomUUID(),
+      name,
+      description,
+      websiteUrl,
+    };
 
-    res.send(blog);
+    BlogRepository.createBlog(newBlog);
+
+    return res.status(201).send(newBlog);
   }
 );
 
 blogRoute.put(
   "/:id",
   authMiddleware,
-  blogPostValidation,
+  blogValidation,
   (req: RequestWithBodyAndParams<Params, BlogBody>, res: Response) => {
     const id = req.params.id;
     let blog = BlogRepository.getBlogById(id);
@@ -65,13 +71,15 @@ blogRoute.put(
     (blog.name = name),
       (blog.description = description),
       (blog.websiteUrl = websiteUrl);
+
+    return res.sendStatus(204);
   }
 );
 
 blogRoute.delete(
   "/:id",
   authMiddleware,
-  blogPostValidation,
+  blogValidation,
   (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
     const blog = BlogRepository.getBlogById(id);
@@ -85,6 +93,6 @@ blogRoute.delete(
       return;
     }
     db.blogs.splice(blogIndex, 1);
-    res.sendStatus(204);
+    return res.sendStatus(204);
   }
 );

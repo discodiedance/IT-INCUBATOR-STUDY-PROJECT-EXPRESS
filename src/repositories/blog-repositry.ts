@@ -1,4 +1,5 @@
 import { db } from "../db/db";
+import { BlogType } from "../types/blog/output";
 
 export class BlogRepository {
   static getAllBlogs() {
@@ -11,5 +12,10 @@ export class BlogRepository {
       return null;
     }
     return blog;
+  }
+
+  static createBlog(createdBlog: BlogType) {
+    const newBlog = db.blogs.push(createdBlog);
+    return newBlog;
   }
 }
