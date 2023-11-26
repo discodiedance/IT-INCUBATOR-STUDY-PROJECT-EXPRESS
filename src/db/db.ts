@@ -4,12 +4,11 @@ import { BlogType } from "../types/blog/output";
 import { PostType } from "../types/post/output";
 
 dotenv.config();
-
 export const port = 3000;
 
 const mongoUri = process.env.MONGO_URL || "mongodb://localhost:27017";
 
-console.log(process.env.MONGO_URL);
+console.log(mongoUri);
 
 const client = new MongoClient(mongoUri);
 
