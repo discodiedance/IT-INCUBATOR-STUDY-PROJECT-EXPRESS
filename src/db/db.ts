@@ -9,6 +9,8 @@ export const port = 3000;
 
 const mongoUri = process.env.MONGO_URL || "mongodb://localhost:27017";
 
+console.log(process.env.MONGO_URL);
+
 const client = new MongoClient(mongoUri);
 
 const db = client.db("node-blog");
