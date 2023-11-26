@@ -1,20 +1,58 @@
-import { db } from "../db/db";
-import { BlogType } from "../types/blog/output";
+import { ObjectId } from "mongodb";
+import { blogCollection } from "../db/db";
+import { BlogType, OutputBlogType } from "../types/blog/output";
+import { blogMapper } from "../middlewares/blog/blog-mapper";
+import { InputBlogType, UpdateBlogData } from "../types/blog/input";
 
 export class BlogRepository {
-  static getAllBlogs() {
-    return db.blogs;
-  }
-  static getBlogById(id: string) {
-    const blog = db.blogs.find((b) => b.id == id);
+  static async getAllBlogs() {
+    const blogs = await blogCollection.find({}).toArray();
 
+    return blogs.map(blogMapper);
+  }
+  static async getBlogById(id: string): Promise<OutputBlogType | null> {
+    const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
     if (!blog) {
       return null;
     }
-    return blog;
+    return blogMapper(blog);
   }
 
-  static createBlog(createdBlog: BlogType) {
-    db.blogs.push(createdBlog);
+  static async createBlog(newBlog: InputBlogType): Promise<BlogType> {
+    const createBlog: BlogType = {
+      name: newBlog.name,
+      description: newBlog.description,
+      websiteUrl: newBlog.websiteUrl,
+      createdAt: new Date().toISOString(),
+      isMembership: true,
+    };
+
+    const result = await blogCollection.insertOne(createBlog);
+    createBlog.id = result.insertedId.toString();
+    return createBlog;
+  }
+
+  static async updateBlog(
+    id: string,
+    updateData: UpdateBlogData
+  ): Promise<boolean> {
+    const result = await blogCollection.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          name: updateData.name,
+          description: updateData.description,
+          webisteUrl: updateData.websiteUrl,
+        },
+      }
+    );
+
+    return !!result.matchedCount;
+  }
+
+  static async deleteBlog(id: string): Promise<boolean> {
+    const result = await blogCollection.deleteOne({ _id: new ObjectId(id) });
+
+    return !!result.deletedCount;
   }
 }

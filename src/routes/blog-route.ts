@@ -9,20 +9,19 @@ import {
 import { BlogBody } from "../types/blog/input";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
 import { blogValidation } from "../middlewares/blog/blog-middleware";
-import { db } from "./../db/db";
-import { randomUUID } from "crypto";
+import { OutputBlogType } from "../types/blog/output";
 
 export const blogRoute = Router({});
 
-blogRoute.get("/", (req: Request, res: Response) => {
-  const blogs = BlogRepository.getAllBlogs();
+blogRoute.get("/", async (req: Request, res: Response) => {
+  const blogs = await BlogRepository.getAllBlogs();
 
   return res.send(blogs);
 });
 
-blogRoute.get("/:id", (req: RequestWithParams<Params>, res: Response) => {
+blogRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
   const id = req.params.id;
-  const blog = BlogRepository.getBlogById(id);
+  const blog = await BlogRepository.getBlogById(id);
 
   if (!blog) {
     res.sendStatus(404);
@@ -36,17 +35,16 @@ blogRoute.post(
   "/",
   authMiddleware,
   blogValidation(),
-  (req: RequestWithBody<BlogBody>, res: Response) => {
+  async (req: RequestWithBody<BlogBody>, res: Response) => {
     let { name, description, websiteUrl } = req.body;
 
     const newBlog = {
-      id: randomUUID(),
       name,
       description,
       websiteUrl,
     };
 
-    BlogRepository.createBlog(newBlog);
+    await BlogRepository.createBlog(newBlog);
 
     return res.status(201).send(newBlog);
   }
@@ -56,9 +54,9 @@ blogRoute.put(
   "/:id",
   authMiddleware,
   blogValidation(),
-  (req: RequestWithBodyAndParams<Params, BlogBody>, res: Response) => {
+  async (req: RequestWithBodyAndParams<Params, BlogBody>, res: Response) => {
     const id = req.params.id;
-    let blog = BlogRepository.getBlogById(id);
+    let blog: OutputBlogType | null = await BlogRepository.getBlogById(id);
     let { name, description, websiteUrl } = req.body;
 
     if (!blog) {
@@ -67,7 +65,8 @@ blogRoute.put(
     }
     (blog.name = name),
       (blog.description = description),
-      (blog.websiteUrl = websiteUrl);
+      (blog.websiteUrl = websiteUrl),
+      await BlogRepository.updateBlog(id, blog);
 
     return res.sendStatus(204);
   }
@@ -76,19 +75,15 @@ blogRoute.put(
 blogRoute.delete(
   "/:id",
   authMiddleware,
-  (req: RequestWithParams<Params>, res: Response) => {
+  async (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
-    const blog = BlogRepository.getBlogById(id);
-    if (!blog) {
+
+    const status = await BlogRepository.deleteBlog(id);
+
+    if (!status) {
       res.sendStatus(404);
       return;
     }
-    const blogIndex = db.blogs.findIndex((b) => b.id == id);
-    if (blogIndex == -1) {
-      res.sendStatus(404);
-      return;
-    }
-    db.blogs.splice(blogIndex, 1);
     return res.sendStatus(204);
   }
 );

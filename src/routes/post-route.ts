@@ -9,23 +9,26 @@ import {
 } from "../types/common";
 import { PostBody } from "../types/post/input";
 import { postValidation } from "../middlewares/post/post-middleware";
-import { db } from "../db/db";
 import { BlogRepository } from "../repositories/blog-repositry";
-import { randomUUID } from "crypto";
+import { OutputPostType } from "../types/post/output";
 
 export const postRoute = Router({});
 
-postRoute.get("/", (req: Request, res: Response) => {
-  const posts = PostRepository.getAllPosts();
-  res.send(posts);
+postRoute.get("/", async (req: Request, res: Response) => {
+  const posts = await PostRepository.getAllPosts();
+
+  return res.send(posts);
 });
 
-postRoute.get("/:id", (req: RequestWithParams<Params>, res: Response) => {
+postRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
   const id = req.params.id;
-  const post = PostRepository.getPostById(id);
+  const post = await PostRepository.getPostById(id);
+
   if (!post) {
     res.sendStatus(404);
+    return;
   }
+
   res.send(post);
 });
 
@@ -33,23 +36,22 @@ postRoute.post(
   "/",
   authMiddleware,
   postValidation(),
-  (req: RequestWithBody<PostBody>, res: Response) => {
-    let { title, shortDescription, content, blogId } = req.body;
+  async (req: RequestWithBody<PostBody>, res: Response) => {
+    let { title, shortDescription, content, blogId, blogName } = req.body;
 
     const blog = BlogRepository.getBlogById(blogId);
 
     if (!blog) return res.sendStatus(404);
 
     const newPost = {
-      id: randomUUID(),
       title,
       shortDescription,
       content,
       blogId,
-      blogName: blog.name,
+      blogName,
     };
 
-    PostRepository.createNewPost(newPost);
+    await PostRepository.createPost(newPost);
 
     return res.status(201).send(newPost);
   }
@@ -59,19 +61,21 @@ postRoute.put(
   "/:id",
   authMiddleware,
   postValidation(),
-  (req: RequestWithBodyAndParams<Params, PostBody>, res: Response) => {
+  async (req: RequestWithBodyAndParams<Params, PostBody>, res: Response) => {
     const id = req.params.id;
-    let post = PostRepository.getPostById(id);
+    let post: OutputPostType | null = await PostRepository.getPostById(id);
     let { title, shortDescription, content, blogId } = req.body;
 
     if (!post) {
       res.sendStatus(404);
       return;
     }
+
     (post.title = title),
       (post.shortDescription = shortDescription),
       (post.content = content),
       (post.blogId = blogId);
+    await PostRepository.updatePost(id, post);
 
     return res.sendStatus(204);
   }
@@ -80,19 +84,15 @@ postRoute.put(
 postRoute.delete(
   "/:id",
   authMiddleware,
-  (req: RequestWithParams<Params>, res: Response) => {
+  async (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
-    const post = PostRepository.getPostById(id);
-    if (!post) {
+
+    const status = await PostRepository.deletePost(id);
+
+    if (status == false) {
       res.sendStatus(404);
       return;
     }
-    const postIndex = db.posts.findIndex((p) => p.id == id);
-    if (postIndex == -1) {
-      res.sendStatus(404);
-      return;
-    }
-    db.posts.splice(postIndex, 1);
-    res.sendStatus(204);
+    return res.sendStatus(204);
   }
 );
