@@ -19,7 +19,7 @@ export class BlogRepository {
   }
 
   static async createBlog(newBlog: InputBlogType): Promise<BlogType> {
-    const createBlog: BlogType = {
+    const createdBlog: BlogType = {
       name: newBlog.name,
       description: newBlog.description,
       websiteUrl: newBlog.websiteUrl,
@@ -27,9 +27,9 @@ export class BlogRepository {
       isMembership: false,
     };
 
-    const result = await blogCollection.insertOne(createBlog);
-    createBlog.id = result.insertedId.toString();
-    return createBlog;
+    const result = await blogCollection.insertOne({ ...createdBlog });
+    createdBlog.id = result.insertedId.toString();
+    return createdBlog;
   }
 
   static async updateBlog(

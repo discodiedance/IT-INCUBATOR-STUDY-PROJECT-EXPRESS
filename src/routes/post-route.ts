@@ -36,24 +36,17 @@ postRoute.post(
   "/",
   authMiddleware,
   postValidation(),
-  async (req: RequestWithBody<PostBody>, res: Response) => {
-    let { title, shortDescription, content, blogId, blogName } = req.body;
+  async (req: RequestWithBody<OutputPostType>, res: Response) => {
+    const blog = await BlogRepository.getBlogById(req.body.id);
 
-    const blog = BlogRepository.getBlogById(blogId);
+    if (!blog) {
+      res.sendStatus(404);
+      return;
+    }
 
-    if (!blog) return res.sendStatus(404);
+    const post = await PostRepository.createPost(req.body);
 
-    const newPost = {
-      title,
-      shortDescription,
-      content,
-      blogId,
-      blogName,
-    };
-
-    await PostRepository.createPost(newPost);
-
-    return res.status(201).send(newPost);
+    return res.status(201).send(post);
   }
 );
 
