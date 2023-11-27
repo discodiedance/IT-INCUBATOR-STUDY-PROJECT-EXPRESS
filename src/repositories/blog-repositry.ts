@@ -24,7 +24,7 @@ export class BlogRepository {
       description: newBlog.description,
       websiteUrl: newBlog.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: true,
+      isMembership: false,
     };
 
     const result = await blogCollection.insertOne(createBlog);
