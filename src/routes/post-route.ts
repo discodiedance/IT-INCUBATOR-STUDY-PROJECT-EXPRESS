@@ -37,7 +37,7 @@ postRoute.post(
   authMiddleware,
   postValidation(),
   async (req: RequestWithBody<OutputPostType>, res: Response) => {
-    const blog = await BlogRepository.getBlogById(req.body.id);
+    const blog = await BlogRepository.getBlogById(req.body.blogId);
 
     if (!blog) {
       res.sendStatus(404);
