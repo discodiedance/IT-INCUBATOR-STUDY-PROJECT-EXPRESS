@@ -44,7 +44,10 @@ postRoute.post(
       return;
     }
 
-    const post = await PostRepository.createPost(req.body);
+    const post = await PostRepository.createPost({
+      ...req.body,
+      blogName: blog.name,
+    });
 
     return res.status(201).send(post);
   }

@@ -5,12 +5,12 @@ import { inputModelValidation } from "../inputModel/input-model-validation";
 const blogIdValidation = body("blogId")
   .isString()
   .trim()
-  .custom((value) => {
-    const blog = BlogRepository.getBlogById(value);
+  .custom(async (value) => {
+    const blog = await BlogRepository.getBlogById(value);
 
     if (!blog) {
-      // throw new Error("Incorrect blogId!");
-      return false;
+      throw new Error("Incorrect blogId!");
+      //return false;
     }
     return true;
   })
