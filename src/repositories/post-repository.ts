@@ -1,24 +1,10 @@
 import { ObjectId } from "mongodb";
 import { postCollection } from "../db/db";
-import { OutputPostType, PostType } from "../types/post/output";
+import { PostType } from "../types/post/output";
 import { InputPostType, UpdatePostData } from "../types/post/input";
-import { postMapper } from "../middlewares/post/post-mapper";
 
 export class PostRepository {
-  static async getAllPosts() {
-    const posts = await postCollection.find({}).toArray();
-    return posts.map(postMapper);
-  }
-
-  static async getPostById(id: string): Promise<OutputPostType | null> {
-    const post = await postCollection.findOne({ _id: new ObjectId(id) });
-    if (!post) {
-      return null;
-    }
-    return postMapper(post);
-  }
-
-  static async createPost(newPost: InputPostType): Promise<PostType> {
+  static async createPost(newPost: InputPostType): Promise<string> {
     const createdPost: PostType = {
       title: newPost.title,
       shortDescription: newPost.shortDescription,
@@ -30,7 +16,7 @@ export class PostRepository {
 
     const result = await postCollection.insertOne({ ...createdPost });
     createdPost.id = result.insertedId.toString();
-    return createdPost;
+    return result.insertedId.toString();
   }
 
   static async updatePost(

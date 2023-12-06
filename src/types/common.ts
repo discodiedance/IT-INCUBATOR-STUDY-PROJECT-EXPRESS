@@ -6,6 +6,8 @@ export type RequestWithBody<B> = Request<{}, {}, B, {}>;
 
 export type RequestWithBodyAndParams<P, B> = Request<P, {}, B, {}>;
 
+export type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>;
+
 export type ErrorType = {
   errorsMessages: ErorMessageType[];
 };
@@ -17,4 +19,8 @@ export type ErorMessageType = {
 
 export type Params = {
   id: string;
+};
+
+export type BlogIdParams = {
+  blogId: string;
 };

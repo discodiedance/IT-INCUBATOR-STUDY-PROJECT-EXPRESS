@@ -17,3 +17,9 @@ export type OutputPostType = {
   blogName: string;
   createdAt: string;
 };
+
+export type CreatePostToBlogType = {
+  content: string;
+  shortDescription: string;
+  title: string;
+};

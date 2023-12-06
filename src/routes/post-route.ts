@@ -6,23 +6,36 @@ import {
   RequestWithBodyAndParams,
   RequestWithParams,
   RequestWithBody,
+  RequestTypeWithQuery,
 } from "../types/common";
 import { PostBody } from "../types/post/input";
 import { postValidation } from "../middlewares/post/post-middleware";
-import { BlogRepository } from "../repositories/blog-repositry";
 import { OutputPostType } from "../types/post/output";
+import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
+import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
+import { SortDataType } from "../types/blog/input";
 
 export const postRoute = Router({});
 
-postRoute.get("/", async (req: Request, res: Response) => {
-  const posts = await PostRepository.getAllPosts();
+postRoute.get(
+  "/",
+  async (req: RequestTypeWithQuery<SortDataType>, res: Response) => {
+    const sortData = {
+      searchNameTerm: req.query.searchNameTerm,
+      sortBy: req.query.sortBy,
+      sortDirection: req.query.sortDirection,
+      pageNumber: req.query.pageNumber,
+      pageSize: req.query.pageSize,
+    };
+    const posts = await QueryPostRepository.getAllPosts(sortData);
 
-  return res.send(posts);
-});
+    return res.send(posts);
+  }
+);
 
 postRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
   const id = req.params.id;
-  const post = await PostRepository.getPostById(id);
+  const post = await QueryPostRepository.getPostById(id);
 
   if (!post) {
     res.sendStatus(404);
@@ -37,7 +50,7 @@ postRoute.post(
   authMiddleware,
   postValidation(),
   async (req: RequestWithBody<OutputPostType>, res: Response) => {
-    const blog = await BlogRepository.getBlogById(req.body.blogId);
+    const blog = await QueryBlogRepository.getBlogById(req.body.blogId);
 
     if (!blog) {
       res.sendStatus(404);
@@ -59,7 +72,7 @@ postRoute.put(
   postValidation(),
   async (req: RequestWithBodyAndParams<Params, PostBody>, res: Response) => {
     const id = req.params.id;
-    let post: OutputPostType | null = await PostRepository.getPostById(id);
+    let post: OutputPostType | null = await QueryPostRepository.getPostById(id);
     let { title, shortDescription, content, blogId } = req.body;
 
     if (!post) {

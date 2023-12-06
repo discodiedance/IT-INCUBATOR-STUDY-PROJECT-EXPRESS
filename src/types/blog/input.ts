@@ -15,3 +15,12 @@ export type InputBlogType = {
   description: string;
   websiteUrl: string;
 };
+
+export type SortDataType = {
+  searchNameTerm?: string;
+  sortBy?: string;
+  sortDirection?: "asc" | "desc";
+  pageNumber?: number;
+  pageSize?: number;
+  blogId?: string;
+};
