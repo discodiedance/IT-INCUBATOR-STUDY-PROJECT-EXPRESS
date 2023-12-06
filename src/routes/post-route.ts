@@ -14,6 +14,7 @@ import { OutputPostType } from "../types/post/output";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { SortDataType } from "../types/blog/input";
+import { PostService } from "../domain/post-service";
 
 export const postRoute = Router({});
 
@@ -57,7 +58,7 @@ postRoute.post(
       return;
     }
 
-    const post = await PostRepository.createPost({
+    const post = await PostService.createPost({
       ...req.body,
       blogName: blog.name,
     });
