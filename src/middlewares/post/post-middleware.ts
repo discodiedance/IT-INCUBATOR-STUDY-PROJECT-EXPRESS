@@ -1,18 +1,18 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
 import { QueryBlogRepository } from "../../repositories/query-repository/query-blog-repository";
 
-const blogIdValidation = body("blogId")
+const blogIdValidation = param("blogId")
   .isString()
   .trim()
   .custom(async (value) => {
+    console.log("123123123");
     const blog = await QueryBlogRepository.getBlogById(value);
 
     if (!blog) {
+      console.log("blognotfound");
       throw new Error("Incorrect blogId!");
-      //return false;
     }
-    return true;
   })
   .withMessage("Incorrect blogId!");
 

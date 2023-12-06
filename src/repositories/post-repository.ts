@@ -4,7 +4,7 @@ import { PostType } from "../types/post/output";
 import { InputPostType, UpdatePostData } from "../types/post/input";
 
 export class PostRepository {
-  static async createPost(newPost: InputPostType): Promise<string> {
+  static async createPost(newPost: InputPostType): Promise<PostType> {
     const createdPost: PostType = {
       title: newPost.title,
       shortDescription: newPost.shortDescription,
@@ -14,9 +14,11 @@ export class PostRepository {
       createdAt: new Date().toISOString(),
     };
 
+    console.log("PostRepository.createPost");
+
     const result = await postCollection.insertOne({ ...createdPost });
     createdPost.id = result.insertedId.toString();
-    return result.insertedId.toString();
+    return createdPost;
   }
 
   static async updatePost(
