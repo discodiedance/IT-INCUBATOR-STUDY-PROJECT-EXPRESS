@@ -82,7 +82,6 @@ blogRoute.post(
     res: Response
   ) => {
     const id = req.params.blogId;
-    console.log("controller");
     const { title, shortDescription, content } = req.body;
     const createdPost = await BlogService.createPostToBlog(id, {
       title,

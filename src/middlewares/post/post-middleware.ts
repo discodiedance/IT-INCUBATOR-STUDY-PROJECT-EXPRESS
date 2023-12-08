@@ -1,16 +1,15 @@
 import { body, param } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
 import { QueryBlogRepository } from "../../repositories/query-repository/query-blog-repository";
+import notFoundValidation from "../inputModel/not-found-validation";
 
 const blogIdValidation = param("blogId")
   .isString()
   .trim()
   .custom(async (value) => {
-    console.log("123123123");
     const blog = await QueryBlogRepository.getBlogById(value);
 
     if (!blog) {
-      console.log("blognotfound");
       throw new Error("Incorrect blogId!");
     }
   })
@@ -35,9 +34,10 @@ const contentValidatorValidation = body("content")
   .withMessage("Incorrect content!");
 
 export const postValidation = () => [
-  blogIdValidation,
   titleValidation,
   shortDescriptionValidation,
   contentValidatorValidation,
   inputModelValidation,
+  blogIdValidation,
+  notFoundValidation,
 ];

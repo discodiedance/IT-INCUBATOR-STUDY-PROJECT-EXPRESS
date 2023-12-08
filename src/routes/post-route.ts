@@ -86,7 +86,6 @@ postRoute.put(
       (post.content = content),
       (post.blogId = blogId);
     await PostRepository.updatePost(id, post);
-
     return res.sendStatus(204);
   }
 );
