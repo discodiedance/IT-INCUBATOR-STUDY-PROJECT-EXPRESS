@@ -8,6 +8,8 @@ export type RequestWithBodyAndParams<P, B> = Request<P, {}, B, {}>;
 
 export type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>;
 
+export type RequestTypeWithQueryBlogId<Q, P> = Request<P, {}, {}, Q>;
+
 export type ErrorType = {
   errorsMessages: ErorMessageType[];
 };

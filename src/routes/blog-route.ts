@@ -7,6 +7,7 @@ import {
   RequestWithBody,
   BlogIdParams,
   RequestTypeWithQuery,
+  RequestTypeWithQueryBlogId,
 } from "../types/common";
 import { BlogBody, InputBlogType, SortDataType } from "../types/blog/input";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
@@ -54,16 +55,23 @@ blogRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
 blogRoute.get(
   "/:blogId/posts",
   allPostsForBlogByIdValidation(),
-  async (req: RequestTypeWithQuery<SortDataType>, res: Response) => {
+  async (
+    req: RequestTypeWithQueryBlogId<SortDataType, BlogIdParams>,
+    res: Response
+  ) => {
     const sortData = {
       sortBy: req.query.sortBy,
       sortDirection: req.query.sortDirection,
       pageNumber: req.query.pageNumber,
       pageSize: req.query.pageSize,
     };
-    const blogId = await QueryPostRepository.getAllPosts(sortData);
+    const blogId = req.params.blogId;
+    const foundPosts = await QueryPostRepository.getAllPosts({
+      ...sortData,
+      blogId,
+    });
 
-    return res.send(blogId);
+    return res.send(foundPosts);
   }
 );
 

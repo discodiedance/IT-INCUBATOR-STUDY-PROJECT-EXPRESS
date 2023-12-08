@@ -3,7 +3,19 @@ import { inputModelValidation } from "../inputModel/input-model-validation";
 import { QueryBlogRepository } from "../../repositories/query-repository/query-blog-repository";
 import notFoundValidation from "../inputModel/not-found-validation";
 
-export const blogIdValidation = param("blogId")
+export const blogIdInParamsValidation = param("blogId")
+  .isString()
+  .trim()
+  .custom(async (value) => {
+    const blog = await QueryBlogRepository.getBlogById(value);
+
+    if (!blog) {
+      throw new Error("Incorrect blogId!");
+    }
+  })
+  .withMessage("Incorrect blogId!");
+
+export const blogIdinBodyValidation = body("blogId")
   .isString()
   .trim()
   .custom(async (value) => {
@@ -33,11 +45,20 @@ const contentValidatorValidation = body("content")
   .isLength({ min: 5, max: 1000 })
   .withMessage("Incorrect content!");
 
+export const createPostValidation = () => [
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidatorValidation,
+  inputModelValidation,
+  blogIdinBodyValidation,
+  notFoundValidation,
+];
+
 export const postValidation = () => [
   titleValidation,
   shortDescriptionValidation,
   contentValidatorValidation,
   inputModelValidation,
-  blogIdValidation,
+  blogIdInParamsValidation,
   notFoundValidation,
 ];

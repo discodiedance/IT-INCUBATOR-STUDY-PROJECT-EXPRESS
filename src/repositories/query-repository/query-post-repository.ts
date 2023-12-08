@@ -3,6 +3,7 @@ import { postCollection } from "../../db/db";
 import { postMapper } from "../../middlewares/post/post-mapper";
 import { OutputPostType } from "../../types/post/output";
 import { SortDataType } from "../../types/blog/input";
+import { BlogIdParams } from "../../types/common";
 
 export class QueryPostRepository {
   // private prepareWithPaging() {}
