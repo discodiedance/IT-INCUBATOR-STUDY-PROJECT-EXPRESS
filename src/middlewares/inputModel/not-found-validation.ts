@@ -25,7 +25,7 @@ const notFoundValidation = (
   if (!errors.isEmpty()) {
     // const err = errors.array({ onlyFirstError: true });
 
-    return res.status(404);
+    return res.sendStatus(404);
   }
   return next();
 };
