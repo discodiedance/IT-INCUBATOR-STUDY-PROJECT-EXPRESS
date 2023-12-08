@@ -73,7 +73,7 @@ postRoute.post(
 postRoute.put(
   "/:id",
   authMiddleware,
-  createPostValidation(),
+  postValidation(),
   async (req: RequestWithBodyAndParams<Params, PostBody>, res: Response) => {
     const id = req.params.id;
     let post: OutputPostType | null = await QueryPostRepository.getPostById(id);
