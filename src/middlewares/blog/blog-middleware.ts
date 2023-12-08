@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
 import notFoundValidation from "../inputModel/not-found-validation";
-import { blogIdValidation } from "../post/post-middleware";
+import { blogIdInParamsValidation } from "../post/post-middleware";
 
 export const nameValidation = body("name")
   .exists()
@@ -24,7 +24,7 @@ export const websiteUrlValidation = body("websiteUrl")
   .withMessage("Incorrect url!");
 
 export const allPostsForBlogByIdValidation = () => [
-  blogIdValidation,
+  blogIdInParamsValidation,
   notFoundValidation,
 ];
 
