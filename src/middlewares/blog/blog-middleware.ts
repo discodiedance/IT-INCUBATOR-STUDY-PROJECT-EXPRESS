@@ -1,5 +1,7 @@
 import { body } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
+import notFoundValidation from "../inputModel/not-found-validation";
+import { blogIdValidation } from "../post/post-middleware";
 
 export const nameValidation = body("name")
   .exists()
@@ -20,6 +22,11 @@ export const websiteUrlValidation = body("websiteUrl")
   .isLength({ min: 1, max: 100 })
   .matches("^https://([a-zA-Z0-9_-]+.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$")
   .withMessage("Incorrect url!");
+
+export const allPostsForBlogByIdValidation = () => [
+  blogIdValidation,
+  notFoundValidation,
+];
 
 export const blogValidation = () => [
   nameValidation,

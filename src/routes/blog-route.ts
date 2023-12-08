@@ -10,7 +10,10 @@ import {
 } from "../types/common";
 import { BlogBody, InputBlogType, SortDataType } from "../types/blog/input";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
-import { blogValidation } from "../middlewares/blog/blog-middleware";
+import {
+  allPostsForBlogByIdValidation,
+  blogValidation,
+} from "../middlewares/blog/blog-middleware";
 import { OutputBlogType } from "../types/blog/output";
 import { BlogService } from "../domain/blog-service";
 import { postValidation } from "../middlewares/post/post-middleware";
@@ -50,6 +53,7 @@ blogRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
 
 blogRoute.get(
   "/:blogId/posts",
+  allPostsForBlogByIdValidation(),
   async (req: RequestTypeWithQuery<SortDataType>, res: Response) => {
     const sortData = {
       sortBy: req.query.sortBy,
