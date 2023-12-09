@@ -18,12 +18,13 @@ export const blogIdInParamsValidation = param("blogId")
 export const blogIdinBodyValidation = body("blogId")
   .isString()
   .trim()
-  .custom(async (value) => {
+  .custom(async (value, meta) => {
     const blog = await QueryBlogRepository.getBlogById(value);
 
     if (!blog) {
       throw new Error("Incorrect blogId!");
     }
+    meta.req.blog = blog;
   })
   .withMessage("Incorrect blogId!");
 

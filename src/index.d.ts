@@ -1,7 +1,11 @@
+import { BlogType } from "./types/blog/output";
+
 export {};
 
-declare namespace Express {
-  export interface Request {
-    blog?: any;
+declare global {
+  namespace Express {
+    export interface Request {
+      blog: BlogType | null;
+    }
   }
 }

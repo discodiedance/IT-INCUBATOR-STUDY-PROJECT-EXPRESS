@@ -1,8 +1,11 @@
 import { Request } from "express";
+import { BlogType } from "./blog/output";
 
 export type RequestWithParams<P> = Request<P, {}, {}, {}>;
 
 export type RequestWithBody<B> = Request<{}, {}, B, {}>;
+
+export type RequestWithBodyAndBlog<B> = Request<{}, {}, B, {}, BlogType>;
 
 export type RequestWithBodyAndParams<P, B> = Request<P, {}, B, {}>;
 

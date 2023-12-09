@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { blogCollection } from "../db/db";
-import { BlogType, OutputBlogType } from "../types/blog/output";
+import { BlogType } from "../types/blog/output";
 import { InputBlogType, UpdateBlogData } from "../types/blog/input";
 
 export class BlogRepository {

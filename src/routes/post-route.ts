@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
 import { PostRepository } from "../repositories/post-repository";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
 import {
@@ -7,6 +7,7 @@ import {
   RequestWithParams,
   RequestWithBody,
   RequestTypeWithQuery,
+  RequestWithBodyAndBlog,
 } from "../types/common";
 import { PostBody } from "../types/post/input";
 import {
@@ -14,10 +15,10 @@ import {
   postValidation,
 } from "../middlewares/post/post-middleware";
 import { OutputPostType } from "../types/post/output";
-import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { SortDataType } from "../types/blog/input";
 import { PostService } from "../domain/post-service";
+import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 
 export const postRoute = Router({});
 
@@ -53,9 +54,9 @@ postRoute.post(
   "/",
   authMiddleware,
   createPostValidation(),
-  async (req: RequestWithBody<OutputPostType>, res: Response) => {
+  async (req: RequestWithBodyAndBlog<OutputPostType>, res: Response) => {
     const blog = await QueryBlogRepository.getBlogById(req.body.blogId);
-
+    // const blog = req.blog;
     if (!blog) {
       res.sendStatus(404);
       return;
