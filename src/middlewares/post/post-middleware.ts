@@ -15,7 +15,7 @@ export const blogIdInParamsValidation = param("blogId")
   })
   .withMessage("Incorrect blogId!");
 
-export const blogIdinBodyValidation = body("blogId")
+export const blogIdInBodyValidation = body("blogId")
   .isString()
   .trim()
   .custom(async (value, meta) => {
@@ -58,6 +58,6 @@ export const postValidation = () => [
   titleValidation,
   shortDescriptionValidation,
   contentValidatorValidation,
-  blogIdInParamsValidation,
+  blogIdInBodyValidation,
   inputModelValidation,
 ];
