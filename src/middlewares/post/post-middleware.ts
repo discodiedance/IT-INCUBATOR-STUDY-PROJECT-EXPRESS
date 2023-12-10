@@ -61,3 +61,12 @@ export const postValidation = () => [
   blogIdInBodyValidation,
   inputModelValidation,
 ];
+
+export const postBlogIdValidation = () => [
+  titleValidation,
+  shortDescriptionValidation,
+  contentValidatorValidation,
+  inputModelValidation,
+  blogIdInParamsValidation,
+  notFoundValidation,
+];

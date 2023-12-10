@@ -17,7 +17,10 @@ import {
 } from "../middlewares/blog/blog-middleware";
 import { OutputBlogType } from "../types/blog/output";
 import { BlogService } from "../domain/blog-service";
-import { postValidation } from "../middlewares/post/post-middleware";
+import {
+  postBlogIdValidation,
+  postValidation,
+} from "../middlewares/post/post-middleware";
 import { CreatePostToBlogType } from "../types/post/output";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
@@ -88,7 +91,7 @@ blogRoute.post(
 blogRoute.post(
   "/:blogId/posts",
   authMiddleware,
-  postValidation(),
+  postBlogIdValidation(),
   async (
     req: RequestWithBodyAndParams<BlogIdParams, CreatePostToBlogType>,
     res: Response
