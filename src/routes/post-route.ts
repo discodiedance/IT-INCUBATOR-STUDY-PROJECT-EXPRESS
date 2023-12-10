@@ -10,10 +10,7 @@ import {
   RequestWithBodyAndBlog,
 } from "../types/common";
 import { PostBody } from "../types/post/input";
-import {
-  createPostValidation,
-  postValidation,
-} from "../middlewares/post/post-middleware";
+import { postValidation } from "../middlewares/post/post-middleware";
 import { OutputPostType } from "../types/post/output";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { SortDataType } from "../types/blog/input";
@@ -53,7 +50,7 @@ postRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
 postRoute.post(
   "/",
   authMiddleware,
-  createPostValidation(),
+  postValidation(),
   async (req: RequestWithBodyAndBlog<OutputPostType>, res: Response) => {
     const blog = await QueryBlogRepository.getBlogById(req.body.blogId);
     // const blog = req.blog;
