@@ -53,7 +53,6 @@ postRoute.post(
   postValidation(),
   async (req: RequestWithBodyAndBlog<OutputPostType>, res: Response) => {
     const blog = await QueryBlogRepository.getBlogById(req.body.blogId);
-    // const blog = req.blog;
     if (!blog) {
       res.sendStatus(404);
       return;
@@ -81,7 +80,7 @@ postRoute.put(
       res.sendStatus(404);
       return;
     }
-
+    // как вынести
     (post.title = title),
       (post.shortDescription = shortDescription),
       (post.content = content),

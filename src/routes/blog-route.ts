@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Response } from "express";
 import { BlogRepository } from "../repositories/blog-repositry";
 import {
   Params,
@@ -98,6 +98,7 @@ blogRoute.post(
   ) => {
     const id = req.params.blogId;
     const { title, shortDescription, content } = req.body;
+    //как вынести
     const createdPost = await BlogService.createPostToBlog(id, {
       title,
       shortDescription,
@@ -121,10 +122,11 @@ blogRoute.put(
       res.sendStatus(404);
       return;
     }
+    // как вынести
     (blog.name = name),
       (blog.description = description),
       (blog.websiteUrl = websiteUrl),
-      await BlogRepository.updateBlog(id, blog);
+      await BlogService.updateBlog(id, blog);
 
     return res.sendStatus(204);
   }

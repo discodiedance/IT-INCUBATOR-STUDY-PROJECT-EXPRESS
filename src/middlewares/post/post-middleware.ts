@@ -46,14 +46,6 @@ const contentValidatorValidation = body("content")
   .isLength({ min: 5, max: 1000 })
   .withMessage("Incorrect content!");
 
-// export const createPostValidation = () => [
-//   titleValidation,
-//   shortDescriptionValidation,
-//   contentValidatorValidation,
-//   blogIdinBodyValidation,
-//   inputModelValidation,
-// ];
-
 export const postValidation = () => [
   titleValidation,
   shortDescriptionValidation,

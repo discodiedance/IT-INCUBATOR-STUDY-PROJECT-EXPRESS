@@ -5,7 +5,7 @@ import { PostType } from "../types/post/output";
 
 dotenv.config();
 
-const mongoUri = process.env.MONGO_URL as string; //|| "mongodb://localhost:27017";
+const mongoUri = process.env.MONGO_URL as string;
 
 console.log(mongoUri);
 
