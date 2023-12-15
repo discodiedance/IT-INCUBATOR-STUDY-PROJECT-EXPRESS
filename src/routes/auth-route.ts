@@ -6,7 +6,7 @@ import { InputLoginOrEmailType } from "../types/auth/input";
 export const authRoute = Router({});
 
 authRoute.post(
-  "/login",
+  "/",
   async (req: RequestWithBody<InputLoginOrEmailType>, res: Response) => {
     const result = await UserService.checkCredentials(
       req.body.loginOrEmail,
