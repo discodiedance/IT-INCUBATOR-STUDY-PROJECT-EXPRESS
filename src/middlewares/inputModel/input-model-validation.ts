@@ -16,7 +16,7 @@ export const inputModelValidation = (
       default:
         return {
           message: error.msg,
-          field: "not found",
+          field: "Not found",
         };
     }
   });

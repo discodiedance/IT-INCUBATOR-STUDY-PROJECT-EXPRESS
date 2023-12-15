@@ -80,7 +80,7 @@ postRoute.put(
       res.sendStatus(404);
       return;
     }
-    // как вынести
+
     (post.title = title),
       (post.shortDescription = shortDescription),
       (post.content = content),

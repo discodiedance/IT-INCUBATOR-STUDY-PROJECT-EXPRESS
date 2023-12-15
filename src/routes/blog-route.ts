@@ -98,7 +98,6 @@ blogRoute.post(
   ) => {
     const id = req.params.blogId;
     const { title, shortDescription, content } = req.body;
-    //как вынести
     const createdPost = await BlogService.createPostToBlog(id, {
       title,
       shortDescription,

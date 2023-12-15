@@ -13,7 +13,7 @@ export class PostRepository {
     const post = await PostService.updatePost(id, updatedPost);
     return post;
   }
-  //delete оставить в репо или в сервис
+
   static async deletePost(id: string): Promise<boolean> {
     const result = await postCollection.deleteOne({ _id: new ObjectId(id) });
 

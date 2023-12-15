@@ -13,7 +13,7 @@ export class BlogRepository {
     const blog = await BlogService.updateBlog(id, updatedBlog);
     return blog;
   }
-  //delete оставить в репо или в сервис
+
   static async deleteBlog(id: string): Promise<boolean> {
     const result = await blogCollection.deleteOne({ _id: new ObjectId(id) });
 

@@ -31,7 +31,6 @@ export class QueryBlogRepository {
       .toArray();
 
     const totalCount = await blogCollection.countDocuments(filter);
-
     const pageCount = Math.ceil(totalCount / +pageSize);
 
     return {
