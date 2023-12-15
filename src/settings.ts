@@ -10,8 +10,7 @@ export const app = express();
 app.use(express.json());
 
 app.use("/testing", testingRoute);
-
+app.use("/login", authRoute);
+app.use("/users", userRoute);
 app.use("/blogs", blogRoute);
 app.use("/posts", postRoute);
-app.use("/users", userRoute);
-app.use("/login", authRoute);
