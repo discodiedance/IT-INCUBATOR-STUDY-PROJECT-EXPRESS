@@ -27,3 +27,9 @@ export const userValidation = () => [
   emailValidation,
   inputModelValidation,
 ];
+
+export const authValidation = () => [
+  loginValidation,
+  passwordValidation,
+  inputModelValidation,
+];
