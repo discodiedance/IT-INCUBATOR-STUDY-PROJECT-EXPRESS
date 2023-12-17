@@ -11,25 +11,30 @@ export class QueryUserRepository {
     const searchLoginTerm = sortData.searchLoginTerm ?? null;
     const searchEmailTerm = sortData.searchEmailTerm ?? null;
 
-    let filter = {};
-    //по первой букве
-    if (searchLoginTerm || searchEmailTerm) {
-      filter = {
-        $or: [
-          {
-            login: {
-              $regex: searchLoginTerm,
-              $options: "i",
-            },
+    let filterLogin = {};
+    let filterEmail = {};
 
-            email: {
-              $regex: searchEmailTerm,
-              $options: "i",
-            },
-          },
-        ],
+    if (searchLoginTerm) {
+      filterLogin = {
+        login: {
+          $regex: searchLoginTerm,
+          $options: "i",
+        },
       };
     }
+
+    if (searchEmailTerm) {
+      filterEmail = {
+        email: {
+          $regex: searchEmailTerm,
+          $options: "i",
+        },
+      };
+    }
+
+    const filter = {
+      $or: [filterLogin, filterEmail],
+    };
 
     const users = await userCollection
       .find(filter)
