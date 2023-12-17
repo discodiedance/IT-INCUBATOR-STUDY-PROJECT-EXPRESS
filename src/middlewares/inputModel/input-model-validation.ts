@@ -27,6 +27,7 @@ export const inputModelValidation = (
     return res.status(400).send({
       errorsMessages: err,
     });
+  } else {
+    return next();
   }
-  return next();
 };

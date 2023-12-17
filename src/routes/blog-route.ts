@@ -14,10 +14,10 @@ import { authMiddleware } from "../middlewares/auth/auth-middleware";
 import {
   allPostsForBlogByIdValidation,
   blogValidation,
-} from "../middlewares/blog/blog-middleware";
+} from "../middlewares/blog/blog-validation";
 import { OutputBlogType } from "../types/blog/output";
 import { BlogService } from "../domain/blog-service";
-import { postBlogIdValidation } from "../middlewares/post/post-middleware";
+import { postBlogIdValidation } from "../middlewares/post/post-validation";
 import { CreatePostToBlogType } from "../types/post/output";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";

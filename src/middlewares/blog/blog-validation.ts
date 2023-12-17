@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
 import notFoundValidation from "../inputModel/not-found-validation";
-import { blogIdInParamsValidation } from "../post/post-middleware";
+import { blogIdInParamsValidation } from "../post/post-validation";
 
 export const nameValidation = body("name")
   .exists()

@@ -10,7 +10,7 @@ import { QueryUserRepository } from "../repositories/query-repository/query-user
 import { UserService } from "../domain/user-service";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
 import { UserRepostitory } from "../repositories/user-repository";
-import { userValidation } from "../middlewares/user/user-middleware";
+import { userValidation } from "../middlewares/user/user-validation";
 
 export const userRoute = Router({});
 

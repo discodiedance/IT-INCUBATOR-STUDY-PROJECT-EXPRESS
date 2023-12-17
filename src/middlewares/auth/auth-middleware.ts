@@ -30,5 +30,6 @@ export const authMiddleware = (
     res.sendStatus(401);
     return;
   }
+
   return next();
 };

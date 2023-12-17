@@ -10,7 +10,7 @@ import {
   RequestWithBodyAndBlog,
 } from "../types/common";
 import { PostBody } from "../types/post/input";
-import { postValidation } from "../middlewares/post/post-middleware";
+import { postValidation } from "../middlewares/post/post-validation";
 import { OutputPostType } from "../types/post/output";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { SortDataType } from "../types/blog/input";

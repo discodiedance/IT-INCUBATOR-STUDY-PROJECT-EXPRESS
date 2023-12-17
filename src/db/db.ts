@@ -12,11 +12,11 @@ console.log(mongoUri);
 
 const client = new MongoClient(mongoUri);
 
-const db = client.db("node-blog");
+const db = client.db("minigram");
 
-export const blogCollection = db.collection<BlogType>("blog");
-export const postCollection = db.collection<PostType>("post");
-export const userCollection = db.collection<UserType>("user");
+export const blogCollection = db.collection<BlogType>("blogs");
+export const postCollection = db.collection<PostType>("posts");
+export const userCollection = db.collection<UserType>("users");
 
 export const runDb = async () => {
   try {

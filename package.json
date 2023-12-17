@@ -20,7 +20,8 @@
   "scripts": {
     "dev": "yarn nodemon --inspect dist/index.js",
     "watch": "tsc -w",
-    "test": "jest"
+    "test": "jest",
+    "testuser": "jest ./__tests__/e2e/user-api.tests.ts"
   },
   "devDependencies": {
     "@babel/generator": "^7.23.3",
