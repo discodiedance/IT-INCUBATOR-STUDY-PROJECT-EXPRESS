@@ -3,13 +3,11 @@ import { UserService } from "../domain/user-service";
 import { RequestWithBody } from "../types/common";
 import { InputLoginOrEmailType } from "../types/auth/input";
 import { authValidation } from "../middlewares/user/user-validation";
-import { authMiddleware } from "../middlewares/auth/auth-middleware";
 
 export const authRoute = Router({});
 
 authRoute.post(
   "/",
-  authMiddleware,
   authValidation(),
   async (req: RequestWithBody<InputLoginOrEmailType>, res: Response) => {
     const result = await UserService.checkCredentials(

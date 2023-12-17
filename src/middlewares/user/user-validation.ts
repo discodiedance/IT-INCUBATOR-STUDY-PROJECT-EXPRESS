@@ -1,5 +1,6 @@
 import { body } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
+import notFoundValidation from "../inputModel/not-found-validation";
 
 export const loginValidation = body("login")
   .isString()
