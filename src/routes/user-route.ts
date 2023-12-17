@@ -42,14 +42,17 @@ userRoute.post(
   }
 );
 
-userRoute.delete("/:id", authMiddleware);
-async (req: RequestWithParams<Params>, res: Response) => {
-  const id = req.params.id;
-  const status = await UserRepostitory.deleteUser(id);
+userRoute.delete(
+  "/:id",
+  authMiddleware,
+  async (req: RequestWithParams<Params>, res: Response) => {
+    const id = req.params.id;
+    const status = await UserRepostitory.deleteUser(id);
 
-  if (!status) {
-    res.sendStatus(404);
-    return;
+    if (!status) {
+      res.sendStatus(404);
+      return;
+    }
+    return res.sendStatus(204);
   }
-  return res.sendStatus(204);
-};
+);
