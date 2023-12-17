@@ -47,6 +47,7 @@ userRoute.delete(
   authMiddleware,
   async (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
+    console.log("50", id);
     const status = await UserRepostitory.deleteUser(id);
 
     if (!status) {

@@ -220,13 +220,13 @@ describe(routerName, () => {
 
   it("204 and deleted blog with correct id and array with 1 blog", async () => {
     const result = await request(app).get(routerName);
-    const startBlogsArrayLength = result.body.lenght;
+    const startBlogsArrayLength = result.body.length;
 
     await request(app)
       .delete(routerName + testBlog2.id)
       .auth(login, password)
       .expect(204);
     const res = await request(app).get(routerName).expect(200);
-    expect(res.body.lenght).toBe(startBlogsArrayLength - 1);
+    expect(res.body.items.length).toBe(startBlogsArrayLength - 1);
   });
 });

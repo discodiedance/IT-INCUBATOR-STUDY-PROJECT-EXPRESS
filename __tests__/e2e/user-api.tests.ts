@@ -1,5 +1,6 @@
 import request from "supertest";
 import { app } from "./../../src/settings";
+import { ObjectId } from "mongodb";
 
 const routerName = "/users";
 const login = "admin";
@@ -33,6 +34,7 @@ describe(routerName, () => {
   it("200 and empty array of users", async () => {
     await request(app).get(routerName).auth(login, password).expect(200);
   });
+
   it("400 and not created user with incorrect data", async () => {
     await request(app)
       .post(routerName)
@@ -106,11 +108,6 @@ describe(routerName, () => {
   });
 
   it("200 and correct all data (only testUser1)", async () => {
-    const res = await request(app)
-      .get(routerName)
-      .auth(login, password)
-      .expect(200);
-    testUser1 = res.body;
     const result = await request(app)
       .get(routerName)
       .auth(login, password)
@@ -125,10 +122,9 @@ describe(routerName, () => {
 
   it("404 and not deleted user with incorrect id and get all data(only testUser1)", async () => {
     const res = await request(app)
-      .delete(routerName + testUser1.id)
+      .delete(routerName + "/" + new ObjectId())
       .auth(login, password)
       .expect(404);
-    testUser1 = res.body;
     const result = await request(app)
       .get(routerName)
       .auth(login, password)
@@ -139,5 +135,20 @@ describe(routerName, () => {
       email: "goodmail@mail.ru",
       createdAt: expect.any(String),
     });
+  });
+
+  it("204 and deleted user with correct id and array with 0 users", async () => {
+    const res = await request(app).get(routerName).auth(login, password);
+    const startUsersArrayLength = res.body.items.length;
+    await request(app)
+      .delete(routerName + "/" + testUser1.id)
+      .auth(login, password)
+      .expect(204);
+
+    const result = await request(app)
+      .get(routerName)
+      .auth(login, password)
+      .expect(200);
+    expect(result.body.items.length).toBe(startUsersArrayLength - 1);
   });
 });

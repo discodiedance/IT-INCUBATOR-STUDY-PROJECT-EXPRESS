@@ -1,6 +1,7 @@
 import { userCollection } from "../db/db";
+import { userMapper } from "../middlewares/user/user-mapper";
 import { InputUserType } from "../types/user/input";
-import { UserType } from "../types/user/output";
+import { OutputUserType, UserType } from "../types/user/output";
 import bcrypt from "bcrypt";
 
 export class UserService {
@@ -9,7 +10,7 @@ export class UserService {
     return hash;
   }
 
-  static async createUser(newUser: InputUserType): Promise<UserType> {
+  static async createUser(newUser: InputUserType): Promise<OutputUserType> {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(
       newUser.password,
@@ -25,8 +26,8 @@ export class UserService {
     };
 
     const result = await userCollection.insertOne({ ...createdUser });
-    createdUser.id = result.insertedId.toString();
-    return createdUser;
+
+    return userMapper({ ...createdUser, _id: result.insertedId });
   }
 
   static async findByLoginOrEmail(loginOrEmail: string) {

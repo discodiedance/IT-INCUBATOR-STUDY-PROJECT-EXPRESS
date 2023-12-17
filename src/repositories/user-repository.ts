@@ -11,7 +11,7 @@ export class UserRepostitory {
   }
 
   static async deleteUser(id: string): Promise<boolean> {
-    const result = await userCollection.deleteOne({ _id: new ObjectId() });
+    const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
 
     return !!result.deletedCount;
   }
