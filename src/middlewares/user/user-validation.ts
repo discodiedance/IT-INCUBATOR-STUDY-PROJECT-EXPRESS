@@ -9,6 +9,12 @@ export const loginValidation = body("login")
   .matches("^[a-zA-Z0-9_-]*$")
   .withMessage("Incorrect value");
 
+export const loginOrEmailValidation = body("loginOrEmail")
+  .isString()
+  .trim()
+  .isLength({ min: 3, max: 50 })
+  .withMessage("Incorrect value");
+
 export const passwordValidation = body("password")
   .isString()
   .trim()
@@ -29,7 +35,7 @@ export const userValidation = () => [
 ];
 
 export const authValidation = () => [
-  loginValidation,
+  loginOrEmailValidation,
   passwordValidation,
   inputModelValidation,
 ];
