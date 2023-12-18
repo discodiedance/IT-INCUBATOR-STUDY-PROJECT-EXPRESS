@@ -30,16 +30,10 @@ export class UserService {
     return userMapper({ ...createdUser, _id: result.insertedId });
   }
 
-  static async findByLoginOrEmail(loginOrEmail: string) {
-    const user = await userCollection.findOne({
-      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
-    });
-
-    return user;
-  }
-
   static async checkCredentials(loginOrEmail: string, password: string) {
     const user = await UserService.findByLoginOrEmail(loginOrEmail);
+
+    console.log("46", user);
 
     if (!user) return false;
 
@@ -48,5 +42,15 @@ export class UserService {
       return false;
     }
     return true;
+  }
+
+  static async findByLoginOrEmail(loginOrEmail: string) {
+    const user = await userCollection.findOne({
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+
+    console.log("38", user);
+
+    return user;
   }
 }

@@ -14,6 +14,8 @@ authRoute.post(
       req.body.loginOrEmail,
       req.body.password
     );
+    console.log("19", req.body.loginOrEmail),
+      console.log("20", req.body.password);
     if (result === false) {
       res.sendStatus(401);
     }
