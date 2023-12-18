@@ -7,7 +7,7 @@ import { authValidation } from "../middlewares/user/user-validation";
 export const authRoute = Router({});
 
 authRoute.post(
-  "/",
+  "/login",
   authValidation(),
   async (req: RequestWithBody<InputLoginOrEmailType>, res: Response) => {
     const result = await UserService.checkCredentials(
