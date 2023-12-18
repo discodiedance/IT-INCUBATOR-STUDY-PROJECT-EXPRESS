@@ -34,6 +34,8 @@ export class UserService {
     loginOrEmail: string,
     password: string
   ): Promise<boolean> {
+    console.log("37", loginOrEmail);
+    console.log("38", password);
     const user = await UserService.findByLoginOrEmail(loginOrEmail);
 
     console.log("46", user);
@@ -48,6 +50,7 @@ export class UserService {
   }
 
   static async findByLoginOrEmail(loginOrEmail: string) {
+    console.log("53", loginOrEmail);
     const user = await userCollection.findOne({
       $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
     });
