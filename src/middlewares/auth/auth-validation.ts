@@ -1,12 +1,10 @@
 import { body } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
 
-export const loginValidation = body("login")
+export const loginOrEmailValidation = body("loginOrEmail")
   .isString()
   .trim()
-  .isLength({ min: 3, max: 10 })
-  .withMessage("Incorrect value")
-  .matches("^[a-zA-Z0-9_-]*$")
+  .isLength({ min: 3, max: 50 })
   .withMessage("Incorrect value");
 
 export const passwordValidation = body("password")
@@ -15,15 +13,8 @@ export const passwordValidation = body("password")
   .isLength({ min: 6, max: 20 })
   .withMessage("Incorrect value");
 
-export const emailValidation = body("email")
-  .isString()
-  .trim()
-  .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-  .withMessage("Incorrect value");
-
-export const userValidation = () => [
-  loginValidation,
+export const authValidation = () => [
+  loginOrEmailValidation,
   passwordValidation,
-  emailValidation,
   inputModelValidation,
 ];

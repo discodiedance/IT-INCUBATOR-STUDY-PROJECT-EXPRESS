@@ -30,7 +30,10 @@ export class UserService {
     return userMapper({ ...createdUser, _id: result.insertedId });
   }
 
-  static async checkCredentials(loginOrEmail: string, password: string) {
+  static async checkCredentials(
+    loginOrEmail: string,
+    password: string
+  ): Promise<boolean> {
     const user = await UserService.findByLoginOrEmail(loginOrEmail);
 
     console.log("46", user);

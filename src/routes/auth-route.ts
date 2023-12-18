@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { UserService } from "../domain/user-service";
 import { RequestWithBody } from "../types/common";
 import { InputLoginOrEmailType } from "../types/auth/input";
-import { authValidation } from "../middlewares/user/user-validation";
+import { authValidation } from "../middlewares/auth/auth-validation";
 
 export const authRoute = Router({});
 
