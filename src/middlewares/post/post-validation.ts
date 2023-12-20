@@ -10,10 +10,10 @@ export const blogIdInParamsValidation = param("blogId")
     const blog = await QueryBlogRepository.getBlogById(value);
 
     if (!blog) {
-      throw new Error("Incorrect blogId!");
+      throw new Error("Incorrect value");
     }
   })
-  .withMessage("Incorrect blogId!");
+  .withMessage("Incorrect value");
 
 export const blogIdInBodyValidation = body("blogId")
   .isString()
@@ -22,34 +22,34 @@ export const blogIdInBodyValidation = body("blogId")
     const blog = await QueryBlogRepository.getBlogById(value);
 
     if (!blog) {
-      throw new Error("Incorrect blogId!");
+      throw new Error("Incorrect value");
     }
     meta.req.blog = blog;
   })
-  .withMessage("Incorrect blogId!");
+  .withMessage("Incorrect value");
 
 const titleValidation = body("title")
   .isString()
   .trim()
   .isLength({ min: 5, max: 30 })
-  .withMessage("Incorrect title!");
+  .withMessage("Incorrect value");
 
 const shortDescriptionValidation = body("shortDescription")
   .isString()
   .trim()
   .isLength({ min: 5, max: 100 })
-  .withMessage("Incorrect short description!");
+  .withMessage("Incorrect value");
 
-const contentValidatorValidation = body("content")
+const contentValidation = body("content")
   .isString()
   .trim()
   .isLength({ min: 5, max: 1000 })
-  .withMessage("Incorrect content!");
+  .withMessage("Incorrect value");
 
 export const postValidation = () => [
   titleValidation,
   shortDescriptionValidation,
-  contentValidatorValidation,
+  contentValidation,
   blogIdInBodyValidation,
   inputModelValidation,
 ];
@@ -57,7 +57,7 @@ export const postValidation = () => [
 export const postBlogIdValidation = () => [
   titleValidation,
   shortDescriptionValidation,
-  contentValidatorValidation,
+  contentValidation,
   inputModelValidation,
   blogIdInParamsValidation,
   notFoundValidation,

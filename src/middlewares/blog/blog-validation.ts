@@ -8,20 +8,21 @@ export const nameValidation = body("name")
   .isString()
   .trim()
   .isLength({ min: 1, max: 15 })
-  .withMessage("Incorrect name!");
+  .withMessage("Incorrect value");
 
 export const descriptionValidation = body("description")
   .isString()
   .trim()
   .isLength({ min: 1, max: 500 })
-  .withMessage("Incorrect description!");
+  .withMessage("Incorrect value");
 
 export const websiteUrlValidation = body("websiteUrl")
   .isString()
   .trim()
   .isLength({ min: 1, max: 100 })
+  .withMessage("Incorrect value")
   .matches("^https://([a-zA-Z0-9_-]+.)+[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)*/?$")
-  .withMessage("Incorrect url!");
+  .withMessage("Incorrect value");
 
 export const allPostsForBlogByIdValidation = () => [
   blogIdInParamsValidation,

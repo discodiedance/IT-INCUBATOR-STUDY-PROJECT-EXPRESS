@@ -42,6 +42,8 @@ export class QueryBlogRepository {
     };
   }
   static async getBlogById(id: string): Promise<OutputBlogType | null> {
+    if (!ObjectId.isValid(id)) return null;
+
     const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
     if (!blog) {
       return null;

@@ -137,6 +137,15 @@ describe(routerName, () => {
     });
   });
 
+  it("401 and not deleted user with incorrect authorization", async () => {
+    await request(app)
+      .delete(routerName + "/" + testUser1.id)
+      .auth("badlogin", "badpassword")
+      .send(correctUserData)
+      .expect(401);
+    await request(app).get(routerName).auth(login, password).expect(200);
+  });
+
   it("204 and deleted user with correct id and array with 0 users", async () => {
     const res = await request(app).get(routerName).auth(login, password);
     const startUsersArrayLength = res.body.items.length;

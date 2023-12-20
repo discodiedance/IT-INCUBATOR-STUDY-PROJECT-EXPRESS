@@ -53,7 +53,7 @@ export class BlogService {
         $set: {
           name: updateData.name,
           description: updateData.description,
-          webisteUrl: updateData.websiteUrl,
+          websiteUrl: updateData.websiteUrl,
         },
       }
     );

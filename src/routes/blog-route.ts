@@ -133,7 +133,6 @@ blogRoute.delete(
   authMiddleware,
   async (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
-
     const status = await BlogRepository.deleteBlog(id);
 
     if (!status) {
