@@ -1,7 +1,6 @@
-import { ObjectId } from "mongodb";
-import { postCollection } from "../db/db";
 import { InputPostType, UpdatePostData } from "../types/post/input";
 import { PostType } from "../types/post/output";
+import { PostRepository } from "../repositories/post-repository";
 
 export class PostService {
   static async createPost(newPost: InputPostType): Promise<PostType> {
@@ -13,27 +12,22 @@ export class PostService {
       blogName: newPost.blogName,
       createdAt: new Date().toISOString(),
     };
-
-    const result = await postCollection.insertOne({ ...createdPost });
-    createdPost.id = result.insertedId.toString();
+    await PostRepository.createPost(createdPost);
     return createdPost;
   }
+
   static async updatePost(
     id: string,
     updateData: UpdatePostData
   ): Promise<boolean> {
-    const result = await postCollection.updateOne(
-      { _id: new ObjectId(id) },
-      {
-        $set: {
-          title: updateData.title,
-          shortDescription: updateData.shortDescription,
-          content: updateData.content,
-          blogId: updateData.blogId,
-        },
-      }
-    );
-
+    const updatedPost: UpdatePostData = {
+      title: updateData.title,
+      shortDescription: updateData.shortDescription,
+      content: updateData.content,
+      blogId: updateData.blogId,
+      blogName: updateData.blogName,
+    };
+    const result = await PostRepository.updatePost(id, updatedPost);
     return !!result.matchedCount;
   }
 }

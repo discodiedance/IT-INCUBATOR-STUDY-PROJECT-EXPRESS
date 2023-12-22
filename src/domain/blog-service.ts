@@ -1,9 +1,8 @@
-import { ObjectId } from "mongodb";
-import { blogCollection } from "../db/db";
-import { PostRepository } from "../repositories/post-repository";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { InputBlogType, UpdateBlogData } from "../types/blog/input";
 import { BlogType } from "../types/blog/output";
+import { BlogRepository } from "../repositories/blog-repositry";
+import { PostService } from "./post-service";
 
 export class BlogService {
   static async createBlog(newBlog: InputBlogType): Promise<BlogType> {
@@ -14,9 +13,7 @@ export class BlogService {
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
-
-    const result = await blogCollection.insertOne({ ...createdBlog });
-    createdBlog.id = result.insertedId.toString();
+    await BlogRepository.createBlog(createdBlog);
     return createdBlog;
   }
 
@@ -34,7 +31,7 @@ export class BlogService {
       return null;
     }
 
-    const post = await PostRepository.createPost({
+    const post = await PostService.createPost({
       ...postData,
       blogId,
       blogName: blog.name,
@@ -47,17 +44,12 @@ export class BlogService {
     id: string,
     updateData: UpdateBlogData
   ): Promise<boolean> {
-    const result = await blogCollection.updateOne(
-      { _id: new ObjectId(id) },
-      {
-        $set: {
-          name: updateData.name,
-          description: updateData.description,
-          websiteUrl: updateData.websiteUrl,
-        },
-      }
-    );
-
+    const updatedBlog: UpdateBlogData = {
+      name: updateData.name,
+      description: updateData.description,
+      websiteUrl: updateData.websiteUrl,
+    };
+    const result = await BlogRepository.updateBlog(id, updatedBlog);
     return !!result.matchedCount;
   }
 }
