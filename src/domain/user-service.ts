@@ -1,3 +1,4 @@
+import { WithId } from "mongodb";
 import { userCollection } from "../db/db";
 import { userMapper } from "../middlewares/user/user-mapper";
 import { InputUserType } from "../types/user/input";
@@ -33,16 +34,16 @@ export class UserService {
   static async checkCredentials(
     loginOrEmail: string,
     password: string
-  ): Promise<boolean> {
+  ): Promise<WithId<UserType> | null> {
     const user = await UserService.findByLoginOrEmail(loginOrEmail);
 
-    if (!user) return false;
+    if (!user) return null;
 
     const passwordHash = await this._generateHash(password, user.passwordSalt);
     if (user.passwordHash !== passwordHash) {
-      return false;
+      return null;
     }
-    return true;
+    return user;
   }
 
   static async findByLoginOrEmail(loginOrEmail: string) {

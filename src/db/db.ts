@@ -1,12 +1,9 @@
 import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
 import { BlogType } from "../types/blog/output";
 import { PostType } from "../types/post/output";
 import { UserType } from "../types/user/output";
-
-dotenv.config();
-
-const mongoUri = process.env.MONGO_URL as string;
+import { CommentType } from "../types/comment/output";
+import { mongoUri } from "../config";
 
 console.log(mongoUri);
 
@@ -17,6 +14,7 @@ const db = client.db("minigram");
 export const blogCollection = db.collection<BlogType>("blogs");
 export const postCollection = db.collection<PostType>("posts");
 export const userCollection = db.collection<UserType>("users");
+export const commentCollection = db.collection<CommentType>("comments");
 
 export const runDb = async () => {
   try {

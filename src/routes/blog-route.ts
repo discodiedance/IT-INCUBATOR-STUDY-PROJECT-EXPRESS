@@ -9,7 +9,7 @@ import {
   RequestTypeWithQuery,
   RequestTypeWithQueryBlogId,
 } from "../types/common";
-import { BlogBody, InputBlogType, SortDataType } from "../types/blog/input";
+import { BlogBody, InputBlogType, BlogSortDataType } from "../types/blog/input";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
 import {
   allPostsForBlogByIdValidation,
@@ -26,7 +26,7 @@ export const blogRoute = Router({});
 
 blogRoute.get(
   "/",
-  async (req: RequestTypeWithQuery<SortDataType>, res: Response) => {
+  async (req: RequestTypeWithQuery<BlogSortDataType>, res: Response) => {
     const sortData = {
       searchNameTerm: req.query.searchNameTerm,
       sortBy: req.query.sortBy,
@@ -56,7 +56,7 @@ blogRoute.get(
   "/:blogId/posts",
   allPostsForBlogByIdValidation(),
   async (
-    req: RequestTypeWithQueryBlogId<SortDataType, BlogIdParams>,
+    req: RequestTypeWithQueryBlogId<BlogSortDataType, BlogIdParams>,
     res: Response
   ) => {
     const sortData = {

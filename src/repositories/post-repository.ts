@@ -1,13 +1,22 @@
 import { ObjectId } from "mongodb";
-import { postCollection } from "../db/db";
+import { commentCollection, postCollection } from "../db/db";
 import { UpdatePostData } from "../types/post/input";
 import { PostType } from "../types/post/output";
+import { CommentType } from "../types/comment/output";
 
 export class PostRepository {
   static async createPost(inputCreatePost: PostType) {
     const createdPost = await postCollection.insertOne({ ...inputCreatePost });
     inputCreatePost.id = createdPost.insertedId.toString();
     return createdPost;
+  }
+
+  static async createComment(inputCreateComment: CommentType) {
+    const createdComment = await commentCollection.insertOne({
+      ...inputCreateComment,
+    });
+    inputCreateComment.id = createdComment.insertedId.toString();
+    return createdComment;
   }
 
   static async updatePost(id: string, updateData: UpdatePostData) {

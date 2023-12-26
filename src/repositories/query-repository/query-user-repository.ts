@@ -1,6 +1,8 @@
+import { ObjectId } from "mongodb";
 import { userCollection } from "../../db/db";
 import { userMapper } from "../../middlewares/user/user-mapper";
 import { SortDataUserType } from "../../types/user/input";
+import { OutputUserType } from "../../types/user/output";
 
 export class QueryUserRepository {
   static async getAllUsers(sortData: SortDataUserType) {
@@ -53,5 +55,15 @@ export class QueryUserRepository {
       totalCount: +totalCount,
       items: users.map(userMapper),
     };
+  }
+
+  static async getUserById(id: string): Promise<OutputUserType | null> {
+    if (!ObjectId.isValid(id)) return null;
+
+    const user = await userCollection.findOne({ _id: new ObjectId(id) });
+    if (!user) {
+      return null;
+    }
+    return userMapper(user);
   }
 }

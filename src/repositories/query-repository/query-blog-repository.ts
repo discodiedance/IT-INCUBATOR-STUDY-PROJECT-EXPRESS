@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import { blogCollection } from "../../db/db";
 import { blogMapper } from "../../middlewares/blog/blog-mapper";
-import { SortDataType } from "../../types/blog/input";
+import { BlogSortDataType } from "../../types/blog/input";
 import { OutputBlogType } from "../../types/blog/output";
 
 export class QueryBlogRepository {
-  static async getAllBlogs(sortData: SortDataType) {
+  static async getAllBlogs(sortData: BlogSortDataType) {
     const sortDirection = sortData.sortDirection ?? "desc";
     const sortBy = sortData.sortBy ?? "createdAt";
     const searchNameTerm = sortData.searchNameTerm ?? null;

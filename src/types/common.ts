@@ -13,6 +13,8 @@ export type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>;
 
 export type RequestTypeWithQueryBlogId<Q, P> = Request<P, {}, {}, Q>;
 
+export type RequestTypeWithQueryPostId<Q, P> = Request<P, {}, {}, Q>;
+
 export type ErrorType = {
   errorsMessages: ErorMessageType[];
 };
@@ -28,4 +30,13 @@ export type Params = {
 
 export type BlogIdParams = {
   blogId: string;
+};
+
+export type PostIdParams = {
+  postId: string;
+};
+
+export type UserIdParams = {
+  id: any;
+  userId: string;
 };

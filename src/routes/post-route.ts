@@ -8,20 +8,25 @@ import {
   RequestWithBody,
   RequestTypeWithQuery,
   RequestWithBodyAndBlog,
+  PostIdParams,
+  RequestTypeWithQueryPostId,
 } from "../types/common";
 import { PostBody } from "../types/post/input";
 import { postValidation } from "../middlewares/post/post-validation";
 import { OutputPostType } from "../types/post/output";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
-import { SortDataType } from "../types/blog/input";
+import { BlogSortDataType } from "../types/blog/input";
+import { CommentSortDataType } from "../types/comment/input";
 import { PostService } from "../domain/post-service";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
+import { commentValidation } from "./../middlewares/comment/comment-validation";
+import { QueryCommentRepository } from "../repositories/query-repository/query-comment-repository";
 
 export const postRoute = Router({});
 
 postRoute.get(
   "/",
-  async (req: RequestTypeWithQuery<SortDataType>, res: Response) => {
+  async (req: RequestTypeWithQuery<BlogSortDataType>, res: Response) => {
     const sortData = {
       searchNameTerm: req.query.searchNameTerm,
       sortBy: req.query.sortBy,
@@ -47,6 +52,21 @@ postRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
   res.send(post);
 });
 
+postRoute.get(
+  "/:postId/comments",
+  async (req: RequestWithParams<Params>, res: Response) => {
+    const id = req.params.id;
+    const comment = await QueryCommentRepository.getCommentById(id);
+
+    if (!comment) {
+      res.sendStatus(404);
+      return;
+    }
+
+    res.send(comment);
+  }
+);
+
 postRoute.post(
   "/",
   authMiddleware,
@@ -64,6 +84,30 @@ postRoute.post(
     });
 
     return res.status(201).send(post);
+  }
+);
+
+postRoute.post(
+  "/:postId/comments",
+  authMiddleware,
+  commentValidation(),
+  async (
+    req: RequestTypeWithQueryPostId<CommentSortDataType, PostIdParams>,
+    res: Response
+  ) => {
+    const sortData = {
+      pageNumber: req.query.pageNumber,
+      pageSize: req.query.pageSize,
+      sortDirection: req.query.sortDirection,
+      sortBy: req.query.sortBy,
+    };
+    const postId = req.query.postId;
+    const foundComments = await QueryPostRepository.getAllComments({
+      ...sortData,
+      postId,
+    });
+
+    return res.send(foundComments);
   }
 );
 

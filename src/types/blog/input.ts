@@ -16,7 +16,7 @@ export type InputBlogType = {
   websiteUrl: string;
 };
 
-export type SortDataType = {
+export type BlogSortDataType = {
   searchNameTerm?: string;
   sortBy?: string;
   sortDirection?: "asc" | "desc";
