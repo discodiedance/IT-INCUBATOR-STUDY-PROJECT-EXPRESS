@@ -34,6 +34,10 @@ commentRoute.put(
   authTokenMiddleware,
   commentValidation(),
   async (req: RequestWithBodyAndParams<Params, CommentBody>, res: Response) => {
+    const user = req.user;
+    if (!user) {
+      return res.sendStatus(401);
+    }
     const id = req.params.id;
     let comment: OutputCommentType | null =
       await QueryCommentRepository.getCommentById(id);
@@ -44,10 +48,18 @@ commentRoute.put(
       return;
     }
 
+    if (
+      comment.commentatorInfo.userId !== req.user?.id &&
+      comment.commentatorInfo.userLogin !== req.user?.login
+    ) {
+      res.sendStatus(403);
+      return;
+    }
+
     comment.content = content;
 
     await CommentService.updateComment(id, comment);
-
+    //updatedComment = quryRepo.getCommentById()
     return res.sendStatus(204);
   }
 );
@@ -55,14 +67,28 @@ commentRoute.put(
 commentRoute.delete(
   "/:id",
   authTokenMiddleware,
-  async (req: RequestWithParams<Params>, res: Response) => {
+  async (req: RequestWithBodyAndParams<Params, CommentBody>, res: Response) => {
+    const user = req.user;
+    if (!user) {
+      return res.sendStatus(401);
+    }
     const id = req.params.id;
-    const status = await CommentRepository.deleteComment(id);
-
-    if (!status) {
+    let comment: OutputCommentType | null =
+      await QueryCommentRepository.getCommentById(id);
+    if (!comment) {
       res.sendStatus(404);
       return;
     }
+    if (
+      comment.commentatorInfo.userId !== req.user?.id &&
+      comment.commentatorInfo.userLogin !== req.user?.login
+    ) {
+      res.sendStatus(403);
+      return;
+    }
+
+    await CommentRepository.deleteComment(id);
+
     return res.sendStatus(204);
   }
 );

@@ -1,7 +1,7 @@
-import { Router, Response } from "express";
+import { Router, Response, Request } from "express";
 import { UserService } from "../domain/user-service";
 import { RequestWithBody } from "../types/common";
-import { AuthMeType, InputLoginOrEmailType } from "../types/auth/input";
+import { InputLoginOrEmailType } from "../types/auth/input";
 import { authValidation } from "../middlewares/auth/auth-validation";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 import { jwtService } from "../aplication/jwt-service";
@@ -18,8 +18,8 @@ authRoute.post(
     );
 
     if (user) {
-      const token = await jwtService.createJWT(user._id.toString());
-      return res.status(200).send(token);
+      const accessToken = await jwtService.createJWT(user._id.toString());
+      return res.status(200).send(accessToken);
     }
     return res.sendStatus(401);
   }
@@ -29,11 +29,16 @@ authRoute.get(
   "/me",
   authTokenMiddleware,
   authValidation(),
-  async (req: RequestWithBody<AuthMeType>, res: Response) => {
+  async (req: Request, res: Response) => {
     const user = req.user;
     if (!user) {
       return res.sendStatus(401);
     }
-    return res.sendStatus(200);
+    const userData = {
+      email: user.email,
+      login: user.login,
+      userId: user.id,
+    };
+    return res.status(200).send(userData);
   }
 );

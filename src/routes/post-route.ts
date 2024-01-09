@@ -96,6 +96,10 @@ postRoute.post(
     req: RequestTypeWithQueryPostId<CommentSortDataType, PostIdParams>,
     res: Response
   ) => {
+    const user = req.user;
+    if (!user) {
+      return res.sendStatus(401);
+    }
     const sortData = {
       pageNumber: req.query.pageNumber,
       pageSize: req.query.pageSize,
