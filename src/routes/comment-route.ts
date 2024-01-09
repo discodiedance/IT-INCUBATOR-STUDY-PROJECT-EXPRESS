@@ -10,6 +10,7 @@ import { CommentBody } from "../types/comment/input";
 import { CommentService } from "../domain/comment-service";
 import { QueryCommentRepository } from "../repositories/query-repository/query-comment-repository";
 import { CommentRepository } from "../repositories/comment-repository";
+import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 
 export const commentRoute = Router({});
 
@@ -30,6 +31,7 @@ commentRoute.get(
 
 commentRoute.put(
   "/:id",
+  authTokenMiddleware,
   commentValidation(),
   async (req: RequestWithBodyAndParams<Params, CommentBody>, res: Response) => {
     const id = req.params.id;
@@ -52,6 +54,7 @@ commentRoute.put(
 
 commentRoute.delete(
   "/:id",
+  authTokenMiddleware,
   async (req: RequestWithParams<Params>, res: Response) => {
     const id = req.params.id;
     const status = await CommentRepository.deleteComment(id);

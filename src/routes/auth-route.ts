@@ -5,7 +5,6 @@ import { AuthMeType, InputLoginOrEmailType } from "../types/auth/input";
 import { authValidation } from "../middlewares/auth/auth-validation";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 import { jwtService } from "../aplication/jwt-service";
-import { QueryUserRepository } from "../repositories/query-repository/query-user-repository";
 
 export const authRoute = Router({});
 
@@ -31,11 +30,9 @@ authRoute.get(
   authTokenMiddleware,
   authValidation(),
   async (req: RequestWithBody<AuthMeType>, res: Response) => {
-    const id = req.body.userId;
-    const user = await QueryUserRepository.getUserById(id);
+    const user = req.user;
     if (!user) {
-      res.sendStatus(404);
-      return;
+      return res.sendStatus(401);
     }
     return res.sendStatus(200);
   }

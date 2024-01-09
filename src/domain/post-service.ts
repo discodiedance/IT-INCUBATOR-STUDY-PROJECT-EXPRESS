@@ -36,7 +36,9 @@ export class PostService {
     postId: string,
     postData: {
       content: string;
-    }
+    },
+    userId: string,
+    userLogin: string
   ) {
     const post = await QueryPostRepository.getPostById(postId);
 
@@ -48,8 +50,8 @@ export class PostService {
       ...postData,
       postId,
       commentatorInfo: {
-        userId: "123",
-        userLogin: "123",
+        userId,
+        userLogin,
       },
     });
 

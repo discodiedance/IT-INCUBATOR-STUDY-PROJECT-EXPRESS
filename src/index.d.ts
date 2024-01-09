@@ -1,5 +1,5 @@
 import { BlogType } from "./types/blog/output";
-import { UserType } from "./types/user/output";
+import { UserType, OutputUserType } from "./types/user/output";
 
 export {};
 
