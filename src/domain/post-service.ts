@@ -34,9 +34,7 @@ export class PostService {
 
   static async createCommentToPost(
     postId: string,
-    postData: {
-      content: string;
-    },
+    content: string,
     userId: string,
     userLogin: string
   ) {
@@ -47,7 +45,7 @@ export class PostService {
     }
 
     const comment = await PostService.createComment({
-      ...postData,
+      content,
       postId,
       commentatorInfo: {
         userId,

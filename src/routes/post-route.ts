@@ -10,18 +10,24 @@ import {
   RequestWithBodyAndBlog,
   PostIdParams,
   RequestTypeWithQueryPostId,
+  RequestWithCommentBodyAndParams,
 } from "../types/common";
 import { PostBody } from "../types/post/input";
 import { postValidation } from "../middlewares/post/post-validation";
 import { OutputPostType } from "../types/post/output";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { BlogSortDataType } from "../types/blog/input";
-import { CommentSortDataType } from "../types/comment/input";
+import {
+  CommentBody,
+  CommentSortDataType,
+  CommentType,
+} from "../types/comment/input";
 import { PostService } from "../domain/post-service";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { commentValidation } from "./../middlewares/comment/comment-validation";
 import { QueryCommentRepository } from "../repositories/query-repository/query-comment-repository";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
+import { CommentService } from "../domain/comment-service";
 
 export const postRoute = Router({});
 
@@ -93,26 +99,28 @@ postRoute.post(
   authTokenMiddleware,
   commentValidation(),
   async (
-    req: RequestTypeWithQueryPostId<CommentSortDataType, PostIdParams>,
+    req: RequestWithCommentBodyAndParams<PostIdParams, CommentBody>,
     res: Response
   ) => {
     const user = req.user;
     if (!user) {
-      return res.sendStatus(401);
+      res.sendStatus(401);
+      return;
     }
-    const sortData = {
-      pageNumber: req.query.pageNumber,
-      pageSize: req.query.pageSize,
-      sortDirection: req.query.sortDirection,
-      sortBy: req.query.sortBy,
-    };
-    const postId = req.query.postId;
-    const foundComments = await QueryPostRepository.getAllComments({
-      ...sortData,
-      postId,
-    });
 
-    return res.send(foundComments);
+    const post = await QueryPostRepository.getPostById(req.query.postId);
+    if (!post) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const comment = await PostService.createCommentToPost(
+      req.query.postId,
+      req.body.content,
+      req.body.commentatorInfo.userId,
+      req.body.commentatorInfo.userLogin
+    );
+    return res.sendStatus(201).send(comment);
   }
 );
 
