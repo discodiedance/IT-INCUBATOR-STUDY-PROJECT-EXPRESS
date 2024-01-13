@@ -19,7 +19,7 @@ authRoute.post(
 
     if (user) {
       const accessToken = await jwtService.createJWT(user._id.toString());
-      return res.status(200).send(accessToken);
+      return res.status(200).send({ accessToken });
     }
     return res.sendStatus(401);
   }
