@@ -17,11 +17,7 @@ import { postValidation } from "../middlewares/post/post-validation";
 import { OutputPostType } from "../types/post/output";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { BlogSortDataType } from "../types/blog/input";
-import {
-  CommentBody,
-  CommentSortDataType,
-  CommentType,
-} from "../types/comment/input";
+import { CommentBody } from "../types/comment/input";
 import { PostService } from "../domain/post-service";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { commentValidation } from "./../middlewares/comment/comment-validation";
@@ -108,17 +104,17 @@ postRoute.post(
       return;
     }
 
-    const post = await QueryPostRepository.getPostById(req.query.postId);
+    const post = await QueryPostRepository.getPostById(req.params.postId);
     if (!post) {
       res.sendStatus(404);
       return;
     }
 
     const comment = await PostService.createCommentToPost(
-      req.query.postId,
+      req.params.postId,
       req.body.content,
-      req.body.commentatorInfo.userId,
-      req.body.commentatorInfo.userLogin
+      req.user!.id,
+      req.user!.login
     );
     return res.sendStatus(201).send(comment);
   }

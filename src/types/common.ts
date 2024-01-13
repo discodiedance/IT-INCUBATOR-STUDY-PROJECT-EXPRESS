@@ -9,7 +9,7 @@ export type RequestWithBodyAndBlog<B> = Request<{}, {}, B, {}, BlogType>;
 
 export type RequestWithBodyAndParams<P, B> = Request<P, {}, B, {}>;
 
-export type RequestWithCommentBodyAndParams<P, B> = Request<{}, {}, B, P>;
+export type RequestWithCommentBodyAndParams<P, B> = Request<P, {}, B, {}>;
 
 export type RequestTypeWithQuery<Q> = Request<{}, {}, {}, Q>;
 

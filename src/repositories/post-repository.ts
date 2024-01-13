@@ -12,11 +12,11 @@ export class PostRepository {
   }
 
   static async createComment(inputCreateComment: CommentType) {
-    const createdComment = await commentCollection.insertOne({
+    const result = await commentCollection.insertOne({
       ...inputCreateComment,
     });
-    inputCreateComment.id = createdComment.insertedId.toString();
-    return createdComment;
+    inputCreateComment.id = result.insertedId.toString();
+    return inputCreateComment;
   }
 
   static async updatePost(id: string, updateData: UpdatePostData) {

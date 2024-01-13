@@ -1,7 +1,6 @@
 import { InputPostType, UpdatePostData } from "../types/post/input";
 import { PostType } from "../types/post/output";
 import { PostRepository } from "../repositories/post-repository";
-import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { InputCommentType } from "../types/comment/input";
 import { CommentType } from "../types/comment/output";
 
@@ -28,8 +27,8 @@ export class PostService {
       postId: newComment.postId,
       createdAt: new Date().toISOString(),
     };
-    await PostRepository.createComment(createdComment);
-    return createdComment;
+    const comment = await PostRepository.createComment(createdComment);
+    return comment;
   }
 
   static async createCommentToPost(
@@ -38,11 +37,11 @@ export class PostService {
     userId: string,
     userLogin: string
   ) {
-    const post = await QueryPostRepository.getPostById(postId);
+    // const post = await QueryPostRepository.getPostById(postId);
 
-    if (!post) {
-      return null;
-    }
+    // if (!post) {
+    //   return null;
+    // }
 
     const comment = await PostService.createComment({
       content,
