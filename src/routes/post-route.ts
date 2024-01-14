@@ -116,7 +116,7 @@ postRoute.post(
       req.user!.id,
       req.user!.login
     );
-    return res.sendStatus(201).send(comment);
+    return res.status(201).send(comment);
   }
 );
 

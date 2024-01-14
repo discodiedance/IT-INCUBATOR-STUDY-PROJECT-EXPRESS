@@ -18,6 +18,5 @@ export const authTokenMiddleware = async (
   if (userId) {
     req.user = await QueryUserRepository.getUserById(userId);
     next();
-  }
-  res.send(401);
+  } else res.sendStatus(401);
 };
