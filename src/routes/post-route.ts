@@ -120,6 +120,7 @@ postRoute.post(
     }
 
     const comment = await PostService.createCommentToPost(
+      req.params.postId,
       req.body.content,
       req.user!.id,
       req.user!.login

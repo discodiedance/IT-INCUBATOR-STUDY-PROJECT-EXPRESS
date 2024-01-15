@@ -6,6 +6,7 @@ export type CommentType = {
     userLogin: string;
   };
   createdAt: string;
+  postId: string;
 };
 
 export type OutputCommentType = {

@@ -25,23 +25,25 @@ export class PostService {
       content: newComment.content,
       commentatorInfo: newComment.commentatorInfo,
       createdAt: new Date().toISOString(),
+      postId: newComment.postId,
     };
     const comment = await PostRepository.createComment(createdComment);
     return comment;
   }
 
   static async createCommentToPost(
+    postId: string,
     content: string,
     userId: string,
     userLogin: string
   ) {
-    const comment = await PostService.createComment({
+    const comment = await this.createComment({
       content,
-
       commentatorInfo: {
         userId,
         userLogin,
       },
+      postId,
     });
 
     return comment;

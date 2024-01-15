@@ -3,7 +3,7 @@ import { inputModelValidation } from "../inputModel/input-model-validation";
 import notFoundValidation from "../inputModel/not-found-validation";
 import { QueryPostRepository } from "../../repositories/query-repository/query-post-repository";
 
-export const postIdinparamsValidation = param("postId")
+export const postIdinParamsValidation = param("postId")
   .isString()
   .trim()
   .custom(async (value) => {
