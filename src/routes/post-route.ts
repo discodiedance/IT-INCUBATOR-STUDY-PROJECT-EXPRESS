@@ -5,7 +5,6 @@ import {
   Params,
   RequestWithBodyAndParams,
   RequestWithParams,
-  RequestWithBody,
   RequestTypeWithQuery,
   RequestWithBodyAndBlog,
   PostIdParams,
@@ -23,7 +22,6 @@ import { QueryBlogRepository } from "../repositories/query-repository/query-blog
 import { commentValidation } from "./../middlewares/comment/comment-validation";
 import { QueryCommentRepository } from "../repositories/query-repository/query-comment-repository";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
-import { CommentService } from "../domain/comment-service";
 
 export const postRoute = Router({});
 
@@ -111,7 +109,7 @@ postRoute.post(
     }
 
     const comment = await PostService.createCommentToPost(
-      req.params.postId,
+      // req.params.postId,
       req.body.content,
       req.user!.id,
       req.user!.login

@@ -24,7 +24,7 @@ export class PostService {
     const createdComment: CommentType = {
       content: newComment.content,
       commentatorInfo: newComment.commentatorInfo,
-      postId: newComment.postId,
+      // postId: newComment.postId,
       createdAt: new Date().toISOString(),
     };
     const comment = await PostRepository.createComment(createdComment);
@@ -32,7 +32,7 @@ export class PostService {
   }
 
   static async createCommentToPost(
-    postId: string,
+    // postId: string,
     content: string,
     userId: string,
     userLogin: string
@@ -45,7 +45,7 @@ export class PostService {
 
     const comment = await PostService.createComment({
       content,
-      postId,
+      // postId,
       commentatorInfo: {
         userId,
         userLogin,

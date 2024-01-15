@@ -16,7 +16,7 @@ export type InputCommentType = {
     userId: string;
     userLogin: string;
   };
-  postId: string;
+  // postId: string;
 };
 
 export type CommentSortDataType = {
