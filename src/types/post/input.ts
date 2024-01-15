@@ -21,3 +21,11 @@ export type InputPostType = {
   blogId: string;
   blogName: string;
 };
+
+export type PostSortDataType = {
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: "asc" | "desc";
+  postId?: string;
+};

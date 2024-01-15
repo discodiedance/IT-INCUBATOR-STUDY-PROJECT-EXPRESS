@@ -2,6 +2,7 @@ import { body, param } from "express-validator";
 import { inputModelValidation } from "../inputModel/input-model-validation";
 import { QueryBlogRepository } from "../../repositories/query-repository/query-blog-repository";
 import notFoundValidation from "../inputModel/not-found-validation";
+import { postIdinparamsValidation } from "../comment/comment-validation";
 
 export const blogIdInParamsValidation = param("blogId")
   .isString()
@@ -45,6 +46,11 @@ const contentValidation = body("content")
   .trim()
   .isLength({ min: 5, max: 1000 })
   .withMessage("Incorrect value");
+
+export const allCommentsForPostByIdValidation = () => [
+  postIdinparamsValidation,
+  notFoundValidation,
+];
 
 export const postValidation = () => [
   titleValidation,

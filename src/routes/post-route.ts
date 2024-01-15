@@ -11,8 +11,11 @@ import {
   RequestTypeWithQueryPostId,
   RequestWithCommentBodyAndParams,
 } from "../types/common";
-import { PostBody } from "../types/post/input";
-import { postValidation } from "../middlewares/post/post-validation";
+import { PostBody, PostSortDataType } from "../types/post/input";
+import {
+  allCommentsForPostByIdValidation,
+  postValidation,
+} from "../middlewares/post/post-validation";
 import { OutputPostType } from "../types/post/output";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { BlogSortDataType } from "../types/blog/input";
@@ -55,16 +58,24 @@ postRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
 
 postRoute.get(
   "/:postId/comments",
-  async (req: RequestWithParams<Params>, res: Response) => {
-    const id = req.params.id;
-    const comment = await QueryCommentRepository.getCommentById(id);
+  allCommentsForPostByIdValidation(),
+  async (
+    req: RequestTypeWithQueryPostId<PostSortDataType, PostIdParams>,
+    res: Response
+  ) => {
+    const sortData = {
+      pageNumber: req.query.pageNumber,
+      pageSize: req.query.pageSize,
+      sortBy: req.query.sortBy,
+      sortDirection: req.query.sortDirection,
+    };
+    const postId = req.params.postId;
+    const foundComments = await QueryPostRepository.getAllComments({
+      ...sortData,
+      postId,
+    });
 
-    if (!comment) {
-      res.sendStatus(404);
-      return;
-    }
-
-    res.send(comment);
+    res.send(foundComments);
   }
 );
 
@@ -109,7 +120,6 @@ postRoute.post(
     }
 
     const comment = await PostService.createCommentToPost(
-      // req.params.postId,
       req.body.content,
       req.user!.id,
       req.user!.login
