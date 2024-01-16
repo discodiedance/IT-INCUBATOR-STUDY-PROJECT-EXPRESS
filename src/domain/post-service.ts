@@ -46,7 +46,12 @@ export class PostService {
       postId,
     });
 
-    return comment;
+    return {
+      id: comment.id,
+      content: comment.content,
+      commentatorInfo: comment.commentatorInfo,
+      createdAt: comment.createdAt,
+    };
   }
 
   static async updatePost(
