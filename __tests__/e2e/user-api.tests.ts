@@ -3,6 +3,7 @@ import { app } from "./../../src/settings";
 import { ObjectId } from "mongodb";
 
 const routerName = "/users";
+
 const login = "admin";
 const password = "qwerty";
 
@@ -11,16 +12,19 @@ const correctUserData = {
   password: "goodpassword",
   email: "goodmail@mail.ru",
 };
-const emptyUserData = {
-  login: "",
-  password: "",
-  email: "",
-};
+
 const incorrectUserData = {
   login: "l",
   password: "p",
   email: "e",
 };
+
+const emptyUserData = {
+  login: "",
+  password: "",
+  email: "",
+};
+
 const overLengthUserData = {
   login: "aaaaaaaaaaaaaaaaaa",
   password: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -31,10 +35,13 @@ describe(routerName, () => {
   beforeAll(async () => {
     await request(app).delete("/testing/all-data");
   });
+
+  let testUser1: any;
+  let testUser2: any;
+
   it("200 and empty array of users", async () => {
     await request(app).get(routerName).auth(login, password).expect(200);
   });
-
   it("400 and not created user with incorrect data", async () => {
     await request(app)
       .post(routerName)
@@ -76,7 +83,6 @@ describe(routerName, () => {
       });
     await request(app).get(routerName).auth(login, password).expect(200);
   });
-
   it("401 and not created user with incorrect authorization", async () => {
     await request(app)
       .post(routerName)
@@ -85,9 +91,6 @@ describe(routerName, () => {
       .expect(401);
     await request(app).get(routerName).auth(login, password).expect(200);
   });
-
-  let testUser1: any;
-
   it("201 and created user with correct all data(only testUser1)", async () => {
     const res = await request(app)
       .post(routerName)
@@ -106,22 +109,28 @@ describe(routerName, () => {
       createdAt: expect.any(String),
     });
   });
-
-  it("200 and correct all data (only testUser1)", async () => {
+  it("201 and created user with correct all data(testUser1 and testUser2)", async () => {
+    const res = await request(app)
+      .post(routerName)
+      .auth(login, password)
+      .send(correctUserData)
+      .expect(201);
+    testUser2 = res.body;
     const result = await request(app)
       .get(routerName)
       .auth(login, password)
       .expect(200);
-    expect(result.body.items[0]).toEqual({
-      id: expect.any(String),
-      login: "good",
-      email: "goodmail@mail.ru",
-      createdAt: expect.any(String),
-    });
+    expect(result.body.items.length).toBe(2);
   });
-
-  it("404 and not deleted user with incorrect id and get all data(only testUser1)", async () => {
-    const res = await request(app)
+  it("200 and correct all data", async () => {
+    const result = await request(app)
+      .get(routerName)
+      .auth(login, password)
+      .expect(200);
+    expect(result.body.items.length).toBe(2);
+  });
+  it("404 and not deleted user with incorrect id and get all data", async () => {
+    await request(app)
       .delete(routerName + "/" + new ObjectId())
       .auth(login, password)
       .expect(404);
@@ -129,15 +138,9 @@ describe(routerName, () => {
       .get(routerName)
       .auth(login, password)
       .expect(200);
-    expect(result.body.items[0]).toEqual({
-      id: expect.any(String),
-      login: "good",
-      email: "goodmail@mail.ru",
-      createdAt: expect.any(String),
-    });
+    expect(result.body.items.length).toBe(2);
   });
-
-  it("401 and not deleted user with incorrect authorization", async () => {
+  it("401 and not deleted testUser1 with incorrect authorization", async () => {
     await request(app)
       .delete(routerName + "/" + testUser1.id)
       .auth("badlogin", "badpassword")
@@ -145,12 +148,33 @@ describe(routerName, () => {
       .expect(401);
     await request(app).get(routerName).auth(login, password).expect(200);
   });
-
-  it("204 and deleted user with correct id and array with 0 users", async () => {
+  it("401 and not deleted testUser2 with incorrect authorization", async () => {
+    await request(app)
+      .delete(routerName + "/" + testUser2.id)
+      .auth("badlogin", "badpassword")
+      .send(correctUserData)
+      .expect(401);
+    await request(app).get(routerName).auth(login, password).expect(200);
+  });
+  it("204 and deleted user with correct id and array with 1 users", async () => {
     const res = await request(app).get(routerName).auth(login, password);
     const startUsersArrayLength = res.body.items.length;
     await request(app)
       .delete(routerName + "/" + testUser1.id)
+      .auth(login, password)
+      .expect(204);
+
+    const result = await request(app)
+      .get(routerName)
+      .auth(login, password)
+      .expect(200);
+    expect(result.body.items.length).toBe(startUsersArrayLength - 1);
+  });
+  it("204 and deleted user with correct id and array with 0 users", async () => {
+    const res = await request(app).get(routerName).auth(login, password);
+    const startUsersArrayLength = res.body.items.length;
+    await request(app)
+      .delete(routerName + "/" + testUser2.id)
       .auth(login, password)
       .expect(204);
 

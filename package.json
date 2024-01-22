@@ -22,9 +22,11 @@
     "dev": "yarn nodemon --inspect dist/index.js",
     "watch": "tsc -w",
     "test": "jest",
-    "testuser": "jest ./__tests__/e2e/user-api.tests.ts",
-    "testblog": "jest ./__tests__/e2e/blog-api.tests.ts",
-    "testpost": "jest ./__tests__/e2e/post-api.tests.ts"
+    "testuser": "jest ./__tests__/e2e/user-api.tests.ts --runInBand",
+    "testblog": "jest ./__tests__/e2e/blog-api.tests.ts --runInBand",
+    "testpost": "jest ./__tests__/e2e/post-api.tests.ts --runInBand",
+    "testauth": "jest ./__tests__/e2e/auth-api.tests.ts --runInBand",
+    "testcomment": "jest ./__tests__/e2e/comment-api.tests.ts --runInBand"
   },
   "devDependencies": {
     "@babel/generator": "^7.23.3",
