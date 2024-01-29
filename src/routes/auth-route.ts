@@ -5,8 +5,51 @@ import { InputLoginOrEmailType } from "../types/auth/input";
 import { authValidation } from "../middlewares/auth/auth-validation";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 import { jwtService } from "../aplication/jwt-service";
+import { authService } from "../domain/auth-service";
 
 export const authRoute = Router({});
+
+authRoute.post("/registration", async (req: Request, res: Response) => {
+  const userData = {
+    login: req.body.login,
+    email: req.body.email,
+    password: req.body.password,
+  };
+
+  const registrationResult = await authService.createUserByRegistration(
+    userData
+  );
+
+  if (registrationResult) {
+    res.status(204).send();
+  } else {
+    res.status(400).send({});
+  }
+});
+
+authRoute.post(
+  "/registration-confirmation",
+  async (req: Request, res: Response) => {
+    const result = await authService.confirmEmail(req.body.code);
+    if (result) {
+      res.status(201).send();
+    } else {
+      res.status(400).send({});
+    }
+  }
+);
+
+authRoute.post(
+  "/registration-confirmation-email-resending",
+  async (req: Request, res: Response) => {
+    const resendedCode = await authService.resendEmail(req.body.email);
+    if (resendedCode) {
+      res.status(204).send();
+    } else {
+      res.status(400).send({});
+    }
+  }
+);
 
 authRoute.post(
   "/login",

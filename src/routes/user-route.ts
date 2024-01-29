@@ -11,6 +11,7 @@ import { UserService } from "../domain/user-service";
 import { authMiddleware } from "../middlewares/auth/auth-middleware";
 import { UserRepostitory } from "../repositories/user-repository";
 import { userValidation } from "../middlewares/user/user-validation";
+import { param } from "express-validator";
 
 export const userRoute = Router({});
 

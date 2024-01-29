@@ -790,6 +790,13 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/nodemailer@^6.4.14":
+  version "6.4.14"
+  resolved "https://registry.npmjs.org/@types/nodemailer/-/nodemailer-6.4.14.tgz"
+  integrity sha512-fUWthHO9k9DSdPCSPRqcu6TWhYyxTBg382vlNIttSe9M7XfsT06y0f24KHXtbnijPGGRIcVvdKHTNikOI6qiHA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/qs@*":
   version "6.9.10"
   resolved "https://registry.npmjs.org/@types/qs/-/qs-6.9.10.tgz"
@@ -843,6 +850,11 @@
   integrity sha512-6c2ogktZ06tr2ENoZivgm7YnprnhYE4ZoXGMY+oA7IuAf17M8FWvujXZGmxLv8y0PTyts4x5A+erSwVUFA8XSg==
   dependencies:
     "@types/superagent" "*"
+
+"@types/uuid@^9.0.7":
+  version "9.0.7"
+  resolved "https://registry.npmjs.org/@types/uuid/-/uuid-9.0.7.tgz"
+  integrity sha512-WUtIVRUZ9i5dYXefDEAI7sh9/O7jGvHg7Df/5O/gtH3Yabe5odI3UWopVR1qbPXQtvOxWu3mM4XxlYeZtMWF4g==
 
 "@types/webidl-conversions@*":
   version "7.0.3"
@@ -1383,6 +1395,11 @@ cross-spawn@^7.0.3:
     path-key "^3.1.0"
     shebang-command "^2.0.0"
     which "^2.0.1"
+
+date-fns@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.npmjs.org/date-fns/-/date-fns-3.3.1.tgz"
+  integrity sha512-y8e109LYGgoQDveiEBD3DYXKba1jWf5BA8YU1FL5Tvm0BTdEfy54WLCwnuYWZNnzzvALy/QQ4Hov+Q9RVRv+Zw==
 
 debug@^3.2.7:
   version "3.2.7"
@@ -2825,6 +2842,11 @@ node-releases@^2.0.13:
   resolved "https://registry.npmjs.org/node-releases/-/node-releases-2.0.13.tgz"
   integrity sha512-uYr7J37ae/ORWdZeQ1xxMJe3NtdmqMC/JZK+geofDrkLUApKRHPd18/TxtBOJ4A0/+uUIliorNrfYV6s1b02eQ==
 
+nodemailer@^6.9.8:
+  version "6.9.8"
+  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.8.tgz"
+  integrity sha512-cfrYUk16e67Ks051i4CntM9kshRYei1/o/Gi8K1d+R34OIs21xdFnW7Pt7EucmVKA0LKtqUGNcjMZ7ehjl49mQ==
+
 nodemon@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/nodemon/-/nodemon-3.0.1.tgz"
@@ -3576,6 +3598,11 @@ utils-merge@1.0.1:
   version "8.3.2"
   resolved "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
+
+uuid@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz"
+  integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"

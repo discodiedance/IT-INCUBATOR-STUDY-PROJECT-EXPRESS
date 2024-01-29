@@ -1,3 +1,5 @@
+import { ObjectId, WithId } from "mongodb";
+
 export type OutputUserBody = {
   id: string;
   login: string;
@@ -14,10 +16,36 @@ export type OutputUserType = {
 };
 
 export type UserType = {
-  id?: string;
+  _id?: ObjectId;
   login: string;
   email: string;
   createdAt: string;
   passwordHash: string;
-  passwordSalt: string;
 };
+
+export type UserDBType = WithId<{
+  accountData: UserAccountType;
+  emailConfirmation: EmailConfirmationType;
+}>;
+
+export type UserAccountType = {
+  email: string;
+  login: string;
+  passwordHash: string;
+  createdAt: Date;
+};
+
+export type EmailConfirmationType = {
+  confirmationCode: string;
+  expirationDate: Date;
+  isConfirmed: boolean;
+  // sentEmails: [];
+};
+
+export type RegstrationDataType = {
+  ip: string;
+};
+
+// export type SentEmailType = {
+//   sentDate: Date;
+// };
