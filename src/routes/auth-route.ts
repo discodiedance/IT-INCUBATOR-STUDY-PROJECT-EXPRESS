@@ -6,10 +6,8 @@ import { authValidation } from "../middlewares/auth/auth-validation";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 import { jwtService } from "../aplication/jwt-service";
 import { authService } from "../domain/auth-service";
-<<<<<<< HEAD
-=======
+
 import { UserRepostitory } from "../repositories/user-repository";
->>>>>>> a1a9fe719e0e78ae31822c7ab8155defc0236737
 
 export const authRoute = Router({});
 

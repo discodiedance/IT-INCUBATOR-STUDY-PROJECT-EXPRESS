@@ -1,14 +1,10 @@
 import nodemailer from "nodemailer";
-<<<<<<< HEAD
 import { MAIL_RU_PASS } from "../config";
-=======
->>>>>>> a1a9fe719e0e78ae31822c7ab8155defc0236737
 
 export class emailAdapter {
   static async sendEmail(email: string, subject: string, message: string) {
     let transport = nodemailer.createTransport({
       service: "Mail.ru",
-<<<<<<< HEAD
       secure: false,
       auth: {
         user: "exitg0d@mail.ru",
@@ -17,11 +13,6 @@ export class emailAdapter {
       tls: {
         // do not fail on invalid certs
         rejectUnauthorized: false,
-=======
-      auth: {
-        user: "exitg0d@mail.ru",
-        pass: process.env.MAIL_RU_PASS,
->>>>>>> a1a9fe719e0e78ae31822c7ab8155defc0236737
       },
     });
 
