@@ -6,28 +6,34 @@ import { authValidation } from "../middlewares/auth/auth-validation";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 import { jwtService } from "../aplication/jwt-service";
 import { authService } from "../domain/auth-service";
-
-import { UserRepostitory } from "../repositories/user-repository";
+import { userValidation } from "../middlewares/user/user-validation";
+import { registrationMiddleware } from "../middlewares/auth/registration-validation";
 
 export const authRoute = Router({});
 
-authRoute.post("/registration", async (req: Request, res: Response) => {
-  const userData = {
-    login: req.body.login,
-    email: req.body.email,
-    password: req.body.password,
-  };
+authRoute.post(
+  "/registration",
+  userValidation(),
+  registrationMiddleware,
+  async (req: Request, res: Response) => {
+    const userData = {
+      login: req.body.login,
+      email: req.body.email,
+      password: req.body.password,
+    };
 
-  const registrationResult = await authService.createUserByRegistration(
-    userData
-  );
+    const registrationResult = await authService.createUserByRegistration(
+      userData
+    );
+    console.log("28", registrationResult);
 
-  if (registrationResult) {
-    res.status(204).send();
-  } else {
-    res.status(400).send({});
+    if (registrationResult) {
+      return res.sendStatus(204);
+    } else {
+      return res.sendStatus(400);
+    }
   }
-});
+);
 
 authRoute.post(
   "/registration-confirmation",

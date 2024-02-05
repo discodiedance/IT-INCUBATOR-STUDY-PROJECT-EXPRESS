@@ -1,6 +1,6 @@
 import { Router, Response } from "express";
 import { PostRepository } from "../repositories/post-repository";
-import { authMiddleware } from "../middlewares/auth/auth-middleware";
+import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
 import {
   Params,
   RequestWithBodyAndParams,

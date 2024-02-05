@@ -8,10 +8,9 @@ import {
 import { InputUserType, SortDataUserType } from "../types/user/input";
 import { QueryUserRepository } from "../repositories/query-repository/query-user-repository";
 import { UserService } from "../domain/user-service";
-import { authMiddleware } from "../middlewares/auth/auth-middleware";
+import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
 import { UserRepostitory } from "../repositories/user-repository";
 import { userValidation } from "../middlewares/user/user-validation";
-import { param } from "express-validator";
 
 export const userRoute = Router({});
 

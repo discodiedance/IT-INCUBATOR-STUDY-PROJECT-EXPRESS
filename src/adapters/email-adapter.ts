@@ -1,14 +1,14 @@
 import nodemailer from "nodemailer";
-import { MAIL_RU_PASS } from "../config";
+import { GMAIL_COM_PASS } from "../config";
 
 export class emailAdapter {
   static async sendEmail(email: string, subject: string, message: string) {
     let transport = nodemailer.createTransport({
-      service: "Mail.ru",
+      service: "Gmail",
       secure: false,
       auth: {
-        user: "exitg0d@mail.ru",
-        pass: MAIL_RU_PASS,
+        user: "fundu1448@gmail.com",
+        pass: GMAIL_COM_PASS,
       },
       tls: {
         // do not fail on invalid certs

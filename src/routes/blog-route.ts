@@ -10,7 +10,7 @@ import {
   RequestTypeWithQueryBlogId,
 } from "../types/common";
 import { BlogBody, InputBlogType, BlogSortDataType } from "../types/blog/input";
-import { authMiddleware } from "../middlewares/auth/auth-middleware";
+import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
 import {
   allPostsForBlogByIdValidation,
   blogValidation,

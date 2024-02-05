@@ -24,11 +24,25 @@ export class UserRepostitory {
 
   static async findByLoginOrEmail(loginOrEmail: string) {
     const user = await userCollection.findOne({
-      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+      $or: [
+        {
+          email: {
+            $regex: loginOrEmail,
+            $options: "i",
+          },
+        },
+        {
+          login: {
+            $regex: loginOrEmail,
+            $options: "i",
+          },
+        },
+      ],
     });
 
     return user;
   }
+
   static async findUserByConfirmationCode(emailConfirmationCode: string) {
     const user = await userCollection.findOne({
       "emailConfirmation.confirmationCode": emailConfirmationCode,
