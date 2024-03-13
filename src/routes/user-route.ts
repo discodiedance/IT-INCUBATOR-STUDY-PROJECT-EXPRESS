@@ -11,6 +11,7 @@ import { UserService } from "../domain/user-service";
 import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
 import { UserRepostitory } from "../repositories/user-repository";
 import { userValidation } from "../middlewares/user/user-validation";
+import { registrationMiddleware } from "../middlewares/auth/registration-middleware";
 
 export const userRoute = Router({});
 
@@ -34,6 +35,7 @@ userRoute.get(
 
 userRoute.post(
   "/",
+  registrationMiddleware,
   authMiddleware,
   userValidation(),
   async (req: RequestWithBody<InputUserType>, res: Response) => {

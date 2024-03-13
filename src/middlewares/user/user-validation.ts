@@ -21,9 +21,21 @@ export const emailValidation = body("email")
   .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .withMessage("Incorrect value");
 
+export const codeValidation = body("code")
+  .isString()
+  .trim()
+  .withMessage("Incorrect value");
+
 export const userValidation = () => [
   loginValidation,
   passwordValidation,
   emailValidation,
   inputModelValidation,
 ];
+
+export const userEmailValidation = () => [
+  emailValidation,
+  inputModelValidation,
+];
+
+export const userCodeValidation = () => [codeValidation, inputModelValidation];

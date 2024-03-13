@@ -8,13 +8,17 @@ import { v4 as uuidv4 } from "uuid";
 import { UserRepostitory } from "../repositories/user-repository";
 
 export class UserService {
-  static async _generateHash(password: string) {
-    const hash = await bcrypt.hash(password, 10);
+  static async _generateHash(password: string, salt: string) {
+    const hash = await bcrypt.hash(password, salt);
     return hash;
   }
 
   static async createUser(newUser: InputUserType): Promise<OutputUserType> {
-    const passwordHash = await this._generateHash(newUser.password);
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await this._generateHash(
+      newUser.password,
+      passwordSalt
+    );
 
     const createdUser: UserDBType = {
       _id: new ObjectId(),
@@ -22,6 +26,7 @@ export class UserService {
         login: newUser.login,
         email: newUser.email,
         passwordHash,
+        passwordSalt,
         createdAt: new Date(),
       },
       emailConfirmation: {
@@ -49,17 +54,16 @@ export class UserService {
     password: string
   ): Promise<UserDBType | null> {
     const user = await UserRepostitory.findByLoginOrEmail(loginOrEmail);
-
     if (!user) return null;
 
-    if (!user.emailConfirmation.isConfirmed) {
-      return null;
-    }
-
-    const passwordHash = await this._generateHash(password);
+    const passwordHash = await this._generateHash(
+      password,
+      user.accountData.passwordSalt
+    );
     if (user.accountData.passwordHash !== passwordHash) {
       return null;
     }
+
     return user;
   }
 }

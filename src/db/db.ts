@@ -2,7 +2,6 @@ import { MongoClient } from "mongodb";
 import { BlogType } from "../types/blog/output";
 import { PostType } from "../types/post/output";
 import { UserDBType } from "../types/user/output";
-
 import { CommentType } from "../types/comment/output";
 import { mongoUri } from "../config";
 

@@ -6,26 +6,28 @@ import { authValidation } from "../middlewares/auth/auth-validation";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 import { jwtService } from "../aplication/jwt-service";
 import { authService } from "../domain/auth-service";
-import { userValidation } from "../middlewares/user/user-validation";
-import { registrationMiddleware } from "../middlewares/auth/registration-validation";
+import {
+  userCodeValidation,
+  userEmailValidation,
+  userValidation,
+} from "../middlewares/user/user-validation";
+import { registrationMiddleware } from "../middlewares/auth/registration-middleware";
 
 export const authRoute = Router({});
 
 authRoute.post(
   "/registration",
-  userValidation(),
   registrationMiddleware,
+  userValidation(),
   async (req: Request, res: Response) => {
     const userData = {
       login: req.body.login,
       email: req.body.email,
       password: req.body.password,
     };
-
     const registrationResult = await authService.createUserByRegistration(
       userData
     );
-    console.log("28", registrationResult);
 
     if (registrationResult) {
       return res.sendStatus(204);
@@ -37,24 +39,30 @@ authRoute.post(
 
 authRoute.post(
   "/registration-confirmation",
+  userCodeValidation(),
   async (req: Request, res: Response) => {
     const result = await authService.confirmEmail(req.body.code);
-    if (result) {
-      res.status(201).send();
+    if (result.result === 204) {
+      return res.sendStatus(204);
     } else {
-      res.status(400).send({});
+      return res
+        .status(400)
+        .send({ errorsMessages: [{ message: result.message, field: "code" }] });
     }
   }
 );
 
 authRoute.post(
-  "/registration-confirmation-email-resending",
+  "/registration-email-resending",
+  userEmailValidation(),
   async (req: Request, res: Response) => {
-    const resendedCode = await authService.resendEmail(req.body.email);
-    if (resendedCode) {
-      res.status(204).send();
+    const result = await authService.resendEmail(req.body.email);
+    if (result.result === 204) {
+      res.sendStatus(204);
     } else {
-      res.status(400).send({});
+      res.status(400).send({
+        errorsMessages: [{ message: result.message, field: "email" }],
+      });
     }
   }
 );

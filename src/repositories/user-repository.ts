@@ -15,24 +15,39 @@ export class UserRepostitory {
   }
 
   static async updateConfirmation(_id: ObjectId) {
-    let result = await userCollection.updateOne(
+    const result = await userCollection.updateOne(
       { _id },
       { $set: { "emailConfirmation.isConfirmed": true } }
     );
-    return result.modifiedCount === 1;
+
+    return result.matchedCount === 1;
+  }
+
+  static async findyByLogin(login: string) {
+    const user = await userCollection.findOne({
+      "accountData.login": login,
+    });
+    return user;
+  }
+
+  static async findyByEmail(email: string) {
+    const user = await userCollection.findOne({
+      "accountData.email": email,
+    });
+    return user;
   }
 
   static async findByLoginOrEmail(loginOrEmail: string) {
     const user = await userCollection.findOne({
       $or: [
         {
-          email: {
+          "accountData.email": {
             $regex: loginOrEmail,
             $options: "i",
           },
         },
         {
-          login: {
+          "accountData.login": {
             $regex: loginOrEmail,
             $options: "i",
           },
@@ -49,5 +64,18 @@ export class UserRepostitory {
     });
 
     return user;
+  }
+
+  static async updateConfirmationCode(
+    code: string,
+    email: string
+  ): Promise<boolean> {
+    const result = await userCollection.updateOne(
+      {
+        "accountData.email": email,
+      },
+      { $set: { "emailConfirmation.confirmationCode": code } }
+    );
+    return result.modifiedCount === 1;
   }
 }

@@ -7,18 +7,24 @@ import { UserRepostitory } from "../repositories/user-repository";
 import { InputUserType } from "../types/user/input";
 import { userMapper } from "../middlewares/user/user-mapper";
 import { emailsManager } from "../managers/email-manager";
+import bcrypt from "bcrypt";
 
 export class authService {
   static async createUserByRegistration(
     inputUser: InputUserType
   ): Promise<OutputUserType | null> {
-    const passwordHash = await UserService._generateHash(inputUser.password);
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await UserService._generateHash(
+      inputUser.password,
+      passwordSalt
+    );
     const user: UserDBType = {
       _id: new ObjectId(),
       accountData: {
         login: inputUser.login,
         email: inputUser.email,
         passwordHash,
+        passwordSalt,
         createdAt: new Date(),
       },
       emailConfirmation: {
@@ -39,35 +45,41 @@ export class authService {
         user.emailConfirmation.confirmationCode
       );
     } catch (error) {
-      console.log("37", error);
       await UserRepostitory.deleteUser(user._id.toString());
       return null;
     }
     return userMapper(user);
   }
 
-  static async confirmEmail(code: string): Promise<boolean> {
-    let user = await UserService.findUserByConfirmationCode(code);
-    if (!user) return false;
-    if (user.emailConfirmation.isConfirmed) return false;
-    if (user.emailConfirmation.confirmationCode !== code) return false;
-    if (user.emailConfirmation.expirationDate < new Date()) return false;
-    let result = await UserRepostitory.updateConfirmation(user._id);
-    return result;
+  static async confirmEmail(code: string): Promise<any> {
+    const user = await UserService.findUserByConfirmationCode(code);
+    if (!user) return { result: 400, message: "User is not found" };
+    if (user.emailConfirmation.isConfirmed === true)
+      return { result: 400, message: "Confirmartion code is not confirmed" };
+    if (user.emailConfirmation.confirmationCode !== code)
+      return { result: 400, message: "Confirmation code error" };
+    if (user.emailConfirmation.expirationDate < new Date())
+      return { result: 400, message: "Confirmaton code is expired" };
+    await UserRepostitory.updateConfirmation(user._id);
+    return { result: 204, message: "Ok" };
   }
 
   static async resendEmail(email: string): Promise<any> {
-    let user = await UserRepostitory.findByLoginOrEmail(email);
-    if (!user) return null;
+    const user = await UserRepostitory.findyByEmail(email);
+    if (!user) return { result: 400, message: "User is not found" };
+    if (user.emailConfirmation.isConfirmed === true)
+      return { result: 400, message: "Email is already confirmed" };
+    const newCode = uuidv4();
+    await UserRepostitory.updateConfirmationCode(newCode, email);
     try {
       await emailsManager.resendConfirmationMessage(
         user.accountData.email,
-        user.emailConfirmation.confirmationCode
+        newCode
       );
+      return { result: 204, message: "OK" };
     } catch (error) {
-      console.log("68", error);
       await UserRepostitory.deleteUser(user._id.toString());
-      return null;
+      return { result: 400, message: "Something goes wrong..." };
     }
   }
 }

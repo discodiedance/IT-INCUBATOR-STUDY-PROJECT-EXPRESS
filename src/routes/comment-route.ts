@@ -36,9 +36,11 @@ commentRoute.put(
   async (req: RequestWithBodyAndParams<Params, CommentBody>, res: Response) => {
     const user = req.user;
     if (!user) {
-      return res.sendStatus(401);
+      res.sendStatus(401);
+      return;
     }
     const id = req.params.id;
+    console.log("42", id);
     let comment: OutputCommentType | null =
       await QueryCommentRepository.getCommentById(id);
     let { content } = req.body;
@@ -59,7 +61,6 @@ commentRoute.put(
     comment.content = content;
 
     await CommentService.updateComment(id, comment);
-    //updatedComment = quryRepo.getCommentById()
     return res.sendStatus(204);
   }
 );

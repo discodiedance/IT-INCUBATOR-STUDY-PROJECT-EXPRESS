@@ -13,6 +13,7 @@ export type OutputUserType = {
   login: string;
   email: string;
   createdAt: string;
+  passwordSalt: string;
 };
 
 export type UserType = {
@@ -32,6 +33,7 @@ export type UserAccountType = {
   email: string;
   login: string;
   passwordHash: string;
+  passwordSalt: string;
   createdAt: Date;
 };
 

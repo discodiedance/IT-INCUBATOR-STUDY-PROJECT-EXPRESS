@@ -8,7 +8,7 @@ export const authTokenMiddleware = async (
   next: NextFunction
 ) => {
   if (!req.headers.authorization) {
-    res.send(401);
+    res.sendStatus(401);
     return;
   }
 
