@@ -40,7 +40,6 @@ commentRoute.put(
       return;
     }
     const id = req.params.id;
-    console.log("42", id);
     let comment: OutputCommentType | null =
       await QueryCommentRepository.getCommentById(id);
     let { content } = req.body;

@@ -8,8 +8,14 @@ import { InputUserType } from "../types/user/input";
 import { userMapper } from "../middlewares/user/user-mapper";
 import { emailsManager } from "../managers/email-manager";
 import bcrypt from "bcrypt";
+import { ConfirmEmailType, ResendEmailType } from "../types/common";
+import { DeviceType } from "../types/security/input";
+import { jwtService } from "../aplication/jwt-service";
+import { QueryUserRepository } from "./../repositories/query-repository/query-user-repository";
+import { SecurityRepostiory } from "../repositories/security-repository";
+import { SecurityQueryRepostiory } from "../repositories/query-repository/query-security-repository";
 
-export class authService {
+export class AuthService {
   static async createUserByRegistration(
     inputUser: InputUserType
   ): Promise<OutputUserType | null> {
@@ -39,19 +45,19 @@ export class authService {
 
     await UserRepostitory.createUser(user);
 
-    try {
-      await emailsManager.sendEmailConfirmationMessage(
+    emailsManager
+      .sendEmailConfirmationMessage(
         user.accountData.email,
         user.emailConfirmation.confirmationCode
-      );
-    } catch (error) {
-      await UserRepostitory.deleteUser(user._id.toString());
-      return null;
-    }
+      )
+      .catch((error) => {
+        console.log(error);
+      });
+
     return userMapper(user);
   }
 
-  static async confirmEmail(code: string): Promise<any> {
+  static async confirmEmail(code: string): Promise<ConfirmEmailType> {
     const user = await UserService.findUserByConfirmationCode(code);
     if (!user) return { result: 400, message: "User is not found" };
     if (user.emailConfirmation.isConfirmed === true)
@@ -64,7 +70,7 @@ export class authService {
     return { result: 204, message: "Ok" };
   }
 
-  static async resendEmail(email: string): Promise<any> {
+  static async resendEmail(email: string): Promise<ResendEmailType> {
     const user = await UserRepostitory.findyByEmail(email);
     if (!user) return { result: 400, message: "User is not found" };
     if (user.emailConfirmation.isConfirmed === true)
@@ -81,5 +87,68 @@ export class authService {
       await UserRepostitory.deleteUser(user._id.toString());
       return { result: 400, message: "Something goes wrong..." };
     }
+  }
+
+  static async loginUser(userId: string, ip: string, title: string) {
+    const deviceId = uuidv4();
+
+    const accessToken = await jwtService.createJWT(userId);
+    const refreshToken = await jwtService.createRefreshJWT(userId, deviceId);
+
+    const expDate = await jwtService.getExpirationDateFromRefreshToken(
+      refreshToken
+    );
+
+    const lastActiveDate = await jwtService.getIssuedAtFromJWTAccessToken(
+      accessToken
+    );
+
+    const sessionData: DeviceType = {
+      ip,
+      title,
+      userId: userId,
+      deviceId,
+      expirationDate: expDate,
+      lastActiveDate: lastActiveDate,
+    };
+
+    const isSessionSaved = await SecurityRepostiory.addDevice(sessionData);
+    if (!isSessionSaved) {
+      return null;
+    }
+    return { accessToken, refreshToken };
+  }
+
+  static async refreshTokens(deviceId: string, userId: string) {
+    const user = await QueryUserRepository.getUserById(userId);
+    if (!user) return null;
+
+    const accessToken = await jwtService.createJWT(user.id);
+    const refreshToken = await jwtService.createRefreshJWT(user.id, deviceId);
+
+    const expirationDate = await jwtService.getExpirationDateFromRefreshToken(
+      refreshToken
+    );
+    if (!expirationDate) return null;
+
+    const lastActiveDate = await jwtService.getIssuedAtFromJWTAccessToken(
+      accessToken
+    );
+    if (!lastActiveDate) return null;
+
+    const updateDeviceData = {
+      expirationDate,
+      lastActiveDate,
+      userId,
+      deviceId,
+    };
+
+    const isSessionUpdated = await SecurityRepostiory.updateDevice(
+      updateDeviceData
+    );
+
+    if (!isSessionUpdated) return null;
+
+    return { accessToken, refreshToken };
   }
 }

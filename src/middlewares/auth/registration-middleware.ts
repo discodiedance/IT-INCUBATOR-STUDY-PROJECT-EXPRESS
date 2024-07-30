@@ -8,6 +8,7 @@ export const registrationMiddleware = async (
 ) => {
   const { login, email } = req.body;
   const userIsExistsByLogin = await UserRepostitory.findyByLogin(login);
+
   if (userIsExistsByLogin) {
     res.status(400).send({
       errorsMessages: [
@@ -17,7 +18,6 @@ export const registrationMiddleware = async (
         },
       ],
     });
-
     return;
   }
 

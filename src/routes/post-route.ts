@@ -23,7 +23,6 @@ import { CommentBody } from "../types/comment/input";
 import { PostService } from "../domain/post-service";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { commentValidation } from "./../middlewares/comment/comment-validation";
-import { QueryCommentRepository } from "../repositories/query-repository/query-comment-repository";
 import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
 
 export const postRoute = Router({});

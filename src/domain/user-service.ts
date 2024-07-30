@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { userMapper } from "../middlewares/user/user-mapper";
 import { InputUserType } from "../types/user/input";
 import { add } from "date-fns/add";

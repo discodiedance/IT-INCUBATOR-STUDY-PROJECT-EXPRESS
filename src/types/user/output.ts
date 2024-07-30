@@ -13,7 +13,7 @@ export type OutputUserType = {
   login: string;
   email: string;
   createdAt: string;
-  passwordSalt: string;
+  // passwordSalt: string;
 };
 
 export type UserType = {

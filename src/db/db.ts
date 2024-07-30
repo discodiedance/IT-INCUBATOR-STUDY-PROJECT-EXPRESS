@@ -4,6 +4,8 @@ import { PostType } from "../types/post/output";
 import { UserDBType } from "../types/user/output";
 import { CommentType } from "../types/comment/output";
 import { mongoUri } from "../config";
+import { APIReqeustsType } from "../types/common";
+import { DeviceType } from "../types/security/input";
 
 console.log(mongoUri);
 
@@ -15,6 +17,10 @@ export const blogCollection = db.collection<BlogType>("blogs");
 export const postCollection = db.collection<PostType>("posts");
 export const userCollection = db.collection<UserDBType>("users");
 export const commentCollection = db.collection<CommentType>("comments");
+export const apiRequestsCollection =
+  db.collection<APIReqeustsType>("api-request");
+export const deviceAuthSessionsCollection =
+  db.collection<DeviceType>("devices");
 
 export const runDb = async () => {
   try {

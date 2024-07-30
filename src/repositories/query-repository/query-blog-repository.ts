@@ -41,6 +41,7 @@ export class QueryBlogRepository {
       items: blogs.map(blogMapper),
     };
   }
+
   static async getBlogById(id: string): Promise<OutputBlogType | null> {
     if (!ObjectId.isValid(id)) return null;
 

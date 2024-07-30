@@ -13,6 +13,7 @@ export class BlogService {
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
+
     await BlogRepository.createBlog(createdBlog);
     return createdBlog;
   }

@@ -38,7 +38,7 @@ export class UserRepostitory {
   }
 
   static async findByLoginOrEmail(loginOrEmail: string) {
-    const user = await userCollection.findOne({
+    const userLoginorEmail = await userCollection.findOne({
       $or: [
         {
           "accountData.email": {
@@ -54,15 +54,13 @@ export class UserRepostitory {
         },
       ],
     });
-
-    return user;
+    return userLoginorEmail;
   }
 
   static async findUserByConfirmationCode(emailConfirmationCode: string) {
     const user = await userCollection.findOne({
       "emailConfirmation.confirmationCode": emailConfirmationCode,
     });
-
     return user;
   }
 

@@ -5,7 +5,7 @@ export const userMapper = (user: UserDBType): OutputUserType => {
     id: user._id!.toString(),
     login: user.accountData.login,
     email: user.accountData.email,
-    passwordSalt: user.accountData.passwordSalt,
-    createdAt: user.accountData.createdAt.toString(),
+    // passwordSalt: user.accountData.passwordSalt,
+    createdAt: user.accountData.createdAt.toISOString(),
   };
 };

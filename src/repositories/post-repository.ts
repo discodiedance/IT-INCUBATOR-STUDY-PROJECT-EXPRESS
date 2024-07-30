@@ -36,7 +36,6 @@ export class PostRepository {
 
   static async deletePost(id: string): Promise<boolean> {
     const result = await postCollection.deleteOne({ _id: new ObjectId(id) });
-
     return !!result.deletedCount;
   }
 }

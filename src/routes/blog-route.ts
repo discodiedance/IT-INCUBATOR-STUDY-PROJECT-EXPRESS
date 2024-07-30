@@ -111,19 +111,15 @@ blogRoute.put(
   blogValidation(),
   async (req: RequestWithBodyAndParams<Params, BlogBody>, res: Response) => {
     const id = req.params.id;
-    let blog: OutputBlogType | null = await QueryBlogRepository.getBlogById(id);
-    let { name, description, websiteUrl } = req.body;
-
+    const blog: OutputBlogType | null = await QueryBlogRepository.getBlogById(
+      id
+    );
     if (!blog) {
       res.sendStatus(404);
       return;
     }
-    // как вынести
-    (blog.name = name),
-      (blog.description = description),
-      (blog.websiteUrl = websiteUrl),
-      await BlogService.updateBlog(id, blog);
 
+    await BlogService.updateBlog(id, blog);
     return res.sendStatus(204);
   }
 );

@@ -30,6 +30,10 @@ export type Params = {
   id: string;
 };
 
+export type DeviceIdParams = {
+  id: string;
+};
+
 export type BlogIdParams = {
   blogId: string;
 };
@@ -41,4 +45,20 @@ export type PostIdParams = {
 export type UserIdParams = {
   id: any;
   userId: string;
+};
+
+export type APIReqeustsType = {
+  IP: string;
+  URL: string;
+  date: Date;
+};
+
+export type ConfirmEmailType = {
+  result: number;
+  message: string;
+};
+
+export type ResendEmailType = {
+  result: number;
+  message: string;
 };

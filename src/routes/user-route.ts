@@ -29,7 +29,8 @@ userRoute.get(
     };
     const users = await QueryUserRepository.getAllUsers(sortData);
 
-    return res.send(users);
+    res.send(users);
+    return;
   }
 );
 
@@ -40,7 +41,8 @@ userRoute.post(
   userValidation(),
   async (req: RequestWithBody<InputUserType>, res: Response) => {
     const user = await UserService.createUser(req.body);
-    return res.status(201).send(user);
+    res.status(201).send(user);
+    return;
   }
 );
 
@@ -55,6 +57,7 @@ userRoute.delete(
       res.sendStatus(404);
       return;
     }
-    return res.sendStatus(204);
+    res.sendStatus(204);
+    return;
   }
 );

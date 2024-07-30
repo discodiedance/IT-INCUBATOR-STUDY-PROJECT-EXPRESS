@@ -1,7 +1,9 @@
 import { Router, Request, Response } from "express";
 import {
+  apiRequestsCollection,
   blogCollection,
   commentCollection,
+  deviceAuthSessionsCollection,
   postCollection,
   userCollection,
 } from "../db/db";
@@ -13,5 +15,7 @@ testingRoute.delete("/all-data", async (req: Request, res: Response) => {
   await postCollection.deleteMany({});
   await userCollection.deleteMany({});
   await commentCollection.deleteMany({});
+  await deviceAuthSessionsCollection.deleteMany({});
+  await apiRequestsCollection.deleteMany({});
   res.sendStatus(204);
 });
