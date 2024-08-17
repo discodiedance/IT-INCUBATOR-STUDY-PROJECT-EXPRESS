@@ -11,7 +11,6 @@ export type UpdatePostData = {
   shortDescription: string;
   content: string;
   blogId: string;
-  blogName: string;
 };
 
 export type InputPostType = {
@@ -20,6 +19,7 @@ export type InputPostType = {
   content: string;
   blogId: string;
   blogName: string;
+  createdAt: string;
 };
 
 export type PostSortDataType = {

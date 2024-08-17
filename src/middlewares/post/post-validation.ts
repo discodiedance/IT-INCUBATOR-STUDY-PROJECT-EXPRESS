@@ -3,12 +3,14 @@ import { inputModelValidation } from "../inputModel/input-model-validation";
 import { QueryBlogRepository } from "../../repositories/query-repository/query-blog-repository";
 import notFoundValidation from "../inputModel/not-found-validation";
 import { postIdinParamsValidation } from "../comment/comment-validation";
+import { OutputBlogType } from "../../types/blog/output";
 
 export const blogIdInParamsValidation = param("blogId")
   .isString()
   .trim()
   .custom(async (value) => {
-    const blog = await QueryBlogRepository.getBlogById(value);
+    const blog: OutputBlogType | null =
+      await QueryBlogRepository.getBlogById(value);
 
     if (!blog) {
       throw new Error("Incorrect value");
@@ -20,7 +22,8 @@ export const blogIdInBodyValidation = body("blogId")
   .isString()
   .trim()
   .custom(async (value, meta) => {
-    const blog = await QueryBlogRepository.getBlogById(value);
+    const blog: OutputBlogType | null =
+      await QueryBlogRepository.getBlogById(value);
 
     if (!blog) {
       throw new Error("Incorrect value");

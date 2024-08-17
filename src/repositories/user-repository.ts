@@ -1,74 +1,32 @@
-import { ObjectId } from "mongodb";
-import { userCollection } from "../db/db";
+import { UserModel } from "../db/db";
 import { UserDBType } from "../types/user/output";
 
 export class UserRepostitory {
-  static async createUser(inputCreateUser: UserDBType) {
-    const createdUser = await userCollection.insertOne({ ...inputCreateUser });
-    inputCreateUser._id = createdUser.insertedId;
+  static async createUser(inputCreateUser: UserDBType): Promise<UserDBType> {
+    const createdUser: UserDBType | null =
+      await UserModel.create(inputCreateUser);
+    return createdUser;
   }
 
   static async deleteUser(id: string): Promise<boolean> {
-    const result = await userCollection.deleteOne({ _id: new ObjectId(id) });
-
+    const result = await UserModel.deleteOne({ id: id });
     return !!result.deletedCount;
   }
 
-  static async updateConfirmation(_id: ObjectId) {
-    const result = await userCollection.updateOne(
-      { _id },
+  static async updateConfirmation(id: string): Promise<boolean> {
+    const result = await UserModel.updateOne(
+      { id: id },
       { $set: { "emailConfirmation.isConfirmed": true } }
     );
 
     return result.matchedCount === 1;
   }
 
-  static async findyByLogin(login: string) {
-    const user = await userCollection.findOne({
-      "accountData.login": login,
-    });
-    return user;
-  }
-
-  static async findyByEmail(email: string) {
-    const user = await userCollection.findOne({
-      "accountData.email": email,
-    });
-    return user;
-  }
-
-  static async findByLoginOrEmail(loginOrEmail: string) {
-    const userLoginorEmail = await userCollection.findOne({
-      $or: [
-        {
-          "accountData.email": {
-            $regex: loginOrEmail,
-            $options: "i",
-          },
-        },
-        {
-          "accountData.login": {
-            $regex: loginOrEmail,
-            $options: "i",
-          },
-        },
-      ],
-    });
-    return userLoginorEmail;
-  }
-
-  static async findUserByConfirmationCode(emailConfirmationCode: string) {
-    const user = await userCollection.findOne({
-      "emailConfirmation.confirmationCode": emailConfirmationCode,
-    });
-    return user;
-  }
-
   static async updateConfirmationCode(
     code: string,
     email: string
   ): Promise<boolean> {
-    const result = await userCollection.updateOne(
+    const result = await UserModel.updateOne(
       {
         "accountData.email": email,
       },

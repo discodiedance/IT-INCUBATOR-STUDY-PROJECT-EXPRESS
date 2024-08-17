@@ -1,5 +1,5 @@
-export type CommentType = {
-  id?: string;
+export type CommentDBType = {
+  id: string;
   content: string;
   commentatorInfo: {
     userId: string;
@@ -10,7 +10,7 @@ export type CommentType = {
 };
 
 export type OutputCommentType = {
-  id: string;
+  commentId: string;
   content: string;
   commentatorInfo: {
     userId: string;

@@ -1,5 +1,4 @@
 import express from "express";
-
 import { postRoute } from "./routes/post-route";
 import { blogRoute } from "./routes/blog-route";
 import { testingRoute } from "./routes/testing-route";

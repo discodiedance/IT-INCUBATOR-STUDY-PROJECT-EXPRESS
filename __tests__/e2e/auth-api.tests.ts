@@ -56,6 +56,7 @@ describe(routerName, () => {
         ],
       });
   });
+
   it("400 and not logged user with incorrect auth data", async () => {
     await request(app)
       .post(userRouterName)
@@ -72,6 +73,7 @@ describe(routerName, () => {
         ],
       });
   });
+
   it("400 and not logged user with overlength auth password", async () => {
     await request(app)
       .post(userRouterName)
@@ -85,6 +87,7 @@ describe(routerName, () => {
         errorsMessages: [{ message: "Incorrect value", field: "password" }],
       });
   });
+
   it("401 and not logged user with incorrect user authorization", async () => {
     await request(app)
       .post(userRouterName)
@@ -96,6 +99,7 @@ describe(routerName, () => {
       .send(correctAuthData)
       .expect(401);
   });
+
   it("200 and logged user with correct data", async () => {
     const user = await request(app)
       .post(userRouterName)
@@ -110,6 +114,7 @@ describe(routerName, () => {
       })
       .expect(200);
   });
+
   it("401 and got no information about current user with not logged user", async () => {
     let user = await request(app)
       .post(userRouterName)
@@ -132,6 +137,7 @@ describe(routerName, () => {
       })
       .expect(401);
   });
+
   it("200 and got information about current user logged user", async () => {
     const user = await request(app)
       .post(userRouterName)

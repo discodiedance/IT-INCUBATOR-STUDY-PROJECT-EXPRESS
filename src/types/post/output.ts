@@ -1,5 +1,5 @@
-export type PostType = {
-  id?: string;
+export type PostDBType = {
+  id: string;
   title: string;
   shortDescription: string;
   content: string;
@@ -9,7 +9,7 @@ export type PostType = {
 };
 
 export type OutputPostType = {
-  id: string;
+  postId: string;
   title: string;
   shortDescription: string;
   content: string;

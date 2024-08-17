@@ -12,6 +12,7 @@ import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
 import { UserRepostitory } from "../repositories/user-repository";
 import { userValidation } from "../middlewares/user/user-validation";
 import { registrationMiddleware } from "../middlewares/auth/registration-middleware";
+import { OutputUserType } from "../types/user/output";
 
 export const userRoute = Router({});
 
@@ -40,7 +41,7 @@ userRoute.post(
   authMiddleware,
   userValidation(),
   async (req: RequestWithBody<InputUserType>, res: Response) => {
-    const user = await UserService.createUser(req.body);
+    const user: OutputUserType = await UserService.createUser(req.body);
     res.status(201).send(user);
     return;
   }
@@ -50,8 +51,8 @@ userRoute.delete(
   "/:id",
   authMiddleware,
   async (req: RequestWithParams<Params>, res: Response) => {
-    const id = req.params.id;
-    const status = await UserRepostitory.deleteUser(id);
+    const id: string = req.params.id;
+    const status: boolean = await UserRepostitory.deleteUser(id);
 
     if (!status) {
       res.sendStatus(404);

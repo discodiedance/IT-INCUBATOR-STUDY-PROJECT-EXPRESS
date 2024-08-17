@@ -1,8 +1,7 @@
-import { ObjectId } from "mongodb";
-import { blogCollection } from "../../db/db";
+import { BlogModel } from "../../db/db";
 import { blogMapper } from "../../middlewares/blog/blog-mapper";
 import { BlogSortDataType } from "../../types/blog/input";
-import { OutputBlogType } from "../../types/blog/output";
+import { BlogDBType, OutputBlogType } from "../../types/blog/output";
 
 export class QueryBlogRepository {
   static async getAllBlogs(sortData: BlogSortDataType) {
@@ -23,15 +22,14 @@ export class QueryBlogRepository {
       };
     }
 
-    const blogs = await blogCollection
-      .find(filter)
-      .sort(sortBy, sortDirection)
+    const blogs = await BlogModel.find(filter)
+      .sort({ [sortBy]: sortDirection })
       .skip((+pageNumber - 1) * +pageSize)
       .limit(+pageSize)
-      .toArray();
+      .lean();
 
-    const totalCount = await blogCollection.countDocuments(filter);
-    const pageCount = Math.ceil(totalCount / +pageSize);
+    const totalCount: number = await BlogModel.countDocuments(filter);
+    const pageCount: number = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
@@ -43,9 +41,9 @@ export class QueryBlogRepository {
   }
 
   static async getBlogById(id: string): Promise<OutputBlogType | null> {
-    if (!ObjectId.isValid(id)) return null;
+    if (!id) return null;
 
-    const blog = await blogCollection.findOne({ _id: new ObjectId(id) });
+    const blog: BlogDBType | null = await BlogModel.findOne({ id: id });
     if (!blog) {
       return null;
     }

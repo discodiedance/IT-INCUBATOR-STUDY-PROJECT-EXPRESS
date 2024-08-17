@@ -1,11 +1,11 @@
 import { Request } from "express";
-import { BlogType } from "./blog/output";
+import { OutputBlogType } from "./blog/output";
 
 export type RequestWithParams<P> = Request<P, {}, {}, {}>;
 
 export type RequestWithBody<B> = Request<{}, {}, B, {}>;
 
-export type RequestWithBodyAndBlog<B> = Request<{}, {}, B, {}, BlogType>;
+export type RequestWithBodyAndBlog<B> = Request<{}, {}, B, {}, OutputBlogType>;
 
 export type RequestWithBodyAndParams<P, B> = Request<P, {}, B, {}>;
 
@@ -48,8 +48,9 @@ export type UserIdParams = {
 };
 
 export type APIReqeustsType = {
-  IP: string;
+  ip: string;
   URL: string;
+  title: string;
   date: Date;
 };
 

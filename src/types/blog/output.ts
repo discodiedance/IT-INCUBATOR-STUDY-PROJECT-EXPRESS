@@ -1,5 +1,5 @@
-export type BlogType = {
-  id?: string;
+export type BlogDBType = {
+  id: string;
   name: string;
   description: string;
   websiteUrl: string;
@@ -8,7 +8,7 @@ export type BlogType = {
 };
 
 export type OutputBlogType = {
-  id: string;
+  blogId: string;
   name: string;
   description: string;
   websiteUrl: string;

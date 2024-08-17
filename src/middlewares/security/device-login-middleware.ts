@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { SecurityQueryRepostiory } from "../../repositories/query-repository/query-security-repository";
 import { jwtService } from "./../../aplication/jwt-service";
+import { DeviceDBType } from "../../types/security/input";
 
 export const deviceMiddleware = async (
   req: Request,
@@ -16,9 +17,8 @@ export const deviceMiddleware = async (
     return;
   }
 
-  const anyDevice = await SecurityQueryRepostiory.getDeviceByDeviceId(
-    currentDeviceId
-  );
+  const anyDevice: DeviceDBType | null =
+    await SecurityQueryRepostiory.getDeviceByDeviceId(currentDeviceId);
 
   if (!anyDevice) {
     res.sendStatus(401);

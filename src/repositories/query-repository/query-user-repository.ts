@@ -1,8 +1,7 @@
-import { ObjectId } from "mongodb";
-import { userCollection } from "../../db/db";
+import { UserModel } from "../../db/db";
 import { userMapper } from "../../middlewares/user/user-mapper";
 import { SortDataUserType } from "../../types/user/input";
-import { OutputUserType } from "../../types/user/output";
+import { OutputUserType, UserDBType } from "../../types/user/output";
 
 export class QueryUserRepository {
   static async getAllUsers(sortData: SortDataUserType) {
@@ -38,15 +37,13 @@ export class QueryUserRepository {
       $or: [filterLogin, filterEmail],
     };
 
-    const users = await userCollection
-      .find(filter)
-      .sort(sortBy, sortDirection)
+    const users = await UserModel.find(filter)
+      .sort({ [sortBy]: sortDirection })
       .skip((+pageNumber - 1) * +pageSize)
-      .limit(+pageSize)
-      .toArray();
+      .limit(+pageSize);
 
-    const totalCount = await userCollection.countDocuments(filter);
-    const pageCount = Math.ceil(totalCount / +pageSize);
+    const totalCount: number = await UserModel.countDocuments(filter);
+    const pageCount: number = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
@@ -58,12 +55,53 @@ export class QueryUserRepository {
   }
 
   static async getUserById(id: string): Promise<OutputUserType | null> {
-    if (!ObjectId.isValid(id)) return null;
+    if (!id) return null;
 
-    const user = await userCollection.findOne({ _id: new ObjectId(id) });
+    const user: UserDBType | null = await UserModel.findOne({ id: id });
     if (!user) {
       return null;
     }
     return userMapper(user);
+  }
+
+  static async findyByLogin(login: string) {
+    const user: UserDBType | null = await UserModel.findOne({
+      "accountData.login": login,
+    });
+    return user;
+  }
+
+  static async findyByEmail(email: string) {
+    const user: UserDBType | null = await UserModel.findOne({
+      "accountData.email": email,
+    });
+    return user;
+  }
+
+  static async findByLoginOrEmail(loginOrEmail: string) {
+    const userLoginorEmail: UserDBType | null = await UserModel.findOne({
+      $or: [
+        {
+          "accountData.email": {
+            $regex: loginOrEmail,
+            $options: "i",
+          },
+        },
+        {
+          "accountData.login": {
+            $regex: loginOrEmail,
+            $options: "i",
+          },
+        },
+      ],
+    });
+    return userLoginorEmail;
+  }
+
+  static async findUserByConfirmationCode(emailConfirmationCode: string) {
+    const user: UserDBType | null = await UserModel.findOne({
+      "emailConfirmation.confirmationCode": emailConfirmationCode,
+    });
+    return user;
   }
 }

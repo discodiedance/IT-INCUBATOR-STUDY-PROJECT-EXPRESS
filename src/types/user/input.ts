@@ -1,9 +1,3 @@
-export type InputUserBody = {
-  login: string;
-  password: string;
-  email: string;
-};
-
 export type InputUserType = {
   login: string;
   password: string;

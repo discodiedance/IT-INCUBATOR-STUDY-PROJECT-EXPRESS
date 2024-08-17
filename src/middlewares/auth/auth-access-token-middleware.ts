@@ -14,7 +14,8 @@ export const authTokenMiddleware = async (
 
   const accessToken = req.headers.authorization.split(" ")[1];
 
-  const userId = await jwtService.getUserIdByJWTToken(accessToken);
+  const userId: string | null =
+    await jwtService.getUserIdByJWTToken(accessToken);
   if (!userId) {
     res.sendStatus(401);
   } else req.user = await QueryUserRepository.getUserById(userId);

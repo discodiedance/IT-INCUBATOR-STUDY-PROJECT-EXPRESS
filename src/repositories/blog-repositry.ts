@@ -1,18 +1,19 @@
-import { ObjectId } from "mongodb";
-import { blogCollection } from "../db/db";
-import { UpdateBlogData } from "../types/blog/input";
-import { BlogType } from "../types/blog/output";
+import { BlogModel } from "../db/db";
+import { InputBlogBodyType } from "../types/blog/input";
+import { BlogDBType } from "../types/blog/output";
 
 export class BlogRepository {
-  static async createBlog(inputCreateBlog: BlogType) {
-    const createdBlog = await blogCollection.insertOne({ ...inputCreateBlog });
-    inputCreateBlog.id = createdBlog.insertedId.toString();
+  static async createBlog(inputCreateBlog: BlogDBType): Promise<BlogDBType> {
+    const createdBlog = await BlogModel.create(inputCreateBlog);
     return createdBlog;
   }
 
-  static async updateBlog(id: string, updateData: UpdateBlogData) {
-    const result = await blogCollection.updateOne(
-      { _id: new ObjectId(id) },
+  static async updateBlog(
+    id: string,
+    updateData: InputBlogBodyType
+  ): Promise<boolean> {
+    const result = await BlogModel.updateOne(
+      { id: id },
       {
         $set: {
           name: updateData.name,
@@ -21,11 +22,11 @@ export class BlogRepository {
         },
       }
     );
-    return result;
+    return !!result.modifiedCount;
   }
 
   static async deleteBlog(id: string): Promise<boolean> {
-    const result = await blogCollection.deleteOne({ _id: new ObjectId(id) });
+    const result = await BlogModel.deleteOne({ id: id });
 
     return !!result.deletedCount;
   }

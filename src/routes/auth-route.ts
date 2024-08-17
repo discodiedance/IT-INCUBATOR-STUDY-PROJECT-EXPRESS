@@ -1,9 +1,13 @@
 import { Router, Response, Request } from "express";
 import { UserService } from "../domain/user-service";
-import { RequestWithBody } from "../types/common";
+import {
+  ConfirmEmailType,
+  RequestWithBody,
+  ResendEmailType,
+} from "../types/common";
 import { InputLoginOrEmailType } from "../types/auth/input";
 import { authValidation } from "../middlewares/auth/auth-validation";
-import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
+import { authTokenMiddleware } from "../middlewares/auth/auth-access-token-middleware";
 import { AuthService } from "../domain/auth-service";
 import {
   userCodeValidation,
@@ -15,6 +19,7 @@ import { authRefreshTokenMiddleware } from "../middlewares/auth/auth-refresh-tok
 import { customRateLimitiMiddleware } from "../middlewares/security/ip-url-date-middleware";
 import { jwtService } from "../aplication/jwt-service";
 import { SecurityService } from "../domain/security-service";
+import { OutputUserType, UserDBType } from "../types/user/output";
 
 export const authRoute = Router({});
 
@@ -23,20 +28,17 @@ authRoute.post(
   customRateLimitiMiddleware,
   authValidation(),
   async (req: RequestWithBody<InputLoginOrEmailType>, res: Response) => {
-    const user = await UserService.checkCredentials(
+    const user: UserDBType | null = await UserService.checkCredentials(
       req.body.loginOrEmail,
       req.body.password
     );
 
     if (user) {
-      const ip = req.ip!.toString();
-      const title = req.headers["user-agent"] as string;
+      const ip: string = req.ip!.toString();
+      const title: string = req.headers["user-agent"] as string;
+      const userId: string = user.id;
 
-      const tokens = await AuthService.loginUser(
-        user._id.toString(),
-        ip,
-        title
-      );
+      const tokens = await AuthService.loginUser(userId, ip, title);
 
       if (!tokens) {
         res.sendStatus(401);
@@ -69,13 +71,16 @@ authRoute.post(
       req.cookies.refreshToken
     );
 
-    const tokens = await AuthService.refreshTokens(deviceId, userId);
-    if (!tokens) {
+    const updatedTokens = await AuthService.updateRefreshTokens(
+      deviceId,
+      userId
+    );
+    if (!updatedTokens) {
       res.sendStatus(500);
       return;
     }
 
-    const { accessToken, refreshToken } = tokens;
+    const { accessToken, refreshToken } = updatedTokens;
 
     return res
       .cookie("refreshToken", refreshToken, {
@@ -97,10 +102,8 @@ authRoute.post(
     const deviceId = await jwtService.getDeviceIdByRefreshToken(
       req.cookies.refreshToken
     );
-    const result = await SecurityService.terminateDeviceByDeviceId(
-      userId,
-      deviceId
-    );
+    const result: boolean | null =
+      await SecurityService.terminateDeviceByDeviceId(userId, deviceId);
     if (!result) {
       return false;
     }
@@ -113,7 +116,7 @@ authRoute.get(
   "/me",
   authTokenMiddleware,
   async (req: Request, res: Response) => {
-    const user = req.user;
+    const user: OutputUserType | null = req.user;
     if (!user) {
       res.sendStatus(401);
       return;
@@ -121,7 +124,7 @@ authRoute.get(
     const userData = {
       email: user.email,
       login: user.login,
-      userId: user.id,
+      userId: user.userId,
     };
     return res.status(200).send(userData);
   }
@@ -132,7 +135,9 @@ authRoute.post(
   customRateLimitiMiddleware,
   userCodeValidation(),
   async (req: Request, res: Response) => {
-    const result = await AuthService.confirmEmail(req.body.code);
+    const result: ConfirmEmailType = await AuthService.confirmEmail(
+      req.body.code
+    );
     if (result.result === 204) {
       res.sendStatus(204);
       return;
@@ -155,9 +160,8 @@ authRoute.post(
       email: req.body.email,
       password: req.body.password,
     };
-    const registrationResult = await AuthService.createUserByRegistration(
-      userData
-    );
+    const registrationResult: OutputUserType | null =
+      await AuthService.createUserByRegistration(userData);
 
     if (registrationResult) {
       return res.sendStatus(204);
@@ -173,7 +177,9 @@ authRoute.post(
   customRateLimitiMiddleware,
   userEmailValidation(),
   async (req: Request, res: Response) => {
-    const result = await AuthService.resendEmail(req.body.email);
+    const result: ResendEmailType = await AuthService.resendEmail(
+      req.body.email
+    );
     if (result.result === 204) {
       res.sendStatus(204);
       return;

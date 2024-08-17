@@ -1,10 +1,9 @@
-import { WithId } from "mongodb";
-import { OutputDeviceType } from "../../types/security/output";
+import { InputDeviceType } from "../../types/security/input";
 
-export const securityMapper = (devices: WithId<OutputDeviceType>[]) => {
+export const securityMapper = (devices: InputDeviceType[]) => {
   return devices.map((device) => ({
     deviceId: device.deviceId,
-    ip: device.ip.toString(),
+    ip: device.ip,
     lastActiveDate: device.lastActiveDate,
     title: device.title,
   }));

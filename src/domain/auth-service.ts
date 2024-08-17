@@ -9,23 +9,22 @@ import { userMapper } from "../middlewares/user/user-mapper";
 import { emailsManager } from "../managers/email-manager";
 import bcrypt from "bcrypt";
 import { ConfirmEmailType, ResendEmailType } from "../types/common";
-import { DeviceType } from "../types/security/input";
+import { DeviceDBType, UpdateDeviceType } from "../types/security/input";
 import { jwtService } from "../aplication/jwt-service";
 import { QueryUserRepository } from "./../repositories/query-repository/query-user-repository";
 import { SecurityRepostiory } from "../repositories/security-repository";
-import { SecurityQueryRepostiory } from "../repositories/query-repository/query-security-repository";
 
 export class AuthService {
   static async createUserByRegistration(
     inputUser: InputUserType
   ): Promise<OutputUserType | null> {
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await UserService._generateHash(
+    const passwordSalt: string = await bcrypt.genSalt(10);
+    const passwordHash: string = await UserService._generateHash(
       inputUser.password,
       passwordSalt
     );
     const user: UserDBType = {
-      _id: new ObjectId(),
+      id: new ObjectId().toString(),
       accountData: {
         login: inputUser.login,
         email: inputUser.email,
@@ -66,12 +65,12 @@ export class AuthService {
       return { result: 400, message: "Confirmation code error" };
     if (user.emailConfirmation.expirationDate < new Date())
       return { result: 400, message: "Confirmaton code is expired" };
-    await UserRepostitory.updateConfirmation(user._id);
+    await UserRepostitory.updateConfirmation(user.id);
     return { result: 204, message: "Ok" };
   }
 
   static async resendEmail(email: string): Promise<ResendEmailType> {
-    const user = await UserRepostitory.findyByEmail(email);
+    const user = await QueryUserRepository.findyByEmail(email);
     if (!user) return { result: 400, message: "User is not found" };
     if (user.emailConfirmation.isConfirmed === true)
       return { result: 400, message: "Email is already confirmed" };
@@ -84,7 +83,7 @@ export class AuthService {
       );
       return { result: 204, message: "OK" };
     } catch (error) {
-      await UserRepostitory.deleteUser(user._id.toString());
+      await UserRepostitory.deleteUser(user.id.toString());
       return { result: 400, message: "Something goes wrong..." };
     }
   }
@@ -92,60 +91,63 @@ export class AuthService {
   static async loginUser(userId: string, ip: string, title: string) {
     const deviceId = uuidv4();
 
-    const accessToken = await jwtService.createJWT(userId);
-    const refreshToken = await jwtService.createRefreshJWT(userId, deviceId);
-
-    const expDate = await jwtService.getExpirationDateFromRefreshToken(
-      refreshToken
+    const accessToken: string = await jwtService.createJWT(userId);
+    const refreshToken: string = await jwtService.createRefreshJWT(
+      userId,
+      deviceId
     );
 
-    const lastActiveDate = await jwtService.getIssuedAtFromJWTAccessToken(
-      accessToken
-    );
+    const expDate: string =
+      await jwtService.getExpirationDateFromRefreshToken(refreshToken);
 
-    const sessionData: DeviceType = {
+    const lastActiveDate: string =
+      await jwtService.getIssuedAtFromJWTAccessToken(accessToken);
+
+    const sessionData: DeviceDBType = {
+      deviceId,
       ip,
+      lastActiveDate: lastActiveDate,
       title,
       userId: userId,
-      deviceId,
       expirationDate: expDate,
-      lastActiveDate: lastActiveDate,
     };
 
-    const isSessionSaved = await SecurityRepostiory.addDevice(sessionData);
+    const isSessionSaved: boolean =
+      await SecurityRepostiory.addDevice(sessionData);
     if (!isSessionSaved) {
       return null;
     }
     return { accessToken, refreshToken };
   }
 
-  static async refreshTokens(deviceId: string, userId: string) {
-    const user = await QueryUserRepository.getUserById(userId);
+  static async updateRefreshTokens(deviceId: string, userId: string) {
+    const user: OutputUserType | null =
+      await QueryUserRepository.getUserById(userId);
     if (!user) return null;
 
-    const accessToken = await jwtService.createJWT(user.id);
-    const refreshToken = await jwtService.createRefreshJWT(user.id, deviceId);
-
-    const expirationDate = await jwtService.getExpirationDateFromRefreshToken(
-      refreshToken
+    const accessToken: string = await jwtService.createJWT(user.userId);
+    const refreshToken: string = await jwtService.createRefreshJWT(
+      user.userId,
+      deviceId
     );
+
+    const expirationDate: string =
+      await jwtService.getExpirationDateFromRefreshToken(refreshToken);
     if (!expirationDate) return null;
 
-    const lastActiveDate = await jwtService.getIssuedAtFromJWTAccessToken(
-      accessToken
-    );
+    const lastActiveDate: string =
+      await jwtService.getIssuedAtFromJWTAccessToken(accessToken);
     if (!lastActiveDate) return null;
 
-    const updateDeviceData = {
+    const updateDeviceData: UpdateDeviceType = {
       expirationDate,
       lastActiveDate,
       userId,
       deviceId,
     };
 
-    const isSessionUpdated = await SecurityRepostiory.updateDevice(
-      updateDeviceData
-    );
+    const isSessionUpdated: boolean =
+      await SecurityRepostiory.updateDevice(updateDeviceData);
 
     if (!isSessionUpdated) return null;
 

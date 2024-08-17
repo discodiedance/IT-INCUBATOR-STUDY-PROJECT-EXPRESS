@@ -1,11 +1,12 @@
 import { Router, Response, Request } from "express";
-import { SecurityRepostiory } from "../repositories/security-repository";
 import { SecurityQueryRepostiory } from "../repositories/query-repository/query-security-repository";
 import { deviceMiddleware } from "../middlewares/security/device-login-middleware";
-import { DeviceIdParams, Params, RequestWithParams } from "../types/common";
+import { DeviceIdParams, RequestWithParams } from "../types/common";
 import { authRefreshTokenMiddleware } from "../middlewares/auth/auth-refresh-token-middleware";
 import { jwtService } from "../aplication/jwt-service";
 import { SecurityService } from "../domain/security-service";
+import { DeviceDBType } from "../types/security/input";
+import { OutputDeviceType } from "../types/security/output";
 
 export const securityRoute = Router({});
 
@@ -14,10 +15,11 @@ securityRoute.get(
   authRefreshTokenMiddleware,
   deviceMiddleware,
   async (req: Request, res: Response) => {
-    const userId = await jwtService.getUserIdByRefreshToken(
+    const userId: string = await jwtService.getUserIdByRefreshToken(
       req.cookies.refreshToken
     );
-    const devices = await SecurityQueryRepostiory.getAllDevicesByUserId(userId);
+    const devices: OutputDeviceType[] | null =
+      await SecurityQueryRepostiory.getAllDevicesByUserId(userId);
     return res.status(200).send(devices);
   }
 );
@@ -27,17 +29,11 @@ securityRoute.delete(
   authRefreshTokenMiddleware,
   deviceMiddleware,
   async (req: Request, res: Response) => {
-    const userId = await jwtService.getUserIdByRefreshToken(
-      req.cookies.refreshToken
-    );
-    const deviceId = await jwtService.getDeviceIdByRefreshToken(
-      req.cookies.refreshToken
-    );
-    const status =
-      await SecurityRepostiory.terminateAllDevicesByUserIdExcludeCurrent(
-        userId,
-        deviceId
+    const status: boolean | null =
+      await SecurityService.terminateAllDevicesByUserIdExcludeCurrent(
+        req.cookies.refreshToken
       );
+
     if (!status) {
       res.sendStatus(401);
       return;
@@ -51,23 +47,18 @@ securityRoute.delete(
   authRefreshTokenMiddleware,
   deviceMiddleware,
   async (req: RequestWithParams<DeviceIdParams>, res: Response) => {
-    const deviceId = req.params.id;
-
-    const device = await SecurityQueryRepostiory.getDeviceByDeviceId(deviceId);
+    const device: DeviceDBType | null =
+      await SecurityQueryRepostiory.getDeviceByDeviceId(req.params.id);
 
     if (!device) {
       res.sendStatus(404);
       return;
     }
-
-    const currentUserId = await jwtService.getUserIdByRefreshToken(
-      req.cookies.refreshToken
-    );
-
-    const status = await SecurityService.terminateDeviceByDeviceId(
-      currentUserId,
-      deviceId
-    );
+    const status: boolean | null =
+      await SecurityService.terminateDeviceByDeviceId(
+        device.deviceId,
+        req.cookies.refreshToken
+      );
 
     if (!status) {
       res.sendStatus(403);

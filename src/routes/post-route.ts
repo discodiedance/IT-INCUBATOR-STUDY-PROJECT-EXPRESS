@@ -11,7 +11,11 @@ import {
   RequestTypeWithQueryPostId,
   RequestWithCommentBodyAndParams,
 } from "../types/common";
-import { PostBody, PostSortDataType } from "../types/post/input";
+import {
+  PostBody,
+  PostSortDataType,
+  UpdatePostData,
+} from "../types/post/input";
 import {
   allCommentsForPostByIdValidation,
   postValidation,
@@ -19,11 +23,17 @@ import {
 import { OutputPostType } from "../types/post/output";
 import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
 import { BlogSortDataType } from "../types/blog/input";
-import { CommentBody } from "../types/comment/input";
+import {
+  InputCommentBody,
+  InputCreateCommentData,
+} from "../types/comment/input";
 import { PostService } from "../domain/post-service";
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
 import { commentValidation } from "./../middlewares/comment/comment-validation";
-import { authTokenMiddleware } from "../middlewares/auth/auth-token-middleware";
+import { authTokenMiddleware } from "../middlewares/auth/auth-access-token-middleware";
+import { OutputUserType } from "../types/user/output";
+import { OutputBlogType } from "../types/blog/output";
+import { OutputCommentType } from "../types/comment/output";
 
 export const postRoute = Router({});
 
@@ -44,8 +54,8 @@ postRoute.get(
 );
 
 postRoute.get("/:id", async (req: RequestWithParams<Params>, res: Response) => {
-  const id = req.params.id;
-  const post = await QueryPostRepository.getPostById(id);
+  const id: string = req.params.id;
+  const post: OutputPostType | null = await QueryPostRepository.getPostById(id);
 
   if (!post) {
     res.sendStatus(404);
@@ -68,7 +78,7 @@ postRoute.get(
       sortBy: req.query.sortBy,
       sortDirection: req.query.sortDirection,
     };
-    const postId = req.params.postId;
+    const postId: string = req.params.postId;
     const foundComments = await QueryPostRepository.getAllComments({
       ...sortData,
       postId,
@@ -83,13 +93,15 @@ postRoute.post(
   authMiddleware,
   postValidation(),
   async (req: RequestWithBodyAndBlog<OutputPostType>, res: Response) => {
-    const blog = await QueryBlogRepository.getBlogById(req.body.blogId);
+    const blog: OutputBlogType | null = await QueryBlogRepository.getBlogById(
+      req.body.blogId
+    );
     if (!blog) {
       res.sendStatus(404);
       return;
     }
 
-    const post = await PostService.createPost({
+    const post: OutputPostType = await PostService.createPost({
       ...req.body,
       blogName: blog.name,
     });
@@ -103,27 +115,32 @@ postRoute.post(
   authTokenMiddleware,
   commentValidation(),
   async (
-    req: RequestWithCommentBodyAndParams<PostIdParams, CommentBody>,
+    req: RequestWithCommentBodyAndParams<PostIdParams, InputCommentBody>,
     res: Response
   ) => {
-    const user = req.user;
+    const user: OutputUserType | null = req.user;
     if (!user) {
       res.sendStatus(401);
       return;
     }
 
-    const post = await QueryPostRepository.getPostById(req.params.postId);
+    const post: OutputPostType | null = await QueryPostRepository.getPostById(
+      req.params.postId
+    );
     if (!post) {
       res.sendStatus(404);
       return;
     }
 
-    const comment = await PostService.createCommentToPost(
-      req.params.postId,
-      req.body.content,
-      req.user!.id,
-      req.user!.login
-    );
+    const createCommentData: InputCreateCommentData = {
+      postId: req.params.postId,
+      content: req.body.content,
+      userId: req.user!.userId,
+      login: req.user!.login,
+    };
+
+    const comment: OutputCommentType =
+      await PostService.createCommentToPost(createCommentData);
     return res.status(201).send(comment);
   }
 );
@@ -132,21 +149,27 @@ postRoute.put(
   "/:id",
   authMiddleware,
   postValidation(),
-  async (req: RequestWithBodyAndParams<Params, PostBody>, res: Response) => {
-    const id = req.params.id;
-    let post: OutputPostType | null = await QueryPostRepository.getPostById(id);
-    let { title, shortDescription, content, blogId } = req.body;
+  async (
+    req: RequestWithBodyAndParams<Params, UpdatePostData>,
+    res: Response
+  ) => {
+    const id: string = req.params.id;
+    const post: OutputPostType | null =
+      await QueryPostRepository.getPostById(id);
 
     if (!post) {
       res.sendStatus(404);
       return;
     }
 
-    (post.title = title),
-      (post.shortDescription = shortDescription),
-      (post.content = content),
-      (post.blogId = blogId);
-    await PostRepository.updatePost(id, post);
+    const updateData: UpdatePostData = {
+      title: req.body.title,
+      shortDescription: req.body.shortDescription,
+      content: req.body.content,
+      blogId: req.body.blogId,
+    };
+
+    await PostRepository.updatePost(id, updateData);
     return res.sendStatus(204);
   }
 );
@@ -155,11 +178,9 @@ postRoute.delete(
   "/:id",
   authMiddleware,
   async (req: RequestWithParams<Params>, res: Response) => {
-    const id = req.params.id;
-
-    const status = await PostRepository.deletePost(id);
-
-    if (status == false) {
+    const id: string = req.params.id;
+    const status: boolean = await PostRepository.deletePost(id);
+    if (!status) {
       res.sendStatus(404);
       return;
     }

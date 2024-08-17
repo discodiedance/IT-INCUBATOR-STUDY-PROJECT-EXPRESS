@@ -1,16 +1,4 @@
-export type BlogBody = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-};
-
-export type UpdateBlogData = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-};
-
-export type InputBlogType = {
+export type InputBlogBodyType = {
   name: string;
   description: string;
   websiteUrl: string;

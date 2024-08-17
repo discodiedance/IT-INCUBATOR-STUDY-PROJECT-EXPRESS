@@ -1,12 +1,19 @@
 import { InputPostType, UpdatePostData } from "../types/post/input";
-import { PostType } from "../types/post/output";
+import { OutputPostType, PostDBType } from "../types/post/output";
 import { PostRepository } from "../repositories/post-repository";
-import { InputCommentType } from "../types/comment/input";
-import { CommentType } from "../types/comment/output";
+import {
+  InputCommentBodyWithPostId,
+  InputCreateCommentData,
+} from "../types/comment/input";
+import { CommentDBType, OutputCommentType } from "../types/comment/output";
+import { ObjectId } from "mongodb";
+import { postMapper } from "./../middlewares/post/post-mapper";
+import { commentMapper } from "./../middlewares/comment/comment-mapper";
 
 export class PostService {
-  static async createPost(newPost: InputPostType): Promise<PostType> {
-    const createdPost: PostType = {
+  static async createPost(newPost: InputPostType): Promise<OutputPostType> {
+    const createdPost: PostDBType = {
+      id: new ObjectId().toString(),
       title: newPost.title,
       shortDescription: newPost.shortDescription,
       content: newPost.content,
@@ -15,43 +22,38 @@ export class PostService {
       createdAt: new Date().toISOString(),
     };
     await PostRepository.createPost(createdPost);
-    return createdPost;
+    return postMapper(createdPost);
   }
 
   static async createComment(
-    newComment: InputCommentType
-  ): Promise<CommentType> {
-    const createdComment: CommentType = {
+    newComment: InputCommentBodyWithPostId
+  ): Promise<OutputCommentType> {
+    const createdComment: CommentDBType = {
       content: newComment.content,
       commentatorInfo: newComment.commentatorInfo,
-      createdAt: new Date().toISOString(),
       postId: newComment.postId,
+      id: new ObjectId().toString(),
+      createdAt: new Date().toISOString(),
     };
-    const comment = await PostRepository.createComment(createdComment);
-    return comment;
+
+    await PostRepository.createComment(createdComment);
+
+    return commentMapper(createdComment);
   }
 
   static async createCommentToPost(
-    postId: string,
-    content: string,
-    userId: string,
-    userLogin: string
-  ) {
-    const comment = await this.createComment({
-      content,
+    createCommentData: InputCreateCommentData
+  ): Promise<OutputCommentType> {
+    const comment: OutputCommentType = await this.createComment({
+      content: createCommentData.content,
       commentatorInfo: {
-        userId,
-        userLogin,
+        userId: createCommentData.userId,
+        userLogin: createCommentData.login,
       },
-      postId,
+      postId: createCommentData.postId,
     });
 
-    return {
-      id: comment.id,
-      content: comment.content,
-      commentatorInfo: comment.commentatorInfo,
-      createdAt: comment.createdAt,
-    };
+    return comment;
   }
 
   static async updatePost(
@@ -63,9 +65,8 @@ export class PostService {
       shortDescription: updateData.shortDescription,
       content: updateData.content,
       blogId: updateData.blogId,
-      blogName: updateData.blogName,
     };
     const result = await PostRepository.updatePost(id, updatedPost);
-    return !!result.matchedCount;
+    return result;
   }
 }

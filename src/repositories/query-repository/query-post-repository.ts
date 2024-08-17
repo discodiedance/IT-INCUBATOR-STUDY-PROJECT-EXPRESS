@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
-import { commentCollection, postCollection } from "../../db/db";
+import { CommentModel, PostModel } from "../../db/db";
 import { postMapper } from "../../middlewares/post/post-mapper";
-import { OutputPostType } from "../../types/post/output";
+import { OutputPostType, PostDBType } from "../../types/post/output";
 import { BlogSortDataType } from "../../types/blog/input";
 import { CommentSortDataType } from "../../types/comment/input";
 import { commentMapper } from "../../middlewares/comment/comment-mapper";
@@ -22,16 +22,15 @@ export class QueryPostRepository {
       };
     }
 
-    const posts = await postCollection
-      .find(filter)
-      .sort(sortBy, sortDirection)
+    const posts = await PostModel.find(filter)
+      .sort({ [sortBy]: sortDirection })
       .skip((+pageNumber - 1) * +pageSize)
       .limit(+pageSize)
-      .toArray();
+      .lean();
 
-    const totalCount = await postCollection.countDocuments(filter);
+    const totalCount: number = await PostModel.countDocuments(filter);
 
-    const pageCount = Math.ceil(totalCount / +pageSize);
+    const pageCount: number = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
@@ -57,16 +56,15 @@ export class QueryPostRepository {
       };
     }
 
-    const comments = await commentCollection
-      .find(filter)
-      .sort(sortBy, sortDirection)
+    const comments = await CommentModel.find(filter)
+      .sort({ [sortBy]: sortDirection })
       .skip((+pageNumber - 1) * +pageSize)
       .limit(+pageSize)
-      .toArray();
+      .lean();
 
-    const totalCount = await commentCollection.countDocuments(filter);
+    const totalCount: number = await CommentModel.countDocuments(filter);
 
-    const pageCount = Math.ceil(totalCount / +pageSize);
+    const pageCount: number = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
@@ -78,7 +76,7 @@ export class QueryPostRepository {
   }
 
   static async getPostById(id: string): Promise<OutputPostType | null> {
-    const post = await postCollection.findOne({ _id: new ObjectId(id) });
+    const post: PostDBType | null = await PostModel.findOne({ id: id });
     if (!post) {
       return null;
     }

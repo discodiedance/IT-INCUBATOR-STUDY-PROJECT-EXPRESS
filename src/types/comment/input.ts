@@ -1,4 +1,4 @@
-export type CommentBody = {
+export type InputCommentBody = {
   content: string;
   commentatorInfo: {
     userId: string;
@@ -6,17 +6,23 @@ export type CommentBody = {
   };
 };
 
-export type UpdateCommentData = {
+export type InputCreateCommentData = {
+  postId: string;
   content: string;
+  userId: string;
+  login: string;
 };
-
-export type InputCommentType = {
+export type InputCommentBodyWithPostId = {
   content: string;
   commentatorInfo: {
     userId: string;
     userLogin: string;
   };
   postId: string;
+};
+
+export type UpdateCommentData = {
+  content: string;
 };
 
 export type CommentSortDataType = {

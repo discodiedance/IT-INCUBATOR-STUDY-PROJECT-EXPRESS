@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { apiRequestsCollection } from "../../db/db";
+import { APIRequeststModel } from "../../db/db";
 
 export const customRateLimitiMiddleware = async (
   req: Request,
@@ -8,16 +8,19 @@ export const customRateLimitiMiddleware = async (
 ) => {
   const IP = req.ip || "incorrect";
   const URL = req.originalUrl;
+  const title = req.headers["user-agent"] || "incorrect";
   const date = new Date();
-  const filter = { IP, URL, date };
 
-  await apiRequestsCollection.insertOne(filter);
+  const filter = { IP, URL, title, date };
+
+  await APIRequeststModel.create(filter);
 
   const reducedDate = new Date(Date.now() - 10000);
 
-  const totalCount = await apiRequestsCollection.countDocuments({
+  const totalCount: number = await APIRequeststModel.countDocuments({
     URL: URL,
     IP: IP,
+    title: title,
     date: { $gte: reducedDate },
   });
 

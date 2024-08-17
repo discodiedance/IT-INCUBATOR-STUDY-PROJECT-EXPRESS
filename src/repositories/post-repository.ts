@@ -1,27 +1,28 @@
-import { ObjectId } from "mongodb";
-import { commentCollection, postCollection } from "../db/db";
+import { CommentModel, PostModel } from "../db/db";
 import { UpdatePostData } from "../types/post/input";
-import { PostType } from "../types/post/output";
-import { CommentType } from "../types/comment/output";
+import { PostDBType } from "../types/post/output";
+import { CommentDBType } from "../types/comment/output";
 
 export class PostRepository {
-  static async createPost(inputCreatePost: PostType) {
-    const createdPost = await postCollection.insertOne({ ...inputCreatePost });
-    inputCreatePost.id = createdPost.insertedId.toString();
+  static async createPost(inputCreatePost: PostDBType): Promise<PostDBType> {
+    const createdPost = await PostModel.create(inputCreatePost);
     return createdPost;
   }
 
-  static async createComment(inputCreateComment: CommentType) {
-    const result = await commentCollection.insertOne({
-      ...inputCreateComment,
-    });
-    inputCreateComment.id = result.insertedId.toString();
-    return inputCreateComment;
+  static async createComment(
+    inputCreateComment: CommentDBType
+  ): Promise<CommentDBType> {
+    const result: CommentDBType | null =
+      await CommentModel.create(inputCreateComment);
+    return result;
   }
 
-  static async updatePost(id: string, updateData: UpdatePostData) {
-    const result = await postCollection.updateOne(
-      { _id: new ObjectId(id) },
+  static async updatePost(
+    id: string,
+    updateData: UpdatePostData
+  ): Promise<boolean> {
+    const result = await PostModel.updateOne(
+      { id: id },
       {
         $set: {
           title: updateData.title,
@@ -31,11 +32,11 @@ export class PostRepository {
         },
       }
     );
-    return result;
+    return !!result.modifiedCount;
   }
 
   static async deletePost(id: string): Promise<boolean> {
-    const result = await postCollection.deleteOne({ _id: new ObjectId(id) });
+    const result = await PostModel.deleteOne({ id: id });
     return !!result.deletedCount;
   }
 }
