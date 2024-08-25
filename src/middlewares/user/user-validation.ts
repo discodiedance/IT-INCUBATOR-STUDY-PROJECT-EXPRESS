@@ -26,6 +26,17 @@ export const codeValidation = body("code")
   .trim()
   .withMessage("Incorrect value");
 
+export const recoverPasswordValidation = body("newPassword")
+  .isString()
+  .trim()
+  .isLength({ min: 6, max: 20 })
+  .withMessage("Incorrect value");
+
+export const recoveryPasswordCodeValidation = body("recoveryCode")
+  .isString()
+  .trim()
+  .withMessage("Incorrect value");
+
 export const userValidation = () => [
   loginValidation,
   passwordValidation,
@@ -35,6 +46,12 @@ export const userValidation = () => [
 
 export const userEmailValidation = () => [
   emailValidation,
+  inputModelValidation,
+];
+
+export const userPasswordUpdateValidation = () => [
+  recoverPasswordValidation,
+  recoveryPasswordCodeValidation,
   inputModelValidation,
 ];
 

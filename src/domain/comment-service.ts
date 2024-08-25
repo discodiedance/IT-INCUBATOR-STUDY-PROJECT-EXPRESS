@@ -5,22 +5,23 @@ import { OutputUserType } from "../types/user/output";
 
 export class CommentService {
   static async updateComment(
-    id: string,
-    updateData: UpdateCommentData
+    updateData: UpdateCommentData,
+    id: string
   ): Promise<boolean> {
     const updatedComment: UpdateCommentData = {
       content: updateData.content,
     };
     const result = await CommentRepository.updateComment(id, updatedComment);
-    return !!result.modifiedCount;
+    return result;
   }
+
   static async checkCredentials(
     comment: OutputCommentType,
-    user: OutputUserType | null
+    user: OutputUserType
   ): Promise<boolean | null> {
     if (
-      comment.commentatorInfo.userId !== user!.userId &&
-      comment.commentatorInfo.userLogin !== user!.login
+      comment.commentatorInfo.userId !== user.id &&
+      comment.commentatorInfo.userLogin !== user.login
     ) {
       return null;
     }

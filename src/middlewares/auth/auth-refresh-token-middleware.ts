@@ -31,7 +31,7 @@ export const authRefreshTokenMiddleware = async (
     return;
   }
 
-  if (exp !== DeviceSession.expirationDate || userId !== DeviceSession.userId) {
+  if (exp !== DeviceSession.expirationDate && userId !== DeviceSession.userId) {
     res.sendStatus(401);
     return;
   }

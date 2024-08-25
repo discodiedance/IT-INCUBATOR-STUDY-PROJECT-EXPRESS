@@ -38,31 +38,35 @@ commentRoute.put(
     req: RequestWithBodyAndParams<Params, UpdateCommentData>,
     res: Response
   ) => {
-    const user: OutputUserType | null = req.user;
-    const id: string = req.params.id;
-    if (!user) {
-      res.sendStatus(401);
-      return;
-    }
+    const user = req.user as OutputUserType;
     const content: UpdateCommentData = req.body;
+    const id: string = req.params.id;
 
     const comment: OutputCommentType | null =
       await QueryCommentRepository.getCommentById(id);
+
     if (!comment) {
       res.sendStatus(404);
       return;
     }
 
-    const status: Promise<boolean | null> = CommentService.checkCredentials(
+    const checkedUser: boolean | null = await CommentService.checkCredentials(
       comment,
-      req!.user
+      user
     );
-    if (!status) {
+
+    if (!checkedUser) {
       res.sendStatus(403);
       return;
     }
-    await CommentService.updateComment(id, content);
-    return res.sendStatus(204);
+
+    const status: boolean = await CommentService.updateComment(content, id);
+    if (!status) {
+      return null;
+    }
+
+    res.sendStatus(204);
+    return;
   }
 );
 
@@ -70,11 +74,9 @@ commentRoute.delete(
   "/:id",
   authTokenMiddleware,
   async (req: RequestWithParams<Params>, res: Response) => {
-    const user: OutputUserType | null = req.user;
-    if (!user) {
-      return res.sendStatus(401);
-    }
+    const user = req.user as OutputUserType;
     const id: string = req.params.id;
+
     const comment: OutputCommentType | null =
       await QueryCommentRepository.getCommentById(id);
 
@@ -82,12 +84,12 @@ commentRoute.delete(
       res.sendStatus(404);
       return;
     }
-    const status: Promise<boolean | null> = CommentService.checkCredentials(
+    const checkedUser: boolean | null = await CommentService.checkCredentials(
       comment,
-      req.user
+      user
     );
 
-    if (!status) {
+    if (!checkedUser) {
       res.sendStatus(403);
       return;
     }

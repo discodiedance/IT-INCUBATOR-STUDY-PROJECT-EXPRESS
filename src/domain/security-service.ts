@@ -39,7 +39,7 @@ export class SecurityService {
       return null;
     }
     const isDeviceFound = foundDevicesByCurrentUserId.find(
-      (device) => device.deviceId === foundDeviceByDeviceId!.deviceId
+      (device) => device.deviceId === foundDeviceByDeviceId.deviceId
     );
 
     if (!isDeviceFound) {

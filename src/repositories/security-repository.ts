@@ -48,7 +48,7 @@ export class SecurityRepostiory {
     try {
       const result = await DevicesModel.updateOne(
         {
-          id: updateInputDevice.deviceId,
+          deviceId: updateInputDevice.deviceId,
         },
         {
           $set: {

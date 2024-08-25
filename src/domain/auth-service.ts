@@ -40,6 +40,10 @@ export class AuthService {
         }),
         isConfirmed: false,
       },
+      passwordRecoveryConfirmation: {
+        recoveryCode: "",
+        expirationDate: null,
+      },
     };
 
     await UserRepostitory.createUser(user);
@@ -57,10 +61,14 @@ export class AuthService {
   }
 
   static async confirmEmail(code: string): Promise<ConfirmEmailType> {
-    const user = await UserService.findUserByConfirmationCode(code);
+    const user: UserDBType | null =
+      await UserService.findUserByConfirmationCode(code);
     if (!user) return { result: 400, message: "User is not found" };
     if (user.emailConfirmation.isConfirmed === true)
-      return { result: 400, message: "Confirmartion code is not confirmed" };
+      return {
+        result: 400,
+        message: "Confirmartion code is already confirmed",
+      };
     if (user.emailConfirmation.confirmationCode !== code)
       return { result: 400, message: "Confirmation code error" };
     if (user.emailConfirmation.expirationDate < new Date())
@@ -70,11 +78,12 @@ export class AuthService {
   }
 
   static async resendEmail(email: string): Promise<ResendEmailType> {
-    const user = await QueryUserRepository.findyByEmail(email);
+    const user: UserDBType | null =
+      await QueryUserRepository.findyByEmail(email);
     if (!user) return { result: 400, message: "User is not found" };
     if (user.emailConfirmation.isConfirmed === true)
       return { result: 400, message: "Email is already confirmed" };
-    const newCode = uuidv4();
+    const newCode: string = uuidv4();
     await UserRepostitory.updateConfirmationCode(newCode, email);
     try {
       await emailsManager.resendConfirmationMessage(
@@ -88,13 +97,70 @@ export class AuthService {
     }
   }
 
+  static async sendPasswordRecoveryCode(email: string) {
+    const user: UserDBType | null =
+      await QueryUserRepository.findyByEmail(email);
+    if (!user) {
+      return { result: 204, message: "OK" };
+    } else {
+      try {
+        const newCode: string = uuidv4();
+        const result = await UserRepostitory.addRecoveryPasswordCodeToUserById(
+          newCode,
+          user.id
+        );
+        if (!result) {
+          return { result: 400, message: "Code wasn't created" };
+        }
+        await emailsManager.sendPasswordRecoveryMessage(email, newCode);
+
+        return { result: 204, message: "OK" };
+      } catch (error) {
+        return { result: 400, message: "Something goes wrong..." };
+      }
+    }
+  }
+
+  static async confirPasswordRecoveryCodeAndUpdatePassword(
+    newPassword: string,
+    code: string
+  ) {
+    const user: UserDBType | null =
+      await QueryUserRepository.findUserByRecoveryConfirmationCode(code);
+    if (!user)
+      return {
+        result: 400,
+        message: "User is not exists",
+      };
+    if (user!.passwordRecoveryConfirmation.expirationDate! < new Date())
+      return { result: 400, message: "Confirmaton code is expired" };
+    const salt: string | null =
+      await QueryUserRepository.findPasswordSaltByUserId(user!.id);
+    if (!salt) {
+      return { result: 400, message: "Can't change the password" };
+    }
+    const newPasswordHash: string = await UserService._generateHash(
+      newPassword,
+      salt
+    );
+    const status: boolean = await UserRepostitory.updateNewPasswordByUserId(
+      newPasswordHash,
+      user.id
+    );
+    if (!status) {
+      return { result: 400, message: "Password wasn't updated" };
+    }
+    return { result: 204, message: "Password is changed" };
+  }
+
   static async loginUser(userId: string, ip: string, title: string) {
-    const deviceId = uuidv4();
+    const deviceId: string = uuidv4();
 
     const accessToken: string = await jwtService.createJWT(userId);
+
     const refreshToken: string = await jwtService.createRefreshJWT(
-      userId,
-      deviceId
+      deviceId,
+      userId
     );
 
     const expDate: string =
@@ -117,6 +183,7 @@ export class AuthService {
     if (!isSessionSaved) {
       return null;
     }
+
     return { accessToken, refreshToken };
   }
 
@@ -125,10 +192,10 @@ export class AuthService {
       await QueryUserRepository.getUserById(userId);
     if (!user) return null;
 
-    const accessToken: string = await jwtService.createJWT(user.userId);
+    const accessToken: string = await jwtService.createJWT(user.id);
     const refreshToken: string = await jwtService.createRefreshJWT(
-      user.userId,
-      deviceId
+      deviceId,
+      user.id
     );
 
     const expirationDate: string =
@@ -146,10 +213,10 @@ export class AuthService {
       deviceId,
     };
 
-    const isSessionUpdated: boolean =
+    const savedSession: boolean =
       await SecurityRepostiory.updateDevice(updateDeviceData);
 
-    if (!isSessionUpdated) return null;
+    if (!savedSession) return null;
 
     return { accessToken, refreshToken };
   }

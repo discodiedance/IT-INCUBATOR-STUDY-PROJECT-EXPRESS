@@ -1,6 +1,6 @@
 import { CommentModel, PostModel } from "../db/db";
 import { UpdatePostData } from "../types/post/input";
-import { PostDBType } from "../types/post/output";
+import { PostDBType } from "../types/post/input";
 import { CommentDBType } from "../types/comment/output";
 
 export class PostRepository {
@@ -12,8 +12,7 @@ export class PostRepository {
   static async createComment(
     inputCreateComment: CommentDBType
   ): Promise<CommentDBType> {
-    const result: CommentDBType | null =
-      await CommentModel.create(inputCreateComment);
+    const result: CommentDBType = await CommentModel.create(inputCreateComment);
     return result;
   }
 

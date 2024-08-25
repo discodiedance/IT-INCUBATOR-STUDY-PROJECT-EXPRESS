@@ -12,6 +12,7 @@ import { AuthService } from "../domain/auth-service";
 import {
   userCodeValidation,
   userEmailValidation,
+  userPasswordUpdateValidation,
   userValidation,
 } from "../middlewares/user/user-validation";
 import { registrationMiddleware } from "../middlewares/auth/registration-middleware";
@@ -96,16 +97,21 @@ authRoute.post(
   "/logout",
   authRefreshTokenMiddleware,
   async (req: Request, res: Response) => {
-    const userId = await jwtService.getUserIdByRefreshToken(
-      req.cookies.refreshToken
-    );
     const deviceId = await jwtService.getDeviceIdByRefreshToken(
       req.cookies.refreshToken
     );
-    const result: boolean | null =
-      await SecurityService.terminateDeviceByDeviceId(userId, deviceId);
-    if (!result) {
-      return false;
+    if (!deviceId) {
+      res.sendStatus(401);
+      return;
+    }
+    const status: boolean | null =
+      await SecurityService.terminateDeviceByDeviceId(
+        deviceId,
+        req.cookies.refreshToken
+      );
+    if (!status) {
+      res.sendStatus(401);
+      return;
     }
     res.sendStatus(204);
     return;
@@ -124,7 +130,7 @@ authRoute.get(
     const userData = {
       email: user.email,
       login: user.login,
-      userId: user.userId,
+      id: user.id,
     };
     return res.status(200).send(userData);
   }
@@ -163,10 +169,11 @@ authRoute.post(
     const registrationResult: OutputUserType | null =
       await AuthService.createUserByRegistration(userData);
 
-    if (registrationResult) {
-      return res.sendStatus(204);
-    } else {
+    if (!registrationResult) {
       res.sendStatus(400);
+      return;
+    } else {
+      res.sendStatus(204);
       return;
     }
   }
@@ -187,6 +194,41 @@ authRoute.post(
       return res.status(400).send({
         errorsMessages: [{ message: result.message, field: "email" }],
       });
+    }
+  }
+);
+
+authRoute.post(
+  "/password-recovery",
+  customRateLimitiMiddleware,
+  userEmailValidation(),
+  async (req: Request, res: Response) => {
+    await AuthService.sendPasswordRecoveryCode(req.body.email);
+    res.sendStatus(204);
+    return;
+  }
+);
+
+authRoute.post(
+  "/new-password",
+  customRateLimitiMiddleware,
+  userPasswordUpdateValidation(),
+  async (req: Request, res: Response) => {
+    const result: ResendEmailType =
+      await AuthService.confirPasswordRecoveryCodeAndUpdatePassword(
+        req.body.newPassword,
+        req.body.recoveryCode
+      );
+    if (result.result === 204) {
+      res.sendStatus(204);
+      return;
+    } else {
+      res
+        .status(400)
+        .send({
+          errorsMessages: [{ message: result.message, field: "recoveryCode" }],
+        });
+      return;
     }
   }
 );

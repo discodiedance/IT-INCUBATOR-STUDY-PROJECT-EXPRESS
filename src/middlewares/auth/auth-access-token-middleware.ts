@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { jwtService } from "../../aplication/jwt-service";
 import { QueryUserRepository } from "../../repositories/query-repository/query-user-repository";
+import { OutputUserType } from "../../types/user/output";
 
 export const authTokenMiddleware = async (
   req: Request,
@@ -14,10 +15,17 @@ export const authTokenMiddleware = async (
 
   const accessToken = req.headers.authorization.split(" ")[1];
 
-  const userId: string | null =
-    await jwtService.getUserIdByJWTToken(accessToken);
+  const userId = await jwtService.getUserIdByJWTToken(accessToken);
   if (!userId) {
     res.sendStatus(401);
-  } else req.user = await QueryUserRepository.getUserById(userId);
+    return;
+  }
+  const foundedUser: OutputUserType | null =
+    await QueryUserRepository.getUserById(userId);
+  if (!foundedUser) {
+    res.sendStatus(401);
+    return;
+  }
+  req.user = foundedUser;
   next();
 };

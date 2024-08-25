@@ -10,7 +10,7 @@ import { QueryUserRepository } from "../repositories/query-repository/query-user
 
 export class UserService {
   static async _generateHash(password: string, salt: string): Promise<string> {
-    const hash = await bcrypt.hash(password, salt);
+    const hash: string = await bcrypt.hash(password, salt);
     return hash;
   }
 
@@ -38,6 +38,10 @@ export class UserService {
         }),
         isConfirmed: false,
       },
+      passwordRecoveryConfirmation: {
+        recoveryCode: "",
+        expirationDate: null,
+      },
     };
 
     const outputUser: UserDBType =
@@ -51,6 +55,9 @@ export class UserService {
   ): Promise<UserDBType | null> {
     const foundedUser: UserDBType | null =
       await QueryUserRepository.findUserByConfirmationCode(code);
+    if (!foundedUser) {
+      return null;
+    }
     return foundedUser;
   }
 
@@ -69,7 +76,6 @@ export class UserService {
     if (user.accountData.passwordHash !== passwordHash) {
       return null;
     }
-
     return user;
   }
 }

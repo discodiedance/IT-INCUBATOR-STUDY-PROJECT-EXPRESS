@@ -1,10 +1,10 @@
-import { ObjectId } from "mongodb";
 import { CommentModel, PostModel } from "../../db/db";
 import { postMapper } from "../../middlewares/post/post-mapper";
-import { OutputPostType, PostDBType } from "../../types/post/output";
+import { OutputPostType } from "../../types/post/output";
 import { BlogSortDataType } from "../../types/blog/input";
 import { CommentSortDataType } from "../../types/comment/input";
 import { commentMapper } from "../../middlewares/comment/comment-mapper";
+import { PostDBType } from "../../types/post/input";
 
 export class QueryPostRepository {
   static async getAllPosts(sortData: BlogSortDataType) {

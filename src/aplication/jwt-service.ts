@@ -4,24 +4,22 @@ import { JWT_SECRET, REFRESH_SECRET } from "../config";
 export class jwtService {
   static async createJWT(userId: string): Promise<string> {
     const accessToken = jwt.sign({ userId }, JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "10s",
     });
     return accessToken;
   }
 
   static async createRefreshJWT(
-    userId: string,
-    deviceId: string
+    deviceId: string,
+    userId: string
   ): Promise<string> {
     const refreshToken = jwt.sign({ deviceId, userId }, REFRESH_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "20s",
     });
     return refreshToken;
   }
 
-  static async getUserIdByJWTToken(
-    accessToken: string
-  ): Promise<string | null> {
+  static async getUserIdByJWTToken(accessToken: string) {
     try {
       const result: any = jwt.verify(accessToken, JWT_SECRET);
       return result.userId;

@@ -11,7 +11,7 @@ export class CommentRepository {
         },
       }
     );
-    return result;
+    return !!result.modifiedCount;
   }
 
   static async deleteComment(id: string): Promise<boolean> {

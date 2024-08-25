@@ -55,9 +55,7 @@ export class QueryUserRepository {
   }
 
   static async getUserById(id: string): Promise<OutputUserType | null> {
-    if (!id) return null;
-
-    const user: UserDBType | null = await UserModel.findOne({ id: id });
+    const user = await UserModel.findOne({ id: id });
     if (!user) {
       return null;
     }
@@ -71,7 +69,7 @@ export class QueryUserRepository {
     return user;
   }
 
-  static async findyByEmail(email: string) {
+  static async findyByEmail(email: string): Promise<UserDBType | null> {
     const user: UserDBType | null = await UserModel.findOne({
       "accountData.email": email,
     });
@@ -79,7 +77,7 @@ export class QueryUserRepository {
   }
 
   static async findByLoginOrEmail(loginOrEmail: string) {
-    const userLoginorEmail: UserDBType | null = await UserModel.findOne({
+    const user: UserDBType | null = await UserModel.findOne({
       $or: [
         {
           "accountData.email": {
@@ -95,13 +93,48 @@ export class QueryUserRepository {
         },
       ],
     });
-    return userLoginorEmail;
+    return user;
   }
 
-  static async findUserByConfirmationCode(emailConfirmationCode: string) {
+  static async findUserByConfirmationCode(
+    emailConfirmationCode: string
+  ): Promise<UserDBType | null> {
     const user: UserDBType | null = await UserModel.findOne({
       "emailConfirmation.confirmationCode": emailConfirmationCode,
     });
     return user;
+  }
+
+  static async findUserByRecoveryConfirmationCode(
+    passwordRecoveryCode: string
+  ): Promise<UserDBType | null> {
+    const user: UserDBType | null = await UserModel.findOne({
+      "passwordRecoveryConfirmation.recoveryCode": passwordRecoveryCode,
+    });
+    return user;
+  }
+
+  static async findPasswordSaltByUserId(
+    userId: string
+  ): Promise<string | null> {
+    const user: UserDBType | null = await UserModel.findOne({
+      id: userId,
+    });
+    return user!.accountData.passwordSalt;
+  }
+
+  //--------------------------for e2e tests--------------------------
+  static async findConfirmationCodeByEmail(email: string) {
+    const user = await UserModel.findOne({
+      "accountData.email": email,
+    });
+    return user!.emailConfirmation.confirmationCode;
+  }
+
+  static async findPasswordRecoveryConfirmationCodeByEmail(email: string) {
+    const user = await UserModel.findOne({
+      "accountData.email": email,
+    });
+    return user!.passwordRecoveryConfirmation.recoveryCode;
   }
 }

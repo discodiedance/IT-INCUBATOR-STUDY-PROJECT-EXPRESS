@@ -2,11 +2,11 @@ import { mongoUri } from "../config";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { BlogDBType } from "../types/blog/output";
-import { PostDBType } from "../types/post/output";
 import { UserDBType } from "../types/user/output";
 import { CommentDBType } from "../types/comment/output";
 import { APIReqeustsType } from "../types/common";
 import { DeviceDBType } from "../types/security/input";
+import { PostDBType } from "../types/post/input";
 
 dotenv.config();
 
@@ -36,6 +36,10 @@ export const UserSchema = new mongoose.Schema<UserDBType>({
     confirmationCode: { type: String, require: true },
     expirationDate: { type: Date, require: true },
     isConfirmed: { type: Boolean, require: true },
+  },
+  passwordRecoveryConfirmation: {
+    recoveryCode: { type: String, require: true },
+    expirationDate: { type: Date, require: true },
   },
 });
 export const UserModel = mongoose.model<UserDBType>("users", UserSchema);

@@ -11,11 +11,7 @@ import {
   RequestTypeWithQueryPostId,
   RequestWithCommentBodyAndParams,
 } from "../types/common";
-import {
-  PostBody,
-  PostSortDataType,
-  UpdatePostData,
-} from "../types/post/input";
+import { PostSortDataType, UpdatePostData } from "../types/post/input";
 import {
   allCommentsForPostByIdValidation,
   postValidation,
@@ -118,15 +114,11 @@ postRoute.post(
     req: RequestWithCommentBodyAndParams<PostIdParams, InputCommentBody>,
     res: Response
   ) => {
-    const user: OutputUserType | null = req.user;
-    if (!user) {
-      res.sendStatus(401);
-      return;
-    }
-
+    const user = req.user as OutputUserType;
     const post: OutputPostType | null = await QueryPostRepository.getPostById(
       req.params.postId
     );
+
     if (!post) {
       res.sendStatus(404);
       return;
@@ -135,8 +127,8 @@ postRoute.post(
     const createCommentData: InputCreateCommentData = {
       postId: req.params.postId,
       content: req.body.content,
-      userId: req.user!.userId,
-      login: req.user!.login,
+      userId: user.id,
+      login: user.login,
     };
 
     const comment: OutputCommentType =

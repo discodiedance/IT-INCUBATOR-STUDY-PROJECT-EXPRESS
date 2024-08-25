@@ -1,5 +1,5 @@
-import { InputPostType, UpdatePostData } from "../types/post/input";
-import { OutputPostType, PostDBType } from "../types/post/output";
+import { InputPostType, PostDBType, UpdatePostData } from "../types/post/input";
+import { OutputPostType } from "../types/post/output";
 import { PostRepository } from "../repositories/post-repository";
 import {
   InputCommentBodyWithPostId,

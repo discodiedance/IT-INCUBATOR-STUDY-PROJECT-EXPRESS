@@ -1,4 +1,5 @@
-import { PostDBType, OutputPostType } from "../../types/post/output";
+import { PostDBType } from "../../types/post/input";
+import { OutputPostType } from "../../types/post/output";
 
 export const postMapper = (post: PostDBType): OutputPostType => {
   return {

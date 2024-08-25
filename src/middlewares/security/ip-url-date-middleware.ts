@@ -6,20 +6,20 @@ export const customRateLimitiMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const IP = req.ip || "incorrect";
+  const ip = req.ip || "incorrect";
   const URL = req.originalUrl;
   const title = req.headers["user-agent"] || "incorrect";
   const date = new Date();
 
-  const filter = { IP, URL, title, date };
+  const filter = { ip, URL, title, date };
 
   await APIRequeststModel.create(filter);
 
   const reducedDate = new Date(Date.now() - 10000);
 
   const totalCount: number = await APIRequeststModel.countDocuments({
+    ip: ip,
     URL: URL,
-    IP: IP,
     title: title,
     date: { $gte: reducedDate },
   });

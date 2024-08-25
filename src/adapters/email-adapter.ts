@@ -3,7 +3,7 @@ import { GMAIL_COM_PASS } from "../config";
 
 export class emailAdapter {
   static async sendEmail(email: string, subject: string, message: string) {
-    let transport = nodemailer.createTransport({
+    const transport = nodemailer.createTransport({
       service: "Gmail",
       secure: false,
       auth: {
@@ -15,8 +15,8 @@ export class emailAdapter {
       },
     });
 
-    let sendingResult = await transport.sendMail({
-      from: "Jerome <exitg0d@mail.ru>",
+    const sendingResult = await transport.sendMail({
+      from: "Jerome V. <fundu1448@gmail.com>",
       to: email,
       subject: subject,
       html: message,
