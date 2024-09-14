@@ -33,6 +33,7 @@
     "testpost": "jest ./__tests__/e2e/post-api.tests.ts --runInBand",
     "testauth": "jest ./__tests__/e2e/auth-api.tests.ts --runInBand",
     "testcomment": "jest ./__tests__/e2e/comment-api.tests.ts --runInBand",
+    "testlike": "jest ./__tests__/e2e/like-api.tests.ts --runInBand",
     "testsecurity": "jest ./__tests__/e2e/security-api.tests.ts --runInBand"
   },
   "devDependencies": {

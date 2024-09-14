@@ -3,11 +3,11 @@ import { securityMapper } from "../../middlewares/security/security-mapper";
 import { DeviceDBType } from "../../types/security/input";
 import { OutputDeviceType } from "../../types/security/output";
 
-export class SecurityQueryRepostiory {
-  static async getAllDevicesByUserId(
+export class QuerySecurityRepostiory {
+  async getAllDevicesByUserId(
     userId: string
   ): Promise<OutputDeviceType[] | null> {
-    const allDevices = await DevicesModel.find({
+    const allDevices: DeviceDBType[] | null = await DevicesModel.find({
       userId: userId,
     });
     if (!allDevices) {
@@ -16,9 +16,7 @@ export class SecurityQueryRepostiory {
     return securityMapper(allDevices);
   }
 
-  static async getDeviceByDeviceId(
-    deviceId: string
-  ): Promise<DeviceDBType | null> {
+  async getDeviceByDeviceId(deviceId: string): Promise<DeviceDBType | null> {
     const device: DeviceDBType | null = await DevicesModel.findOne({
       deviceId: deviceId,
     });

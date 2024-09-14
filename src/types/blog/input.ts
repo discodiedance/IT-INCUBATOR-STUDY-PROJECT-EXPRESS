@@ -1,14 +1,18 @@
-export type InputBlogBodyType = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-};
+export class InputBlogBodyType {
+  constructor(
+    public name: string,
+    public description: string,
+    public websiteUrl: string
+  ) {}
+}
 
-export type BlogSortDataType = {
-  searchNameTerm?: string;
-  sortBy?: string;
-  sortDirection?: "asc" | "desc";
-  pageNumber?: number;
-  pageSize?: number;
-  blogId?: string;
-};
+export class BlogSortDataType {
+  constructor(
+    public searchNameTerm?: string,
+    public sortBy?: string,
+    public sortDirection?: "asc" | "desc",
+    public pageNumber?: number,
+    public pageSize?: number,
+    public blogId?: string
+  ) {}
+}

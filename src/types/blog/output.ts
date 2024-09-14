@@ -1,17 +1,21 @@
-export type BlogDBType = {
-  id: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-  isMembership: boolean;
-};
+export class BlogDBType {
+  constructor(
+    public id: string,
+    public name: string,
+    public description: string,
+    public websiteUrl: string,
+    public createdAt: string,
+    public isMembership: boolean
+  ) {}
+}
 
-export type OutputBlogType = {
-  blogId: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-  isMembership: boolean;
-};
+export class OutputBlogType {
+  constructor(
+    public id: string,
+    public name: string,
+    public description: string,
+    public websiteUrl: string,
+    public createdAt: string,
+    public isMembership: boolean
+  ) {}
+}

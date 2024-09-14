@@ -1,17 +1,35 @@
-import { CommentDBType, OutputCommentType } from "../../types/comment/output";
 import { CommentModel } from "../../db/db";
-import { commentMapper } from "../../middlewares/comment/comment-mapper";
+import {
+  commentMapper,
+  commentMapperWithStatus,
+} from "../../middlewares/comment/comment-mapper";
+import {
+  CommentDBType,
+  OutputCommentType,
+  OutputCommentTypeWithStatus,
+} from "../../types/comment/output";
 
 export class QueryCommentRepository {
-  static async getCommentById(id: string): Promise<OutputCommentType | null> {
-    if (!id) return null;
-
+  async getCommentById(commentId: string): Promise<OutputCommentType | null> {
     const comment: CommentDBType | null = await CommentModel.findOne({
-      id: id,
+      id: commentId,
     });
     if (!comment) {
       return null;
     }
     return commentMapper(comment);
+  }
+
+  async getCommentByIdWithStatus(
+    commentId: string,
+    userId: string
+  ): Promise<OutputCommentTypeWithStatus | null> {
+    const comment: CommentDBType | null = await CommentModel.findOne({
+      id: commentId,
+    });
+    if (!comment) {
+      return null;
+    }
+    return await commentMapperWithStatus(comment, userId);
   }
 }

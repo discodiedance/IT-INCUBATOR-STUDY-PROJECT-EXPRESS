@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
 
-const notFoundValidation = (
+export const notFoundValidation = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -13,5 +13,3 @@ const notFoundValidation = (
   }
   return next();
 };
-
-export default notFoundValidation;

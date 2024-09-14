@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { jwtService } from "../../aplication/jwt-service";
-import { QueryUserRepository } from "../../repositories/query-repository/query-user-repository";
-import { SecurityQueryRepostiory } from "../../repositories/query-repository/query-security-repository";
+import {
+  jwtService,
+  querySecurityRepostiory,
+  queryUserRepository,
+} from "../../routes/composition-root";
 import { DeviceDBType } from "../../types/security/input";
 import { OutputUserType } from "../../types/user/output";
 
@@ -16,7 +18,7 @@ export const authRefreshTokenMiddleware = async (
     return;
   }
 
-  const payLoad: any = await jwtService.validateRefreshToken(refreshToken);
+  const payLoad = await jwtService.validateRefreshToken(refreshToken);
   if (!payLoad) {
     res.sendStatus(401);
     return;
@@ -25,7 +27,7 @@ export const authRefreshTokenMiddleware = async (
   const { deviceId, userId, exp } = payLoad;
 
   const DeviceSession: DeviceDBType | null =
-    await SecurityQueryRepostiory.getDeviceByDeviceId(deviceId);
+    await querySecurityRepostiory.getDeviceByDeviceId(deviceId);
   if (!DeviceSession) {
     res.sendStatus(401);
     return;
@@ -37,7 +39,7 @@ export const authRefreshTokenMiddleware = async (
   }
 
   const userData: OutputUserType | null =
-    await QueryUserRepository.getUserById(userId);
+    await queryUserRepository.getUserById(userId);
   if (!userData) {
     res.sendStatus(401);
     return;

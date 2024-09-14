@@ -4,7 +4,7 @@ import { BlogSortDataType } from "../../types/blog/input";
 import { BlogDBType, OutputBlogType } from "../../types/blog/output";
 
 export class QueryBlogRepository {
-  static async getAllBlogs(sortData: BlogSortDataType) {
+  async getAllBlogs(sortData: BlogSortDataType) {
     const sortDirection = sortData.sortDirection ?? "desc";
     const sortBy = sortData.sortBy ?? "createdAt";
     const searchNameTerm = sortData.searchNameTerm ?? null;
@@ -28,8 +28,8 @@ export class QueryBlogRepository {
       .limit(+pageSize)
       .lean();
 
-    const totalCount: number = await BlogModel.countDocuments(filter);
-    const pageCount: number = Math.ceil(totalCount / +pageSize);
+    const totalCount = await BlogModel.countDocuments(filter);
+    const pageCount = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
@@ -40,9 +40,7 @@ export class QueryBlogRepository {
     };
   }
 
-  static async getBlogById(id: string): Promise<OutputBlogType | null> {
-    if (!id) return null;
-
+  async getBlogById(id: string): Promise<OutputBlogType | null> {
     const blog: BlogDBType | null = await BlogModel.findOne({ id: id });
     if (!blog) {
       return null;

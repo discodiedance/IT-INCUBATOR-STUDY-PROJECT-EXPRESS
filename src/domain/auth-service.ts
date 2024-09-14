@@ -1,38 +1,49 @@
+import { SecurityRepostiory } from "../repositories/security-repository";
+import { UserRepostitory } from "./../repositories/user-repository";
+import { QueryUserRepository } from "./../repositories/query-repository/query-user-repository";
+
+import { EmailsManager } from "../managers/email-manager";
+import { UserService } from "./user-service";
+import { JwtService } from "../aplication/jwt-service";
+import { userMapper } from "../middlewares/user/user-mapper";
+
 import { ObjectId } from "mongodb";
 import { add } from "date-fns/add";
 import { v4 as uuidv4 } from "uuid";
-import { UserService } from "./user-service";
+
 import { OutputUserType, UserDBType } from "../types/user/output";
-import { UserRepostitory } from "../repositories/user-repository";
 import { InputUserType } from "../types/user/input";
-import { userMapper } from "../middlewares/user/user-mapper";
-import { emailsManager } from "../managers/email-manager";
 import bcrypt from "bcrypt";
 import { ConfirmEmailType, ResendEmailType } from "../types/common";
 import { DeviceDBType, UpdateDeviceType } from "../types/security/input";
-import { jwtService } from "../aplication/jwt-service";
-import { QueryUserRepository } from "./../repositories/query-repository/query-user-repository";
-import { SecurityRepostiory } from "../repositories/security-repository";
 
 export class AuthService {
-  static async createUserByRegistration(
+  constructor(
+    protected EmailsManager: EmailsManager,
+    protected JwtService: JwtService,
+    protected UserService: UserService,
+    protected UserRepostitory: UserRepostitory,
+    protected SecurityRepostiory: SecurityRepostiory,
+    protected QueryUserRepository: QueryUserRepository
+  ) {}
+  async createUserByRegistration(
     inputUser: InputUserType
   ): Promise<OutputUserType | null> {
     const passwordSalt: string = await bcrypt.genSalt(10);
-    const passwordHash: string = await UserService._generateHash(
+    const passwordHash: string = await this.UserService._generateHash(
       inputUser.password,
       passwordSalt
     );
-    const user: UserDBType = {
-      id: new ObjectId().toString(),
-      accountData: {
-        login: inputUser.login,
+    const user = new UserDBType(
+      new ObjectId().toString(),
+      {
         email: inputUser.email,
+        login: inputUser.login,
+        createdAt: new Date().toISOString(),
         passwordHash,
         passwordSalt,
-        createdAt: new Date(),
       },
-      emailConfirmation: {
+      {
         confirmationCode: uuidv4(),
         expirationDate: add(new Date(), {
           hours: 1,
@@ -40,29 +51,27 @@ export class AuthService {
         }),
         isConfirmed: false,
       },
-      passwordRecoveryConfirmation: {
+      {
         recoveryCode: "",
         expirationDate: null,
-      },
-    };
+      }
+    );
 
-    await UserRepostitory.createUser(user);
+    await this.UserRepostitory.createUser(user);
 
-    emailsManager
-      .sendEmailConfirmationMessage(
-        user.accountData.email,
-        user.emailConfirmation.confirmationCode
-      )
-      .catch((error) => {
-        console.log(error);
-      });
+    await this.EmailsManager.sendEmailConfirmationMessage(
+      user.accountData.email,
+      user.emailConfirmation.confirmationCode
+    ).catch((error) => {
+      console.log(error);
+    });
 
     return userMapper(user);
   }
 
-  static async confirmEmail(code: string): Promise<ConfirmEmailType> {
+  async confirmEmail(code: string): Promise<ConfirmEmailType> {
     const user: UserDBType | null =
-      await UserService.findUserByConfirmationCode(code);
+      await this.UserService.findUserByConfirmationCode(code);
     if (!user) return { result: 400, message: "User is not found" };
     if (user.emailConfirmation.isConfirmed === true)
       return {
@@ -73,46 +82,47 @@ export class AuthService {
       return { result: 400, message: "Confirmation code error" };
     if (user.emailConfirmation.expirationDate < new Date())
       return { result: 400, message: "Confirmaton code is expired" };
-    await UserRepostitory.updateConfirmation(user.id);
+    await this.UserRepostitory.updateConfirmation(user.id);
     return { result: 204, message: "Ok" };
   }
 
-  static async resendEmail(email: string): Promise<ResendEmailType> {
+  async resendEmail(email: string): Promise<ResendEmailType> {
     const user: UserDBType | null =
-      await QueryUserRepository.findyByEmail(email);
+      await this.QueryUserRepository.findyByEmail(email);
     if (!user) return { result: 400, message: "User is not found" };
     if (user.emailConfirmation.isConfirmed === true)
       return { result: 400, message: "Email is already confirmed" };
     const newCode: string = uuidv4();
-    await UserRepostitory.updateConfirmationCode(newCode, email);
+    await this.UserRepostitory.updateConfirmationCode(newCode, email);
     try {
-      await emailsManager.resendConfirmationMessage(
+      await this.EmailsManager.resendConfirmationMessage(
         user.accountData.email,
         newCode
       );
       return { result: 204, message: "OK" };
     } catch (error) {
-      await UserRepostitory.deleteUser(user.id.toString());
+      await this.UserRepostitory.deleteUser(user.id.toString());
       return { result: 400, message: "Something goes wrong..." };
     }
   }
 
-  static async sendPasswordRecoveryCode(email: string) {
+  async sendPasswordRecoveryCode(email: string) {
     const user: UserDBType | null =
-      await QueryUserRepository.findyByEmail(email);
+      await this.QueryUserRepository.findyByEmail(email);
     if (!user) {
       return { result: 204, message: "OK" };
     } else {
       try {
-        const newCode: string = uuidv4();
-        const result = await UserRepostitory.addRecoveryPasswordCodeToUserById(
-          newCode,
-          user.id
-        );
+        const newCode = uuidv4();
+        const result =
+          await this.UserRepostitory.addRecoveryPasswordCodeToUserById(
+            newCode,
+            user.id
+          );
         if (!result) {
           return { result: 400, message: "Code wasn't created" };
         }
-        await emailsManager.sendPasswordRecoveryMessage(email, newCode);
+        await this.EmailsManager.sendPasswordRecoveryMessage(email, newCode);
 
         return { result: 204, message: "OK" };
       } catch (error) {
@@ -121,12 +131,12 @@ export class AuthService {
     }
   }
 
-  static async confirPasswordRecoveryCodeAndUpdatePassword(
+  async confirPasswordRecoveryCodeAndUpdatePassword(
     newPassword: string,
     code: string
   ) {
     const user: UserDBType | null =
-      await QueryUserRepository.findUserByRecoveryConfirmationCode(code);
+      await this.QueryUserRepository.findUserByRecoveryConfirmationCode(code);
     if (!user)
       return {
         result: 400,
@@ -135,15 +145,15 @@ export class AuthService {
     if (user!.passwordRecoveryConfirmation.expirationDate! < new Date())
       return { result: 400, message: "Confirmaton code is expired" };
     const salt: string | null =
-      await QueryUserRepository.findPasswordSaltByUserId(user!.id);
+      await this.QueryUserRepository.findPasswordSaltByUserId(user!.id);
     if (!salt) {
       return { result: 400, message: "Can't change the password" };
     }
-    const newPasswordHash: string = await UserService._generateHash(
+    const newPasswordHash = await this.UserService._generateHash(
       newPassword,
       salt
     );
-    const status: boolean = await UserRepostitory.updateNewPasswordByUserId(
+    const status = await this.UserRepostitory.updateNewPasswordByUserId(
       newPasswordHash,
       user.id
     );
@@ -153,33 +163,30 @@ export class AuthService {
     return { result: 204, message: "Password is changed" };
   }
 
-  static async loginUser(userId: string, ip: string, title: string) {
-    const deviceId: string = uuidv4();
-
-    const accessToken: string = await jwtService.createJWT(userId);
-
-    const refreshToken: string = await jwtService.createRefreshJWT(
+  async loginUser(userId: string, ip: string, title: string) {
+    const deviceId = uuidv4();
+    const accessToken = await this.JwtService.createJWT(userId);
+    const refreshToken = await this.JwtService.createRefreshJWT(
       deviceId,
       userId
     );
 
-    const expDate: string =
-      await jwtService.getExpirationDateFromRefreshToken(refreshToken);
+    const expDate =
+      await this.JwtService.getExpirationDateFromRefreshToken(refreshToken);
 
-    const lastActiveDate: string =
-      await jwtService.getIssuedAtFromJWTAccessToken(accessToken);
+    const lastActiveDate =
+      await this.JwtService.getIssuedAtFromJWTAccessToken(accessToken);
 
-    const sessionData: DeviceDBType = {
+    const sessionData = new DeviceDBType(
       deviceId,
       ip,
-      lastActiveDate: lastActiveDate,
+      lastActiveDate,
       title,
-      userId: userId,
-      expirationDate: expDate,
-    };
+      userId,
+      expDate
+    );
 
-    const isSessionSaved: boolean =
-      await SecurityRepostiory.addDevice(sessionData);
+    const isSessionSaved = await this.SecurityRepostiory.addDevice(sessionData);
     if (!isSessionSaved) {
       return null;
     }
@@ -187,23 +194,23 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  static async updateRefreshTokens(deviceId: string, userId: string) {
+  async updateRefreshTokens(deviceId: string, userId: string) {
     const user: OutputUserType | null =
-      await QueryUserRepository.getUserById(userId);
+      await this.QueryUserRepository.getUserById(userId);
     if (!user) return null;
 
-    const accessToken: string = await jwtService.createJWT(user.id);
-    const refreshToken: string = await jwtService.createRefreshJWT(
+    const accessToken = await this.JwtService.createJWT(user.id);
+    const refreshToken = await this.JwtService.createRefreshJWT(
       deviceId,
       user.id
     );
 
-    const expirationDate: string =
-      await jwtService.getExpirationDateFromRefreshToken(refreshToken);
+    const expirationDate =
+      await this.JwtService.getExpirationDateFromRefreshToken(refreshToken);
     if (!expirationDate) return null;
 
-    const lastActiveDate: string =
-      await jwtService.getIssuedAtFromJWTAccessToken(accessToken);
+    const lastActiveDate =
+      await this.JwtService.getIssuedAtFromJWTAccessToken(accessToken);
     if (!lastActiveDate) return null;
 
     const updateDeviceData: UpdateDeviceType = {
@@ -213,8 +220,8 @@ export class AuthService {
       deviceId,
     };
 
-    const savedSession: boolean =
-      await SecurityRepostiory.updateDevice(updateDeviceData);
+    const savedSession =
+      await this.SecurityRepostiory.updateDevice(updateDeviceData);
 
     if (!savedSession) return null;
 

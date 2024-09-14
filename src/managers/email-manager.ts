@@ -1,7 +1,8 @@
-import { emailAdapter } from "../adapters/email-adapter";
+import { EmailAdapter } from "../adapters/email-adapter";
 
-export class emailsManager {
-  static async sendEmailConfirmationMessage(email: string, code: string) {
+export class EmailsManager {
+  constructor(protected EmailAdapter: EmailAdapter) {}
+  async sendEmailConfirmationMessage(email: string, code: string) {
     const message = `<h1>Thank for your registration</h1>
     <p>To finish registration please follow the link below:
         <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
@@ -9,10 +10,10 @@ export class emailsManager {
 
     const subject = `Registration confirmation`;
 
-    await emailAdapter.sendEmail(email, subject, message);
+    await this.EmailAdapter.sendEmail(email, subject, message);
   }
 
-  static async resendConfirmationMessage(email: string, code: string) {
+  async resendConfirmationMessage(email: string, code: string) {
     const message = `<h1>Thank for your registration</h1>
     <p>To finish registration please follow the link below:
         <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
@@ -20,10 +21,10 @@ export class emailsManager {
 
     const subject = `Resending registration confirmation `;
 
-    await emailAdapter.sendEmail(email, subject, message);
+    await this.EmailAdapter.sendEmail(email, subject, message);
   }
 
-  static async sendPasswordRecoveryMessage(email: string, code: string) {
+  async sendPasswordRecoveryMessage(email: string, code: string) {
     const message = `<h1>Password recovery</h1>
     <p>To finish password recovery please follow the link below:
        <a href='https://somesite.com/password-recovery?recoveryCode=${code}'>recovery password</a>
@@ -31,6 +32,6 @@ export class emailsManager {
 
     const subject = `Password recovery`;
 
-    await emailAdapter.sendEmail(email, subject, message);
+    await this.EmailAdapter.sendEmail(email, subject, message);
   }
 }

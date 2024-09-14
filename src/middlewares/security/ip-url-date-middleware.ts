@@ -17,7 +17,7 @@ export const customRateLimitiMiddleware = async (
 
   const reducedDate = new Date(Date.now() - 10000);
 
-  const totalCount: number = await APIRequeststModel.countDocuments({
+  const totalCount = await APIRequeststModel.countDocuments({
     ip: ip,
     URL: URL,
     title: title,

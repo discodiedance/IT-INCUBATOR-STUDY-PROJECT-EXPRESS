@@ -1,13 +1,12 @@
 import { CommentModel, PostModel } from "../../db/db";
 import { postMapper } from "../../middlewares/post/post-mapper";
-import { OutputPostType } from "../../types/post/output";
+import { commentMapperWithStatus } from "../../middlewares/comment/comment-mapper";
+import { OutputPostType, PostDBType } from "../../types/post/output";
 import { BlogSortDataType } from "../../types/blog/input";
 import { CommentSortDataType } from "../../types/comment/input";
-import { commentMapper } from "../../middlewares/comment/comment-mapper";
-import { PostDBType } from "../../types/post/input";
 
 export class QueryPostRepository {
-  static async getAllPosts(sortData: BlogSortDataType) {
+  async getAllPosts(sortData: BlogSortDataType) {
     const sortDirection = sortData.sortDirection ?? "desc";
     const sortBy = sortData.sortBy ?? "createdAt";
     const pageNumber = sortData.pageNumber ?? 1;
@@ -28,9 +27,9 @@ export class QueryPostRepository {
       .limit(+pageSize)
       .lean();
 
-    const totalCount: number = await PostModel.countDocuments(filter);
+    const totalCount = await PostModel.countDocuments(filter);
 
-    const pageCount: number = Math.ceil(totalCount / +pageSize);
+    const pageCount = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
@@ -41,7 +40,7 @@ export class QueryPostRepository {
     };
   }
 
-  static async getAllComments(sortData: CommentSortDataType) {
+  async getAllComments(userId: string, sortData: CommentSortDataType) {
     const sortDirection = sortData.sortDirection ?? "desc";
     const sortBy = sortData.sortBy ?? "createdAt";
     const pageNumber = sortData.pageNumber ?? 1;
@@ -62,21 +61,23 @@ export class QueryPostRepository {
       .limit(+pageSize)
       .lean();
 
-    const totalCount: number = await CommentModel.countDocuments(filter);
+    const totalCount = await CommentModel.countDocuments(filter);
 
-    const pageCount: number = Math.ceil(totalCount / +pageSize);
+    const pageCount = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
       page: +pageNumber,
       pageSize: +pageSize,
       totalCount: +totalCount,
-      items: comments.map(commentMapper),
+      items: await Promise.all(
+        comments.map((comment) => commentMapperWithStatus(comment, userId))
+      ),
     };
   }
 
-  static async getPostById(id: string): Promise<OutputPostType | null> {
-    const post: PostDBType | null = await PostModel.findOne({ id: id });
+  async getPostById(postId: string): Promise<OutputPostType | null> {
+    const post: PostDBType | null = await PostModel.findOne({ id: postId });
     if (!post) {
       return null;
     }

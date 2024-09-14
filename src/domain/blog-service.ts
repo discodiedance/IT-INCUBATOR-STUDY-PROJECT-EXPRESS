@@ -1,29 +1,38 @@
 import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
+import { BlogRepository } from "../repositories/blog-repositry";
+
+import { PostService } from "./post-service";
+import { blogMapper } from "./../middlewares/blog/blog-mapper";
+
+import { ObjectId } from "mongodb";
+
 import { InputBlogBodyType } from "../types/blog/input";
 import { BlogDBType, OutputBlogType } from "../types/blog/output";
-import { BlogRepository } from "../repositories/blog-repositry";
-import { PostService } from "./post-service";
-import { ObjectId } from "mongodb";
-import { blogMapper } from "./../middlewares/blog/blog-mapper";
 import { OutputPostType } from "../types/post/output";
 
 export class BlogService {
-  static async createBlog(newBlog: InputBlogBodyType): Promise<OutputBlogType> {
-    const createdBlog: BlogDBType = {
-      id: new ObjectId().toString(),
-      name: newBlog.name,
-      description: newBlog.description,
-      websiteUrl: newBlog.websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-    };
+  constructor(
+    protected PostService: PostService,
+    protected BlogRepository: BlogRepository,
+    protected QueryBlogRepository: QueryBlogRepository
+  ) {}
 
-    await BlogRepository.createBlog(createdBlog);
+  async createBlog(newBlog: InputBlogBodyType): Promise<OutputBlogType> {
+    const createdBlog = new BlogDBType(
+      new ObjectId().toString(),
+      newBlog.name,
+      newBlog.description,
+      newBlog.websiteUrl,
+      new Date().toISOString(),
+      false
+    );
+
+    await this.BlogRepository.createBlog(createdBlog);
 
     return blogMapper(createdBlog);
   }
 
-  static async createPostToBlog(
+  async createPostToBlog(
     blogId: string,
     postData: {
       title: string;
@@ -31,13 +40,13 @@ export class BlogService {
       content: string;
     }
   ): Promise<OutputPostType | null> {
-    const blog = await QueryBlogRepository.getBlogById(blogId);
+    const blog = await this.QueryBlogRepository.getBlogById(blogId);
 
     if (!blog) {
       return null;
     }
 
-    const post = await PostService.createPost({
+    const post = await this.PostService.createPost({
       ...postData,
       blogId,
       blogName: blog.name,
@@ -47,16 +56,17 @@ export class BlogService {
     return post;
   }
 
-  static async updateBlog(
+  async updateBlog(
     id: string,
     updateData: InputBlogBodyType
   ): Promise<boolean> {
-    const updatedBlog: InputBlogBodyType = {
-      name: updateData.name,
-      description: updateData.description,
-      websiteUrl: updateData.websiteUrl,
-    };
-    const result: boolean = await BlogRepository.updateBlog(id, updatedBlog);
+    const updatedBlog = new InputBlogBodyType(
+      updateData.name,
+      updateData.description,
+      updateData.websiteUrl
+    );
+
+    const result = await this.BlogRepository.updateBlog(id, updatedBlog);
     return result;
   }
 }

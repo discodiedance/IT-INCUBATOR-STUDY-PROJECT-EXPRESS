@@ -1,34 +1,20 @@
 import { body, param } from "express-validator";
+import { queryPostRepository } from "../../routes/composition-root";
 import { inputModelValidation } from "../inputModel/input-model-validation";
-import { QueryBlogRepository } from "../../repositories/query-repository/query-blog-repository";
-import notFoundValidation from "../inputModel/not-found-validation";
-import { postIdinParamsValidation } from "../comment/comment-validation";
-import { OutputBlogType } from "../../types/blog/output";
+import {
+  blogIdInBodyValidation,
+  blogIdInParamsValidation,
+} from "../blog/blog-validation";
+import { notFoundValidation } from "../inputModel/not-found-validation";
 
-export const blogIdInParamsValidation = param("blogId")
+export const postIdinParamsValidation = param("postId")
   .isString()
   .trim()
   .custom(async (value) => {
-    const blog: OutputBlogType | null =
-      await QueryBlogRepository.getBlogById(value);
-
-    if (!blog) {
+    const post = await queryPostRepository.getPostById(value);
+    if (!post) {
       throw new Error("Incorrect value");
     }
-  })
-  .withMessage("Incorrect value");
-
-export const blogIdInBodyValidation = body("blogId")
-  .isString()
-  .trim()
-  .custom(async (value, meta) => {
-    const blog: OutputBlogType | null =
-      await QueryBlogRepository.getBlogById(value);
-
-    if (!blog) {
-      throw new Error("Incorrect value");
-    }
-    meta.req.blog = blog;
   })
   .withMessage("Incorrect value");
 

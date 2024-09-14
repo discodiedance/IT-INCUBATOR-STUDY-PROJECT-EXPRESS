@@ -1,33 +1,42 @@
-export type OutputUserType = {
-  id: string;
-  login: string;
-  email: string;
+export class OutputUserType {
+  constructor(
+    public id: string,
+    public login: string,
+    public email: string,
+    public createdAt: string
+  ) {}
+}
 
-  createdAt: string;
-};
+export class UserDBType {
+  constructor(
+    public id: string,
+    public accountData: UserAccountType,
+    public emailConfirmation: EmailConfirmationType,
+    public passwordRecoveryConfirmation: PasswordRecoveryType
+  ) {}
+}
 
-export type UserDBType = {
-  id: string;
-  accountData: UserAccountType;
-  emailConfirmation: EmailConfirmationType;
-  passwordRecoveryConfirmation: PasswordRecoveryType;
-};
+export class UserAccountType {
+  constructor(
+    public email: string,
+    public login: string,
+    public createdAt: string,
+    public passwordHash: string,
+    public passwordSalt: string
+  ) {}
+}
 
-export type UserAccountType = {
-  email: string;
-  login: string;
-  createdAt: Date;
-  passwordHash: string;
-  passwordSalt: string;
-};
+export class EmailConfirmationType {
+  constructor(
+    public confirmationCode: string,
+    public expirationDate: Date,
+    public isConfirmed: boolean
+  ) {}
+}
 
-export type EmailConfirmationType = {
-  confirmationCode: string;
-  expirationDate: Date;
-  isConfirmed: boolean;
-};
-
-export type PasswordRecoveryType = {
-  recoveryCode: string;
-  expirationDate: Date | null;
-};
+export class PasswordRecoveryType {
+  constructor(
+    public recoveryCode: string,
+    public expirationDate: Date | null
+  ) {}
+}

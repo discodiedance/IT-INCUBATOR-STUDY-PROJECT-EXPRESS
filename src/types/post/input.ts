@@ -1,33 +1,29 @@
-export type PostDBType = {
-  id: string;
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName: string;
-  createdAt: string;
-};
+export class UpdatePostData {
+  constructor(
+    public title: string,
+    public shortDescription: string,
+    public content: string,
+    public blogId: string
+  ) {}
+}
 
-export type UpdatePostData = {
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-};
+export class InputPostType {
+  constructor(
+    public title: string,
+    public shortDescription: string,
+    public content: string,
+    public blogId: string,
+    public blogName: string,
+    public createdAt: string
+  ) {}
+}
 
-export type InputPostType = {
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName: string;
-  createdAt: string;
-};
-
-export type PostSortDataType = {
-  pageNumber?: number;
-  pageSize?: number;
-  sortBy?: string;
-  sortDirection?: "asc" | "desc";
-  postId?: string;
-};
+export class PostSortDataType {
+  constructor(
+    public pageNumber?: number,
+    public pageSize?: number,
+    public sortBy?: string,
+    public sortDirection?: "asc" | "desc",
+    public postId?: string
+  ) {}
+}

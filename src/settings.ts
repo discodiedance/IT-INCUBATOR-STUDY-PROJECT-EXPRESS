@@ -1,11 +1,11 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import { postRoute } from "./routes/post-route";
 import { blogRoute } from "./routes/blog-route";
 import { testingRoute } from "./routes/testing-route";
 import { userRoute } from "./routes/user-route";
 import { authRoute } from "./routes/auth-route";
 import { commentRoute } from "./routes/comment-route";
-import cookieParser from "cookie-parser";
 import { securityRoute } from "./routes/security-route";
 
 export const app = express();

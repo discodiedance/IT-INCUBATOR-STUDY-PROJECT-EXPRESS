@@ -1,6 +1,8 @@
-export type OutputDeviceType = {
-  deviceId: string;
-  ip: string;
-  lastActiveDate: string;
-  title: string;
-};
+export class OutputDeviceType {
+  constructor(
+    public deviceId: string,
+    public ip: string,
+    public lastActiveDate: string,
+    public title: string
+  ) {}
+}

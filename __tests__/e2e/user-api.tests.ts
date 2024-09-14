@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "./../../src/settings";
-import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 
 const routerName = "/users";
 

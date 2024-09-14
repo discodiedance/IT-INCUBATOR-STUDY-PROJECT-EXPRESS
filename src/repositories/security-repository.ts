@@ -1,12 +1,12 @@
+import { DevicesModel } from "../db/db";
 import {
   CheckUserAndDeviceIdType,
   DeviceDBType,
   UpdateDeviceType,
 } from "../types/security/input";
-import { DevicesModel } from "../db/db";
 
 export class SecurityRepostiory {
-  static async terminateAllDevicesByUserIdExcludeCurrent(
+  async terminateAllDevicesByUserIdExcludeCurrent(
     userAndDeviceId: CheckUserAndDeviceIdType
   ): Promise<boolean> {
     const savedDevice: DeviceDBType | null = await DevicesModel.findOne({
@@ -20,7 +20,7 @@ export class SecurityRepostiory {
     return result.acknowledged === true;
   }
 
-  static async terminateDeviceByDeviceId(deviceId: string): Promise<boolean> {
+  async terminateDeviceByDeviceId(deviceId: string): Promise<boolean> {
     try {
       const result = await DevicesModel.deleteOne({
         deviceId: deviceId,
@@ -32,7 +32,7 @@ export class SecurityRepostiory {
     }
   }
 
-  static async addDevice(inputDevice: DeviceDBType): Promise<boolean> {
+  async addDevice(inputDevice: DeviceDBType): Promise<boolean> {
     try {
       await DevicesModel.create(inputDevice);
       return true;
@@ -42,9 +42,7 @@ export class SecurityRepostiory {
     }
   }
 
-  static async updateDevice(
-    updateInputDevice: UpdateDeviceType
-  ): Promise<boolean> {
+  async updateDevice(updateInputDevice: UpdateDeviceType): Promise<boolean> {
     try {
       const result = await DevicesModel.updateOne(
         {

@@ -3,12 +3,12 @@ import { InputBlogBodyType } from "../types/blog/input";
 import { BlogDBType } from "../types/blog/output";
 
 export class BlogRepository {
-  static async createBlog(inputCreateBlog: BlogDBType): Promise<BlogDBType> {
+  async createBlog(inputCreateBlog: BlogDBType): Promise<BlogDBType> {
     const createdBlog = await BlogModel.create(inputCreateBlog);
     return createdBlog;
   }
 
-  static async updateBlog(
+  async updateBlog(
     id: string,
     updateData: InputBlogBodyType
   ): Promise<boolean> {
@@ -25,7 +25,7 @@ export class BlogRepository {
     return !!result.modifiedCount;
   }
 
-  static async deleteBlog(id: string): Promise<boolean> {
+  async deleteBlog(id: string): Promise<boolean> {
     const result = await BlogModel.deleteOne({ id: id });
 
     return !!result.deletedCount;

@@ -1,14 +1,18 @@
-export type InputUserType = {
-  login: string;
-  password: string;
-  email: string;
-};
+export class InputUserType {
+  constructor(
+    public login: string,
+    public password: string,
+    public email: string
+  ) {}
+}
 
-export type SortDataUserType = {
-  sortBy?: string;
-  sortDirection?: "asc" | "desc";
-  pageNumber?: number;
-  pageSize?: number;
-  searchLoginTerm?: string;
-  searchEmailTerm?: string;
-};
+export class SortDataUserType {
+  constructor(
+    public sortBy?: string,
+    public sortDirection?: "asc" | "desc",
+    public pageNumber?: number,
+    public pageSize?: number,
+    public searchLoginTerm?: string,
+    public searchEmailTerm?: string
+  ) {}
+}

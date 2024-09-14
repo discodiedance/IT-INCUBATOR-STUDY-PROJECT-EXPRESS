@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer";
 import { GMAIL_COM_PASS } from "../config";
 
-export class emailAdapter {
-  static async sendEmail(email: string, subject: string, message: string) {
+export class EmailAdapter {
+  async sendEmail(email: string, subject: string, message: string) {
     const transport = nodemailer.createTransport({
       service: "Gmail",
       secure: false,

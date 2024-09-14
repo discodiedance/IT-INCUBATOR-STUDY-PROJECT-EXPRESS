@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "./../../src/settings";
 import mongoose from "mongoose";
-import { QueryUserRepository } from "../../src/repositories/query-repository/query-user-repository";
+import { queryUserRepository } from "../../src/routes/composition-root";
 
 const routerName = "/auth";
 const userRouterName = "/users";
@@ -403,7 +403,7 @@ describe("Mongoose integration", () => {
   });
 
   it("204 and verified email with correct confirmation code", async () => {
-    const userCode = await QueryUserRepository.findConfirmationCodeByEmail(
+    const userCode = await queryUserRepository.findConfirmationCodeByEmail(
       "fundu1448@gmail.com"
     );
     //registration confirmation
@@ -469,7 +469,7 @@ describe("Mongoose integration", () => {
 
   it("204 and updated password with correct input data", async () => {
     const recoveryCode =
-      await QueryUserRepository.findPasswordRecoveryConfirmationCodeByEmail(
+      await queryUserRepository.findPasswordRecoveryConfirmationCodeByEmail(
         "fundu1448@gmail.com"
       );
     //update new password
@@ -496,7 +496,7 @@ describe("Mongoose integration", () => {
 
   it("400 and not updated password cuz of incorrect password", async () => {
     const recoveryCode =
-      await QueryUserRepository.findPasswordRecoveryConfirmationCodeByEmail(
+      await queryUserRepository.findPasswordRecoveryConfirmationCodeByEmail(
         "fundu1448@gmail.com"
       );
     //update new password

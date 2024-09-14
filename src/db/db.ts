@@ -1,12 +1,14 @@
+import dotenv from "dotenv";
 import { mongoUri } from "../config";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+
 import { BlogDBType } from "../types/blog/output";
 import { UserDBType } from "../types/user/output";
 import { CommentDBType } from "../types/comment/output";
 import { APIReqeustsType } from "../types/common";
 import { DeviceDBType } from "../types/security/input";
-import { PostDBType } from "../types/post/input";
+import { PostDBType } from "../types/post/output";
+import { CommentLikesDBType } from "../types/like/output";
 
 dotenv.config();
 
@@ -55,6 +57,18 @@ export const PostSchema = new mongoose.Schema<PostDBType>({
 });
 export const PostModel = mongoose.model<PostDBType>("posts", PostSchema);
 
+export const CommentLikesSchema = new mongoose.Schema<CommentLikesDBType>({
+  id: { type: String, require: true },
+  commentId: { type: String, require: true },
+  createdAt: { type: Date, require: true },
+  status: { type: String, default: "None", require: true },
+  parentId: { type: String, require: true },
+});
+export const CommentLikesModel = mongoose.model<CommentLikesDBType>(
+  "commentLikes",
+  CommentLikesSchema
+);
+
 export const CommentSchema = new mongoose.Schema<CommentDBType>({
   id: { type: String, require: true },
   content: { type: String, require: true },
@@ -64,6 +78,10 @@ export const CommentSchema = new mongoose.Schema<CommentDBType>({
   },
   createdAt: { type: String, require: true },
   postId: { type: String, require: true },
+  likesInfo: {
+    likesCount: { type: Number, require: true },
+    dislikesCount: { type: Number, require: true },
+  },
 });
 export const CommentModel = mongoose.model<CommentDBType>(
   "comments",

@@ -1,27 +1,35 @@
-export type DeviceDBType = {
-  deviceId: string;
-  ip: string;
-  lastActiveDate: string;
-  title: string;
-  userId: string;
-  expirationDate: string;
-};
+export class DeviceDBType {
+  constructor(
+    public deviceId: string,
+    public ip: string,
+    public lastActiveDate: string,
+    public title: string,
+    public userId: string,
+    public expirationDate: string
+  ) {}
+}
 
-export type InputDeviceType = {
-  deviceId: string;
-  ip: string;
-  lastActiveDate: string;
-  title: string;
-};
+export class InputDeviceType {
+  constructor(
+    public deviceId: string,
+    public ip: string,
+    public lastActiveDate: string,
+    public title: string
+  ) {}
+}
 
-export type UpdateDeviceType = {
-  expirationDate: string;
-  lastActiveDate: string;
-  userId: string;
-  deviceId: string;
-};
+export class UpdateDeviceType {
+  constructor(
+    public expirationDate: string,
+    public lastActiveDate: string,
+    public userId: string,
+    public deviceId: string
+  ) {}
+}
 
-export type CheckUserAndDeviceIdType = {
-  deviceId: string;
-  userId: string;
-};
+export class CheckUserAndDeviceIdType {
+  constructor(
+    public deviceId: string,
+    public userId: string
+  ) {}
+}

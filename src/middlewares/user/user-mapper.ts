@@ -5,6 +5,6 @@ export const userMapper = (user: UserDBType): OutputUserType => {
     id: user.id,
     login: user.accountData.login,
     email: user.accountData.email,
-    createdAt: user.accountData.createdAt.toISOString(),
+    createdAt: user.accountData.createdAt,
   };
 };

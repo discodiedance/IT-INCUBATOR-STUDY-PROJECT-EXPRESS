@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { QueryUserRepository } from "../../repositories/query-repository/query-user-repository";
+import { queryUserRepository } from "../../routes/composition-root";
 
 export const registrationMiddleware = async (
   req: Request,
@@ -7,7 +7,7 @@ export const registrationMiddleware = async (
   next: NextFunction
 ) => {
   const { login, email } = req.body;
-  const userIsExistsByLogin = await QueryUserRepository.findyByLogin(login);
+  const userIsExistsByLogin = await queryUserRepository.findyByLogin(login);
 
   if (userIsExistsByLogin) {
     res.status(400).send({
@@ -21,7 +21,7 @@ export const registrationMiddleware = async (
     return;
   }
 
-  const userIsExistsByEmail = await QueryUserRepository.findyByEmail(email);
+  const userIsExistsByEmail = await queryUserRepository.findyByEmail(email);
 
   if (userIsExistsByEmail) {
     res.status(400).send({

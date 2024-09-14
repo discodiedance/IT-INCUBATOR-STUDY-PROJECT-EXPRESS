@@ -65,11 +65,9 @@ describe("Mongoose integration", () => {
   const mongoURI = process.env.MONGO_URL || `mongodb://0.0.0.0:27017/minigram`;
 
   beforeAll(async () => {
-    /* Connecting to the database. */
     await mongoose.connect(mongoURI);
   });
   afterAll(async () => {
-    /* Closing database connection after each test. */
     await mongoose.connection.close();
   });
 
@@ -91,7 +89,7 @@ describe("Mongoose integration", () => {
         .auth(login, password)
         .send(correctBlogData)
         .expect(201);
-      testBlogId = res.body.blogId;
+      testBlogId = res.body.id;
     });
 
     it("Create testPost for tests", async () => {
@@ -101,7 +99,7 @@ describe("Mongoose integration", () => {
         .auth(login, password)
         .send({ ...correctPostData, blogId: testBlogId })
         .expect(201);
-      testPostId = res.body.postId;
+      testPostId = res.body.id;
     });
 
     it("Create testUser for tests)", async () => {
@@ -134,7 +132,7 @@ describe("Mongoose integration", () => {
         .send(correctCommentData)
         .expect(201);
       await request(app)
-        .get(routerName + "/" + res.body.commentId)
+        .get(routerName + "/" + res.body.id)
         .set("Authorization", "Bearer " + testAuth.accessToken)
         .expect(200);
       testComment = res.body;
@@ -143,21 +141,21 @@ describe("Mongoose integration", () => {
     it("404 and not founded comment for a user with a correct data", async () => {
       //get comments
       await request(app)
-        .get(routerName + "/" + "01010")
+        .get(routerName + "/" + "0")
         .expect(404);
     });
 
     it("200 and founded comment for a user with a correct data", async () => {
       //get comments
       await request(app)
-        .get(routerName + "/" + testComment.commentId)
+        .get(routerName + "/" + testComment.id)
         .expect(200);
     });
 
     it("401 and not updated comment with unauthorized (JWT token)", async () => {
       //update comment
       await request(app)
-        .put(routerName + "/" + testComment.commentId)
+        .put(routerName + "/" + testComment.id)
         .set("Authorization", "Bearer " + "as362sad2Eyik2")
         .send(correctUpdateCommentData)
         .expect(401);
@@ -166,7 +164,7 @@ describe("Mongoose integration", () => {
     it("400 and not updated comment with incorrect data", async () => {
       //update comment
       await request(app)
-        .put(routerName + "/" + testComment.commentId)
+        .put(routerName + "/" + testComment.id)
         .set("Authorization", "Bearer " + testAuth.accessToken)
         .send(incorrectUpdateCommentData)
         .expect(400, {
@@ -194,7 +192,7 @@ describe("Mongoose integration", () => {
       const post = await request(app)
         .post(postRouterName)
         .auth(login, password)
-        .send({ ...correctPostData, blogId: blog.body.blogId })
+        .send({ ...correctPostData, blogId: blog.body.id })
         .expect(201);
       //create user
       const user = await request(app)
@@ -212,7 +210,7 @@ describe("Mongoose integration", () => {
         .expect(200);
       //create comment
       const comment = await request(app)
-        .post(postRouterName + "/" + post.body.postId + "/" + "comments")
+        .post(postRouterName + "/" + post.body.id + "/" + "comments")
         .set("Authorization", "Bearer " + auth.body.accessToken)
         .send(correctCommentData)
         .expect(201);
@@ -230,9 +228,9 @@ describe("Mongoose integration", () => {
           password: correctUserData3.password,
         })
         .expect(200);
-      //get update comment of user1 by user2
+      //update comment of user1 by user2
       await request(app)
-        .put(routerName + "/" + comment.body.commentId)
+        .put(routerName + "/" + comment.body.id)
         .set("Authorization", "Bearer " + auth2.body.accessToken)
         .send(correctUpdateCommentData)
         .expect(403);
@@ -241,7 +239,7 @@ describe("Mongoose integration", () => {
     it("204 and updated comment with correct data", async () => {
       //update comment
       await request(app)
-        .put(routerName + "/" + testComment.commentId)
+        .put(routerName + "/" + testComment.id)
         .set("Authorization", "Bearer " + testAuth.accessToken)
         .send(correctUpdateCommentData)
         .expect(204);
@@ -250,7 +248,7 @@ describe("Mongoose integration", () => {
     it("401 and not deleted comment with unauthorized JWT", async () => {
       //delete comment
       await request(app)
-        .delete(routerName + "/" + testComment.commentId)
+        .delete(routerName + "/" + testComment.id)
         .set("Authorization", "Bearer " + "sae131ffas")
         .expect(401);
     });
@@ -280,7 +278,7 @@ describe("Mongoose integration", () => {
         .expect(200);
       //delete comment
       await request(app)
-        .delete(routerName + "/" + testComment.commentId)
+        .delete(routerName + "/" + testComment.id)
         .set("Authorization", "Bearer " + auth.body.accessToken)
         .expect(403);
     });
@@ -288,7 +286,7 @@ describe("Mongoose integration", () => {
     it("204 and deleted comment", async () => {
       //get comments
       await request(app)
-        .delete(routerName + "/" + testComment.commentId)
+        .delete(routerName + "/" + testComment.id)
         .set("Authorization", "Bearer " + testAuth.accessToken)
         .expect(204);
     });

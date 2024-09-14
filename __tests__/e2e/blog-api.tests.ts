@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "./../../src/settings";
-import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 
 const routerName = "/blogs";
 const login = "admin";
@@ -132,7 +132,7 @@ describe("Mongoose integration", () => {
         .expect(201);
       testBlog1 = res.body;
       //get blog
-      await request(app).get(routerName + "/" + testBlog1.blogId);
+      await request(app).get(routerName + "/" + testBlog1.id);
       expect(testBlog1);
     });
 
@@ -145,7 +145,7 @@ describe("Mongoose integration", () => {
         .expect(201);
       testBlog2 = res.body;
       //get blog
-      await request(app).get(routerName + "/" + testBlog2.blogId);
+      await request(app).get(routerName + "/" + testBlog2.id);
       expect(testBlog2);
     });
 
@@ -161,14 +161,14 @@ describe("Mongoose integration", () => {
             { message: "Incorrect value", field: "description" },
           ],
         });
-      await request(app).get(routerName + "/" + testBlog1.blogId);
+      await request(app).get(routerName + "/" + testBlog1.id);
       expect(testBlog1);
     });
 
     it("400 and not updated post with overlength name and description)", async () => {
       //update blog
       await request(app)
-        .put(routerName + "/" + testBlog1.blogId)
+        .put(routerName + "/" + testBlog1.id)
         .auth(login, password)
         .send(overLengthBlogData)
         .expect(400, {
@@ -178,32 +178,32 @@ describe("Mongoose integration", () => {
           ],
         });
       //get blog
-      await request(app).get(routerName + "/" + testBlog1.blogId);
+      await request(app).get(routerName + "/" + testBlog1.id);
       expect(testBlog1);
     });
 
     it("401 and not updated blog with incorrect authorization", async () => {
       //update blog
       await request(app)
-        .put(routerName + "/" + testBlog1.blogId)
+        .put(routerName + "/" + testBlog1.id)
         .auth("badlogin", "badpassword")
         .send(correctUpdateBlogData)
         .expect(401);
       //get blog
-      await request(app).get(routerName + "/" + testBlog1.blogId);
+      await request(app).get(routerName + "/" + testBlog1.id);
       expect(testBlog1);
     });
 
     it("204 and updated blog", async () => {
       //update blog
       await request(app)
-        .put(routerName + "/" + testBlog1.blogId)
+        .put(routerName + "/" + testBlog1.id)
         .auth(login, password)
         .send(correctUpdateBlogData)
         .expect(204);
       //get blog
       const res = await request(app)
-        .get(routerName + "/" + testBlog1.blogId)
+        .get(routerName + "/" + testBlog1.id)
         .expect(200);
       expect(res.body).toEqual(
         (testBlog1 = {
@@ -233,7 +233,7 @@ describe("Mongoose integration", () => {
     it("401 and not deleted blog with incorrect authorization", async () => {
       //delete blog
       await request(app)
-        .delete(routerName + "/" + testBlog2.blogId)
+        .delete(routerName + "/" + testBlog2.id)
         .auth("badlogin", "badpassword")
         .expect(401);
     });
@@ -244,7 +244,7 @@ describe("Mongoose integration", () => {
       const startBlogsArrayLength = result.body.items.length;
       //delete blog
       await request(app)
-        .delete(routerName + "/" + testBlog1.blogId)
+        .delete(routerName + "/" + testBlog1.id)
         .auth(login, password)
         .expect(204);
       //get blogs
@@ -258,7 +258,7 @@ describe("Mongoose integration", () => {
       const startBlogsArrayLength = result.body.items.length;
       //delete blog
       await request(app)
-        .delete(routerName + "/" + testBlog2.blogId)
+        .delete(routerName + "/" + testBlog2.id)
         .auth(login, password)
         .expect(204);
       //get blogs

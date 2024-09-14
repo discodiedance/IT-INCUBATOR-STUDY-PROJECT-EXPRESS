@@ -1,25 +1,22 @@
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, REFRESH_SECRET } from "../config";
 
-export class jwtService {
-  static async createJWT(userId: string): Promise<string> {
+export class JwtService {
+  async createJWT(userId: string): Promise<string> {
     const accessToken = jwt.sign({ userId }, JWT_SECRET, {
-      expiresIn: "10s",
+      expiresIn: "10m",
     });
     return accessToken;
   }
 
-  static async createRefreshJWT(
-    deviceId: string,
-    userId: string
-  ): Promise<string> {
+  async createRefreshJWT(deviceId: string, userId: string): Promise<string> {
     const refreshToken = jwt.sign({ deviceId, userId }, REFRESH_SECRET, {
-      expiresIn: "20s",
+      expiresIn: "20m",
     });
     return refreshToken;
   }
 
-  static async getUserIdByJWTToken(accessToken: string) {
+  async getUserIdByJWTToken(accessToken: string) {
     try {
       const result: any = jwt.verify(accessToken, JWT_SECRET);
       return result.userId;
@@ -28,7 +25,7 @@ export class jwtService {
     }
   }
 
-  static async getUserIdByRefreshToken(refreshToken: string) {
+  async getUserIdByRefreshToken(refreshToken: string) {
     try {
       const result: any = jwt.verify(refreshToken, REFRESH_SECRET);
       return result.userId;
@@ -37,7 +34,7 @@ export class jwtService {
     }
   }
 
-  static async getDeviceIdByRefreshToken(refreshToken: string) {
+  async getDeviceIdByRefreshToken(refreshToken: string) {
     try {
       const result: any = jwt.verify(refreshToken, REFRESH_SECRET);
       return result.deviceId;
@@ -46,7 +43,7 @@ export class jwtService {
     }
   }
 
-  static async getExpirationDateFromRefreshToken(
+  async getExpirationDateFromRefreshToken(
     refreshToken: string
   ): Promise<string> {
     const decodedToken: any = jwt.decode(refreshToken);
@@ -54,15 +51,13 @@ export class jwtService {
     return exp;
   }
 
-  static async getIssuedAtFromJWTAccessToken(
-    accessToken: string
-  ): Promise<string> {
+  async getIssuedAtFromJWTAccessToken(accessToken: string): Promise<string> {
     const decodedToken: any = jwt.decode(accessToken);
     const iat = new Date(decodedToken.iat * 1000).toISOString();
     return iat;
   }
 
-  static async validateRefreshToken(token: string) {
+  async validateRefreshToken(token: string) {
     try {
       const decodedToken: any = jwt.verify(token, REFRESH_SECRET);
       const deviceId = decodedToken.deviceId;

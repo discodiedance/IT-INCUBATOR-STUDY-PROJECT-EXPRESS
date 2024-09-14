@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "../../src/settings";
-import { ObjectId } from "mongodb";
 import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 
 const routerName = "/posts";
 const userRouterName = "/users";
@@ -120,13 +120,13 @@ describe("Mongoose integration", () => {
           websiteUrl: "https://www.blog.com",
         })
         .expect(201);
-      testBlogId1 = res.body.blogId;
+      testBlogId1 = res.body.id;
     });
 
     it("Create testBlog2 for test posts2", async () => {
       //create testBlog2
       const res = await request(app)
-        .post("/blogs/")
+        .post("/blogs")
         .auth(login, password)
         .send({
           name: "Blog2",
@@ -134,7 +134,7 @@ describe("Mongoose integration", () => {
           websiteUrl: "https://www.blog.com",
         })
         .expect(201);
-      testBlogId2 = res.body.blogId;
+      testBlogId2 = res.body.id;
     });
 
     it("400 and not created post with empty data", async () => {
@@ -219,7 +219,7 @@ describe("Mongoose integration", () => {
       testPost1 = res.body;
       //get post
       await request(app)
-        .get(routerName + "/" + testPost1.postId)
+        .get(routerName + "/" + testPost1.id)
         .expect(testPost1);
     });
 
@@ -236,7 +236,7 @@ describe("Mongoose integration", () => {
       testPost2 = res.body;
       //get post
       await request(app)
-        .get(routerName + "/" + testPost2.postId)
+        .get(routerName + "/" + testPost2.id)
         .expect(testPost2);
     });
 
@@ -253,14 +253,14 @@ describe("Mongoose integration", () => {
           ],
         });
       //get post
-      await request(app).get(routerName + "/" + testPost1.postId);
+      await request(app).get(routerName + "/" + testPost1.id);
       expect(testPost1);
     });
 
     it("400 and not updated post with overlength title and shortdescription", async () => {
       //update post
       await request(app)
-        .put(routerName + "/" + testPost1.postId)
+        .put(routerName + "/" + testPost1.id)
         .auth(login, password)
         .send({
           ...overLengthPostData,
@@ -287,19 +287,19 @@ describe("Mongoose integration", () => {
         })
         .expect(401);
       //get post
-      await request(app).get(routerName + "/" + testPost1.postId);
+      await request(app).get(routerName + "/" + testPost1.id);
       expect(testPost1);
     });
 
     it("204 and updated post", async () => {
       //update post
       await request(app)
-        .put(routerName + "/" + testPost1.postId)
+        .put(routerName + "/" + testPost1.id)
         .auth(login, password)
         .send({ ...correctUpdatePostData, blogId: testBlogId1 })
         .expect(204);
       //get post
-      const res = await request(app).get(routerName + "/" + testPost1.postId);
+      const res = await request(app).get(routerName + "/" + testPost1.id);
       expect(res.body).toEqual(
         (testPost1 = {
           ...testPost1,
@@ -328,27 +328,27 @@ describe("Mongoose integration", () => {
     it("201 and created comment for a user with correct data", async () => {
       //create comment
       await request(app)
-        .post(routerName + "/" + testPost1.postId + "/" + "comments")
+        .post(routerName + "/" + testPost1.id + "/" + "comments")
         .set("Authorization", "Bearer " + testAuth.accessToken)
         .send(correctCommentData)
         .expect(201);
       //get all comments for a post
       await request(app)
-        .get(routerName + "/" + testPost1.postId + "/comments")
+        .get(routerName + "/" + testPost1.id + "/comments")
         .expect(200);
     });
 
     it("200 and founded all comments with correct post id", async () => {
       //get all comments for a post
       await request(app)
-        .get(routerName + "/" + testPost1.postId + "/" + "comments")
+        .get(routerName + "/" + testPost1.id + "/" + "comments")
         .expect(200);
     });
 
     it("400 not and created comment for a user with incorrect data", async () => {
       //create comment
       await request(app)
-        .post(routerName + "/" + testPost1.postId + "/" + "comments")
+        .post(routerName + "/" + testPost1.id + "/" + "comments")
         .set("Authorization", "Bearer " + testAuth.accessToken)
         .send(incorrectCommentData)
         .expect(400, {
@@ -356,20 +356,20 @@ describe("Mongoose integration", () => {
         });
       //get all comments for a post
       await request(app)
-        .get(routerName + "/" + testPost1.postId + "/comments")
+        .get(routerName + "/" + testPost1.id + "/comments")
         .expect(200);
     });
 
     it("401 and not created comment for a user with unauthorized user", async () => {
       //create comment
       await request(app)
-        .post(routerName + "/" + testPost1.postId + "/" + "comments")
+        .post(routerName + "/" + testPost1.id + "/" + "comments")
         .set("Authorization", "Bearer " + "esae241dtg5")
         .send(correctCommentData)
         .expect(401);
       //get all comments for a post
       await request(app)
-        .get(routerName + "/" + testPost1.postId + "/comments")
+        .get(routerName + "/" + testPost1.id + "/comments")
         .expect(200);
     });
 
@@ -382,7 +382,7 @@ describe("Mongoose integration", () => {
         .expect(404);
       //get all comments for a post
       await request(app)
-        .get(routerName + "/" + testPost1.postId + "/comments")
+        .get(routerName + "/" + testPost1.id + "/comments")
         .expect(200);
     });
 
@@ -402,7 +402,7 @@ describe("Mongoose integration", () => {
     it("200 and founded post with correct id", async () => {
       //get post
       await request(app)
-        .get(routerName + "/" + testPost1.postId)
+        .get(routerName + "/" + testPost1.id)
         .expect(200, testPost1);
     });
 
@@ -417,7 +417,7 @@ describe("Mongoose integration", () => {
     it("401 and not deleted post with incorrect authorization", async () => {
       //delete post
       await request(app)
-        .delete(routerName + "/" + testPost1.postId)
+        .delete(routerName + "/" + testPost1.id)
         .auth("badlogin", "badpassword")
         .expect(401);
     });
@@ -428,7 +428,7 @@ describe("Mongoose integration", () => {
       const startPostsArrayLength = result.body.items.length;
       //delete post
       await request(app)
-        .delete(routerName + "/" + testPost1.postId)
+        .delete(routerName + "/" + testPost1.id)
         .auth(login, password)
         .expect(204);
       //get posts
@@ -442,7 +442,7 @@ describe("Mongoose integration", () => {
       const startPostsArrayLength = result.body.items.length;
       //delete post
       await request(app)
-        .delete(routerName + "/" + testPost2.postId)
+        .delete(routerName + "/" + testPost2.id)
         .auth(login, password)
         .expect(204);
       //get posts

@@ -1,72 +1,84 @@
-import { InputPostType, PostDBType, UpdatePostData } from "../types/post/input";
-import { OutputPostType } from "../types/post/output";
 import { PostRepository } from "../repositories/post-repository";
+
+import { postMapper } from "./../middlewares/post/post-mapper";
+import { commentMapperWithStatus } from "./../middlewares/comment/comment-mapper";
+
+import { ObjectId } from "mongodb";
+
+import { InputPostType, UpdatePostData } from "../types/post/input";
+import { OutputPostType, PostDBType } from "../types/post/output";
 import {
+  CreateCommentData,
   InputCommentBodyWithPostId,
   InputCreateCommentData,
 } from "../types/comment/input";
 import { CommentDBType, OutputCommentType } from "../types/comment/output";
-import { ObjectId } from "mongodb";
-import { postMapper } from "./../middlewares/post/post-mapper";
-import { commentMapper } from "./../middlewares/comment/comment-mapper";
 
 export class PostService {
-  static async createPost(newPost: InputPostType): Promise<OutputPostType> {
-    const createdPost: PostDBType = {
-      id: new ObjectId().toString(),
-      title: newPost.title,
-      shortDescription: newPost.shortDescription,
-      content: newPost.content,
-      blogId: newPost.blogId,
-      blogName: newPost.blogName,
-      createdAt: new Date().toISOString(),
-    };
-    await PostRepository.createPost(createdPost);
-    return postMapper(createdPost);
+  constructor(protected PostRepository: PostRepository) {}
+  async createPost(postData: InputPostType): Promise<OutputPostType> {
+    const createdPost = new PostDBType(
+      new ObjectId().toString(),
+      postData.title,
+      postData.shortDescription,
+      postData.content,
+      postData.blogId,
+      postData.blogName,
+      new Date().toISOString()
+    );
+
+    const newPost = await this.PostRepository.createPost(createdPost);
+    return postMapper(newPost);
   }
 
-  static async createComment(
-    newComment: InputCommentBodyWithPostId
+  async createComment(
+    newComment: InputCommentBodyWithPostId,
+    userId: string
   ): Promise<OutputCommentType> {
-    const createdComment: CommentDBType = {
-      content: newComment.content,
-      commentatorInfo: newComment.commentatorInfo,
-      postId: newComment.postId,
-      id: new ObjectId().toString(),
-      createdAt: new Date().toISOString(),
-    };
+    const createCommentData = new CreateCommentData(
+      userId,
+      newComment.content,
+      newComment.commentatorInfo,
+      new Date().toISOString(),
+      {
+        likesCount: 0,
+        dislikesCount: 0,
+      }
+    );
 
-    await PostRepository.createComment(createdComment);
+    const createdComment =
+      await this.PostRepository.createComment(createCommentData);
 
-    return commentMapper(createdComment);
+    return await commentMapperWithStatus(createdComment, userId);
   }
 
-  static async createCommentToPost(
-    createCommentData: InputCreateCommentData
+  async createCommentToPost(
+    createCommentData: InputCreateCommentData,
+    userId: string
   ): Promise<OutputCommentType> {
-    const comment: OutputCommentType = await this.createComment({
-      content: createCommentData.content,
-      commentatorInfo: {
-        userId: createCommentData.userId,
-        userLogin: createCommentData.login,
+    const comment: OutputCommentType | null = await this.createComment(
+      {
+        content: createCommentData.content,
+        commentatorInfo: {
+          userId: createCommentData.userId,
+          userLogin: createCommentData.login,
+        },
+        postId: createCommentData.postId,
       },
-      postId: createCommentData.postId,
-    });
-
+      userId
+    );
     return comment;
   }
 
-  static async updatePost(
-    id: string,
-    updateData: UpdatePostData
-  ): Promise<boolean> {
-    const updatedPost: UpdatePostData = {
-      title: updateData.title,
-      shortDescription: updateData.shortDescription,
-      content: updateData.content,
-      blogId: updateData.blogId,
-    };
-    const result = await PostRepository.updatePost(id, updatedPost);
+  async updatePost(id: string, updateData: UpdatePostData): Promise<boolean> {
+    const updatedPost = new UpdatePostData(
+      updateData.title,
+      updateData.shortDescription,
+      updateData.content,
+      updateData.blogId
+    );
+
+    const result = await this.PostRepository.updatePost(id, updatedPost);
     return result;
   }
 }

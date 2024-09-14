@@ -4,7 +4,7 @@ import { SortDataUserType } from "../../types/user/input";
 import { OutputUserType, UserDBType } from "../../types/user/output";
 
 export class QueryUserRepository {
-  static async getAllUsers(sortData: SortDataUserType) {
+  async getAllUsers(sortData: SortDataUserType) {
     const sortBy = sortData.sortBy ?? "createdAt";
     const sortDirection = sortData.sortDirection ?? "desc";
     const pageNumber = sortData.pageNumber ?? 1;
@@ -42,8 +42,8 @@ export class QueryUserRepository {
       .skip((+pageNumber - 1) * +pageSize)
       .limit(+pageSize);
 
-    const totalCount: number = await UserModel.countDocuments(filter);
-    const pageCount: number = Math.ceil(totalCount / +pageSize);
+    const totalCount = await UserModel.countDocuments(filter);
+    const pageCount = Math.ceil(totalCount / +pageSize);
 
     return {
       pagesCount: pageCount,
@@ -54,29 +54,29 @@ export class QueryUserRepository {
     };
   }
 
-  static async getUserById(id: string): Promise<OutputUserType | null> {
-    const user = await UserModel.findOne({ id: id });
+  async getUserById(userId: string): Promise<OutputUserType | null> {
+    const user: UserDBType | null = await UserModel.findOne({ id: userId });
     if (!user) {
       return null;
     }
     return userMapper(user);
   }
 
-  static async findyByLogin(login: string) {
+  async findyByLogin(login: string) {
     const user: UserDBType | null = await UserModel.findOne({
       "accountData.login": login,
     });
     return user;
   }
 
-  static async findyByEmail(email: string): Promise<UserDBType | null> {
+  async findyByEmail(email: string): Promise<UserDBType | null> {
     const user: UserDBType | null = await UserModel.findOne({
       "accountData.email": email,
     });
     return user;
   }
 
-  static async findByLoginOrEmail(loginOrEmail: string) {
+  async findByLoginOrEmail(loginOrEmail: string) {
     const user: UserDBType | null = await UserModel.findOne({
       $or: [
         {
@@ -96,7 +96,7 @@ export class QueryUserRepository {
     return user;
   }
 
-  static async findUserByConfirmationCode(
+  async findUserByConfirmationCode(
     emailConfirmationCode: string
   ): Promise<UserDBType | null> {
     const user: UserDBType | null = await UserModel.findOne({
@@ -105,7 +105,7 @@ export class QueryUserRepository {
     return user;
   }
 
-  static async findUserByRecoveryConfirmationCode(
+  async findUserByRecoveryConfirmationCode(
     passwordRecoveryCode: string
   ): Promise<UserDBType | null> {
     const user: UserDBType | null = await UserModel.findOne({
@@ -114,9 +114,7 @@ export class QueryUserRepository {
     return user;
   }
 
-  static async findPasswordSaltByUserId(
-    userId: string
-  ): Promise<string | null> {
+  async findPasswordSaltByUserId(userId: string): Promise<string | null> {
     const user: UserDBType | null = await UserModel.findOne({
       id: userId,
     });
@@ -124,14 +122,15 @@ export class QueryUserRepository {
   }
 
   //--------------------------for e2e tests--------------------------
-  static async findConfirmationCodeByEmail(email: string) {
+
+  async findConfirmationCodeByEmail(email: string) {
     const user = await UserModel.findOne({
       "accountData.email": email,
     });
     return user!.emailConfirmation.confirmationCode;
   }
 
-  static async findPasswordRecoveryConfirmationCodeByEmail(email: string) {
+  async findPasswordRecoveryConfirmationCodeByEmail(email: string) {
     const user = await UserModel.findOne({
       "accountData.email": email,
     });

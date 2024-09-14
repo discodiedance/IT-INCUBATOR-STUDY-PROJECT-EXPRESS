@@ -1,21 +1,25 @@
 import { CommentRepository } from "../repositories/comment-repository";
+
 import { UpdateCommentData } from "../types/comment/input";
 import { OutputCommentType } from "../types/comment/output";
 import { OutputUserType } from "../types/user/output";
 
 export class CommentService {
-  static async updateComment(
+  constructor(protected CommentRepository: CommentRepository) {}
+  async updateComment(
     updateData: UpdateCommentData,
     id: string
   ): Promise<boolean> {
-    const updatedComment: UpdateCommentData = {
-      content: updateData.content,
-    };
-    const result = await CommentRepository.updateComment(id, updatedComment);
+    const updatedComment = new UpdateCommentData(updateData.content);
+
+    const result = await this.CommentRepository.updateComment(
+      id,
+      updatedComment
+    );
     return result;
   }
 
-  static async checkCredentials(
+  async checkCredentials(
     comment: OutputCommentType,
     user: OutputUserType
   ): Promise<boolean | null> {

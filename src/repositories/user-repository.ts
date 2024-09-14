@@ -1,19 +1,19 @@
-import { add } from "date-fns/add";
 import { UserModel } from "../db/db";
+import { add } from "date-fns/add";
 import { UserDBType } from "../types/user/output";
 
 export class UserRepostitory {
-  static async createUser(inputCreateUser: UserDBType): Promise<UserDBType> {
-    const createdUser: UserDBType = await UserModel.create(inputCreateUser);
+  async createUser(inputCreateUser: UserDBType): Promise<UserDBType> {
+    const createdUser = await UserModel.create(inputCreateUser);
     return createdUser;
   }
 
-  static async deleteUser(id: string): Promise<boolean> {
+  async deleteUser(id: string): Promise<boolean> {
     const result = await UserModel.deleteOne({ id: id });
     return !!result.deletedCount;
   }
 
-  static async updateConfirmation(id: string): Promise<boolean> {
+  async updateConfirmation(id: string): Promise<boolean> {
     const result = await UserModel.updateOne(
       { id: id },
       { $set: { "emailConfirmation.isConfirmed": true } }
@@ -22,10 +22,7 @@ export class UserRepostitory {
     return result.matchedCount === 1;
   }
 
-  static async updateConfirmationCode(
-    code: string,
-    email: string
-  ): Promise<boolean> {
+  async updateConfirmationCode(code: string, email: string): Promise<boolean> {
     const result = await UserModel.updateOne(
       {
         "accountData.email": email,
@@ -35,7 +32,7 @@ export class UserRepostitory {
     return result.modifiedCount === 1;
   }
 
-  static async updateNewPasswordByUserId(
+  async updateNewPasswordByUserId(
     passwordHash: string,
     userId: string
   ): Promise<boolean> {
@@ -48,7 +45,7 @@ export class UserRepostitory {
     return result.modifiedCount === 1;
   }
 
-  static async addRecoveryPasswordCodeToUserById(code: string, userId: string) {
+  async addRecoveryPasswordCodeToUserById(code: string, userId: string) {
     const result = await UserModel.updateOne(
       {
         id: userId,

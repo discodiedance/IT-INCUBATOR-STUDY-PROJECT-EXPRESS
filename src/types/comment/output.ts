@@ -1,20 +1,49 @@
-export type CommentDBType = {
-  id: string;
-  content: string;
-  commentatorInfo: {
-    userId: string;
-    userLogin: string;
-  };
-  createdAt: string;
-  postId: string;
-};
+export class CommentDBType {
+  constructor(
+    public id: string,
+    public content: string,
+    public commentatorInfo: {
+      userId: string;
+      userLogin: string;
+    },
+    public createdAt: string,
+    public postId: string,
+    public likesInfo: {
+      likesCount: number;
+      dislikesCount: number;
+    }
+  ) {}
+}
 
-export type OutputCommentType = {
-  commentId: string;
-  content: string;
-  commentatorInfo: {
-    userId: string;
-    userLogin: string;
-  };
-  createdAt: string;
-};
+export class OutputCommentType {
+  constructor(
+    public id: string,
+    public content: string,
+    public commentatorInfo: {
+      userId: string;
+      userLogin: string;
+    },
+    public createdAt: string,
+    public likesInfo: {
+      likesCount: number;
+      dislikesCount: number;
+    }
+  ) {}
+}
+
+export class OutputCommentTypeWithStatus {
+  constructor(
+    public id: string,
+    public content: string,
+    public commentatorInfo: {
+      userId: string;
+      userLogin: string;
+    },
+    public createdAt: string,
+    public likesInfo: {
+      likesCount: number;
+      dislikesCount: number;
+      myStatus: string;
+    }
+  ) {}
+}
