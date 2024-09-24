@@ -1,4 +1,4 @@
-export class InputBlogBodyType {
+export class InputBlogDataType {
   constructor(
     public name: string,
     public description: string,
@@ -6,7 +6,7 @@ export class InputBlogBodyType {
   ) {}
 }
 
-export class BlogSortDataType {
+export class InputBlogSortDataType {
   constructor(
     public searchNameTerm?: string,
     public sortBy?: string,

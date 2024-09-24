@@ -1,4 +1,4 @@
-export class UpdatePostData {
+export class InputUpdatePostDataType {
   constructor(
     public title: string,
     public shortDescription: string,
@@ -7,23 +7,29 @@ export class UpdatePostData {
   ) {}
 }
 
-export class InputPostType {
+export class InputCreatePostDataType {
   constructor(
     public title: string,
     public shortDescription: string,
     public content: string,
-    public blogId: string,
-    public blogName: string,
-    public createdAt: string
+    public blogId: string
   ) {}
 }
 
-export class PostSortDataType {
+export class InputPostSortDataType {
   constructor(
     public pageNumber?: number,
     public pageSize?: number,
     public sortBy?: string,
     public sortDirection?: "asc" | "desc",
-    public postId?: string
+    public blogId?: string
+  ) {}
+}
+
+export class InputCreatePostToBlogDataType {
+  constructor(
+    public content: string,
+    public shortDescription: string,
+    public title: string
   ) {}
 }

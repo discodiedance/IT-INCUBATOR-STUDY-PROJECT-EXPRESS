@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { userValidation } from "../middlewares/user/user-validation";
 import { userController } from "./composition-root";
-import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
-import { registrationMiddleware } from "../middlewares/auth/registration-middleware";
+import { authMiddleware } from "../features/application/middlewares/auth/auth-basic-middleware";
+import { registrationMiddleware } from "../features/application/middlewares/auth/registration-middleware";
+import { userValidation } from "../features/application/validators/user/user-validation";
 
 export const userRoute = Router({});
 

@@ -325,7 +325,7 @@ describe("Mongoose integration", () => {
         .expect(404);
     });
 
-    it("201 and created comment for a user with correct data", async () => {
+    it("201 and created comment for post with correct data", async () => {
       //create comment
       await request(app)
         .post(routerName + "/" + testPost1.id + "/" + "comments")

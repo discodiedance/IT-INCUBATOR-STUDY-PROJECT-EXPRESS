@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "./../../src/settings";
 import mongoose from "mongoose";
-import { queryUserRepository } from "../../src/routes/composition-root";
+import { UserModel } from "../../src/features/domain/entities/user-entity";
 
 const routerName = "/auth";
 const userRouterName = "/users";
@@ -371,7 +371,7 @@ describe("Mongoose integration", () => {
       .expect(400);
   });
 
-  it("204 and sent confirmation code to the mail of the user cuz of valid email", async () => {
+  it("204 and sent confirmation code to the mail of the user with valid email", async () => {
     //email resending
     await request(app)
       .post(routerName + "/registration-email-resending")
@@ -380,14 +380,14 @@ describe("Mongoose integration", () => {
   });
 
   it("429 and not sent mail with confrimation code cuz of too many requests", async () => {
-    //email resending 3 times
+    //email resending 4 times
     for (let i = 0; i < 3; i++) {
       await request(app)
         .post(routerName + "/registration-email-resending")
         .send({ email: "fundu1448@gmail.com" })
         .expect(204);
     }
-    //email resending 5th time
+    //email resending 6th time
     await request(app)
       .post(routerName + "/registration-email-resending")
       .send({ email: "fundu1448@gmail.com" })
@@ -403,13 +403,13 @@ describe("Mongoose integration", () => {
   });
 
   it("204 and verified email with correct confirmation code", async () => {
-    const userCode = await queryUserRepository.findConfirmationCodeByEmail(
-      "fundu1448@gmail.com"
-    );
+    const user = await UserModel.findOne({
+      "accountData.email": "fundu1448@gmail.com",
+    });
     //registration confirmation
     await request(app)
       .post(routerName + "/registration-confirmation")
-      .send({ code: userCode })
+      .send({ code: user!.emailConfirmation.confirmationCode })
       .expect(204);
   });
 
@@ -468,14 +468,16 @@ describe("Mongoose integration", () => {
   });
 
   it("204 and updated password with correct input data", async () => {
-    const recoveryCode =
-      await queryUserRepository.findPasswordRecoveryConfirmationCodeByEmail(
-        "fundu1448@gmail.com"
-      );
+    const user = await UserModel.findOne({
+      "accountData.email": "fundu1448@gmail.com",
+    });
     //update new password
     await request(app)
       .post(routerName + "/new-password")
-      .send({ newPassword: "12345678", recoveryCode: recoveryCode })
+      .send({
+        newPassword: "12345678",
+        recoveryCode: user!.passwordRecoveryConfirmation.recoveryCode,
+      })
       .expect(204);
     //login user with updated password
     await request(app)
@@ -495,14 +497,16 @@ describe("Mongoose integration", () => {
   });
 
   it("400 and not updated password cuz of incorrect password", async () => {
-    const recoveryCode =
-      await queryUserRepository.findPasswordRecoveryConfirmationCodeByEmail(
-        "fundu1448@gmail.com"
-      );
+    const user = await UserModel.findOne({
+      "accountData.email": "fundu1448@gmail.com",
+    });
     //update new password
     await request(app)
       .post(routerName + "/new-password")
-      .send({ newPassword: "1", recoveryCode: recoveryCode })
+      .send({
+        newPassword: "1",
+        recoveryCode: user!.passwordRecoveryConfirmation.recoveryCode,
+      })
       .expect(400, {
         errorsMessages: [{ message: "Incorrect value", field: "newPassword" }],
       });

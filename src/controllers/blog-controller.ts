@@ -1,13 +1,9 @@
 import { Response } from "express";
+import { inject, injectable } from "inversify";
 
-import { BlogRepository } from "../repositories/blog-repositry";
-import { QueryBlogRepository } from "../repositories/query-repository/query-blog-repository";
-import { QueryPostRepository } from "../repositories/query-repository/query-post-repository";
+import { BlogService } from "../features/application/services/blog-service";
 
-import { BlogService } from "../domain/blog-service";
-
-import { BlogSortDataType, InputBlogBodyType } from "../types/blog/input";
-import { OutputBlogType } from "../types/blog/output";
+import { InputBlogDataType, InputBlogSortDataType } from "../types/blog/input";
 import {
   RequestTypeWithQuery,
   RequestWithParams,
@@ -17,20 +13,32 @@ import {
   RequestWithBody,
   RequestWithBodyAndParams,
 } from "../types/common";
-import { CreatePostToBlogType, OutputPostType } from "../types/post/output";
+import { QueryBlogRepository } from "../features/infrastructure/repositories/query-repository/query-blog-repository";
+import { QueryPostRepository } from "../features/infrastructure/repositories/query-repository/query-post-repository";
+import { BlogRepository } from "../features/infrastructure/repositories/blog-repository";
+import { BlogSortDataType } from "../types/blog/blog-dto";
+import {
+  InputCreatePostToBlogDataType,
+  InputPostSortDataType,
+} from "../types/post/input";
+import { PostSortDataType } from "../types/post/post-dto";
 
+@injectable()
 export class BlogController {
   constructor(
-    protected BlogService: BlogService,
+    @inject(BlogService) protected BlogService: BlogService,
+    @inject(QueryBlogRepository)
     protected QueryBlogRepository: QueryBlogRepository,
-    protected BlogRepository: BlogRepository,
+    @inject(BlogRepository) protected BlogRepository: BlogRepository,
+    @inject(QueryPostRepository)
     protected QueryPostRepository: QueryPostRepository
   ) {}
+
   async getAllBlogs(
-    req: RequestTypeWithQuery<BlogSortDataType>,
+    req: RequestTypeWithQuery<InputBlogSortDataType>,
     res: Response
   ) {
-    const sortData = {
+    const sortData: BlogSortDataType = {
       searchNameTerm: req.query.searchNameTerm,
       sortBy: req.query.sortBy,
       sortDirection: req.query.sortDirection,
@@ -42,10 +50,9 @@ export class BlogController {
     return res.send(blogs);
   }
 
-  async getBlogById(req: RequestWithParams<Params>, res: Response) {
-    const id: string = req.params.id;
-    const blog: OutputBlogType | null =
-      await this.QueryBlogRepository.getBlogById(id);
+  async getBlogByBlogId(req: RequestWithParams<Params>, res: Response) {
+    const id = req.params.id;
+    const blog = await this.QueryBlogRepository.getMappedBlogById(id);
 
     if (!blog) {
       res.sendStatus(404);
@@ -55,16 +62,16 @@ export class BlogController {
   }
 
   async getAllPostsFromBlog(
-    req: RequestTypeWithQueryBlogId<BlogSortDataType, BlogIdParams>,
+    req: RequestTypeWithQueryBlogId<InputPostSortDataType, BlogIdParams>,
     res: Response
   ) {
-    const sortData = {
-      sortBy: req.query.sortBy,
-      sortDirection: req.query.sortDirection,
+    const sortData: PostSortDataType = {
       pageNumber: req.query.pageNumber,
       pageSize: req.query.pageSize,
+      sortBy: req.query.sortBy,
+      sortDirection: req.query.sortDirection,
     };
-    const blogId: string = req.params.blogId;
+    const blogId = req.params.blogId;
     const foundPosts = await this.QueryPostRepository.getAllPosts({
       ...sortData,
       blogId,
@@ -73,34 +80,32 @@ export class BlogController {
     return res.send(foundPosts);
   }
 
-  async createBlog(req: RequestWithBody<InputBlogBodyType>, res: Response) {
-    const blog: OutputBlogType = await this.BlogService.createBlog(req.body);
+  async createBlog(req: RequestWithBody<InputBlogDataType>, res: Response) {
+    const blog = await this.BlogService.createBlog(req.body);
     return res.status(201).send(blog);
   }
 
   async createPostForBlog(
-    req: RequestWithBodyAndParams<BlogIdParams, CreatePostToBlogType>,
+    req: RequestWithBodyAndParams<BlogIdParams, InputCreatePostToBlogDataType>,
     res: Response
   ) {
-    const id: string = req.params.blogId;
+    const id = req.params.blogId;
     const { title, shortDescription, content } = req.body;
-    const createdPost: OutputPostType | null =
-      await this.BlogService.createPostToBlog(id, {
-        title,
-        shortDescription,
-        content,
-      });
+    const createdPost = await this.BlogService.createPostToBlog(id, {
+      title,
+      shortDescription,
+      content,
+    });
 
     return res.status(201).send(createdPost);
   }
 
   async updateBlog(
-    req: RequestWithBodyAndParams<Params, InputBlogBodyType>,
+    req: RequestWithBodyAndParams<Params, InputBlogDataType>,
     res: Response
   ) {
-    const id: string = req.params.id;
-    const blog: OutputBlogType | null =
-      await this.QueryBlogRepository.getBlogById(id);
+    const id = req.params.id;
+    const blog = await this.BlogRepository.getBlogByBlogId(id);
     if (!blog) {
       res.sendStatus(404);
       return;
@@ -110,14 +115,18 @@ export class BlogController {
       description: req.body.description,
       websiteUrl: req.body.websiteUrl,
     };
-    await this.BlogService.updateBlog(id, updateData);
+    const updatedBlog = await this.BlogService.updateBlog(blog, updateData);
+    if (!updatedBlog) {
+      res.sendStatus(500);
+      return;
+    }
     res.sendStatus(204);
     return;
   }
 
   async deleteBlog(req: RequestWithParams<Params>, res: Response) {
-    const id: string = req.params.id;
-    const status: boolean = await this.BlogRepository.deleteBlog(id);
+    const id = req.params.id;
+    const status = await this.BlogRepository.deleteBlog(id);
 
     if (!status) {
       res.sendStatus(404);

@@ -1,19 +1,19 @@
 import { Router } from "express";
 import { commentController } from "./composition-root";
 import {
+  authTokenForGetRequests,
+  authTokenMiddleware,
+} from "../features/application/middlewares/auth/auth-access-token-middleware";
+import {
   commentLikeValidation,
   commentValidation,
-} from "../middlewares/comment/comment-validation";
-import {
-  authTokenForGetRequets,
-  authTokenMiddleware,
-} from "../middlewares/auth/auth-access-token-middleware";
+} from "../features/application/validators/comment/comment-validation";
 
 export const commentRoute = Router({});
 
 commentRoute.get(
   "/:id",
-  authTokenForGetRequets,
+  authTokenForGetRequests,
   commentController.getComment.bind(commentController)
 );
 

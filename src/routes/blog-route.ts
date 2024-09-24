@@ -1,17 +1,17 @@
 import { Router } from "express";
+import { blogController } from "./composition-root";
+import { authMiddleware } from "../features/application/middlewares/auth/auth-basic-middleware";
 import {
   allPostsForBlogByIdValidation,
   blogValidation,
-} from "../middlewares/blog/blog-validation";
-import { postBlogIdValidation } from "../middlewares/post/post-validation";
-import { blogController } from "./composition-root";
-import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
+} from "../features/application/validators/blog/blog-validation";
+import { postBlogIdValidation } from "../features/application/validators/post/post-validation";
 
 export const blogRoute = Router({});
 
 blogRoute.get("/", blogController.getAllBlogs.bind(blogController));
 
-blogRoute.get("/:id", blogController.getBlogById.bind(blogController));
+blogRoute.get("/:id", blogController.getBlogByBlogId.bind(blogController));
 
 blogRoute.get(
   "/:blogId/posts",

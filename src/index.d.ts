@@ -1,12 +1,12 @@
-import { BlogType } from "./types/blog/output";
-import { OutputUserType, UserDBType } from "./types/user/output";
+import { OutputBlogType } from "./types/blog/output";
+import { OutputUserType } from "./types/user/output";
 
 export {};
 
 declare global {
   namespace Express {
     export interface Request {
-      blog: BlogType | null;
+      blog: OutputBlogType | null;
     }
   }
   namespace Express {

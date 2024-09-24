@@ -1,15 +1,15 @@
 import { Router } from "express";
 import { postController } from "./composition-root";
 import {
+  authTokenForGetRequests,
+  authTokenMiddleware,
+} from "../features/application/middlewares/auth/auth-access-token-middleware";
+import { authMiddleware } from "../features/application/middlewares/auth/auth-basic-middleware";
+import { commentCreationValidation } from "../features/application/validators/comment/comment-validation";
+import {
   allCommentsForPostByIdValidation,
   postValidation,
-} from "../middlewares/post/post-validation";
-import { commentCreationValidation } from "./../middlewares/comment/comment-validation";
-import { authMiddleware } from "../middlewares/auth/auth-basic-middleware";
-import {
-  authTokenForGetRequets,
-  authTokenMiddleware,
-} from "../middlewares/auth/auth-access-token-middleware";
+} from "../features/application/validators/post/post-validation";
 
 export const postRoute = Router({});
 
@@ -19,7 +19,7 @@ postRoute.get("/:id", postController.getPost.bind(postController));
 
 postRoute.get(
   "/:postId/comments",
-  authTokenForGetRequets,
+  authTokenForGetRequests,
   allCommentsForPostByIdValidation(),
   postController.getAllCommentsFromPost.bind(postController)
 );

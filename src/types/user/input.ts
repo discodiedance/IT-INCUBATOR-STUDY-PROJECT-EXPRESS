@@ -1,4 +1,4 @@
-export class InputUserType {
+export class InputCreateUserAccountDataType {
   constructor(
     public login: string,
     public password: string,
@@ -6,7 +6,7 @@ export class InputUserType {
   ) {}
 }
 
-export class SortDataUserType {
+export class InputUserSortDataUserType {
   constructor(
     public sortBy?: string,
     public sortDirection?: "asc" | "desc",

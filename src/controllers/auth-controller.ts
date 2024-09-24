@@ -1,57 +1,57 @@
 import { Response, Request } from "express";
-
-import { JwtService } from "../aplication/jwt-service";
-import { AuthService } from "../domain/auth-service";
-import { SecurityService } from "../domain/security-service";
-import { UserService } from "../domain/user-service";
-
+import { inject, injectable } from "inversify";
+import { AuthService } from "../features/application/services/auth-service";
+import { SecurityService } from "../features/application/services/security-service";
+import { UserService } from "../features/application/services/user-service";
 import { InputLoginOrEmailType } from "../types/auth/input";
-import {
-  RequestWithBody,
-  ConfirmEmailType,
-  ResendEmailType,
-} from "../types/common";
-import { UserDBType, OutputUserType } from "../types/user/output";
+import { RequestWithBody } from "../types/common";
 
+import { JwtService } from "../features/application/services/jwt-service";
+import { CreateUserAccountDataType } from "../types/user/user-dto";
+
+@injectable()
 export class AuthController {
   constructor(
-    protected SecurityService: SecurityService,
-    protected UserService: UserService,
-    protected JwtService: JwtService,
-    protected AuthService: AuthService
+    @inject(SecurityService) protected SecurityService: SecurityService,
+    @inject(UserService) protected UserService: UserService,
+    @inject(JwtService) protected JwtService: JwtService,
+    @inject(AuthService) protected AuthService: AuthService
   ) {}
 
   async loginUser(req: RequestWithBody<InputLoginOrEmailType>, res: Response) {
-    const user: UserDBType | null = await this.UserService.checkCredentials(
+    const user = await this.UserService.checkCredentials(
       req.body.loginOrEmail,
       req.body.password
     );
 
-    if (user) {
-      const ip: string = req.ip!.toString();
-      const title: string = req.headers["user-agent"] as string;
-      const userId: string = user.id;
-
-      const tokens = await this.AuthService.loginUser(userId, ip, title);
-
-      if (!tokens) {
-        res.sendStatus(401);
-        return;
-      }
-
-      const { accessToken, refreshToken } = tokens;
-
-      return res
-        .cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: true,
-        })
-        .status(200)
-        .send({ accessToken });
+    if (!user) {
+      res.sendStatus(401);
+      return;
     }
-    res.sendStatus(401);
+
+    const ip = req.ip!.toString();
+    const title = req.headers["user-agent"] as string;
+    const userId = user.id;
+
+    const tokens = await this.AuthService.loginUser(userId, ip, title);
+
+    if (!tokens) {
+      res.sendStatus(500);
+      return;
+    }
+
+    const { accessToken, refreshToken } = tokens;
+
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      .status(200)
+      .send({ accessToken });
     return;
   }
+
   async updateRefreshToken(req: Request, res: Response) {
     const userId = await this.JwtService.getUserIdByRefreshToken(
       req.cookies.refreshToken
@@ -64,6 +64,7 @@ export class AuthController {
       deviceId,
       userId
     );
+
     if (!updatedTokens) {
       res.sendStatus(500);
       return;
@@ -79,6 +80,7 @@ export class AuthController {
       .status(200)
       .send({ accessToken });
   }
+
   async logoutUser(req: Request, res: Response) {
     const deviceId = await this.JwtService.getDeviceIdByRefreshToken(
       req.cookies.refreshToken
@@ -87,11 +89,10 @@ export class AuthController {
       res.sendStatus(401);
       return;
     }
-    const status: boolean | null =
-      await this.SecurityService.terminateDeviceByDeviceId(
-        deviceId,
-        req.cookies.refreshToken
-      );
+    const status = await this.SecurityService.terminateDeviceByDeviceId(
+      deviceId,
+      req.cookies.refreshToken
+    );
     if (!status) {
       res.sendStatus(401);
       return;
@@ -99,51 +100,63 @@ export class AuthController {
     res.sendStatus(204);
     return;
   }
+
   async getInfoAboutCurrentUser(req: Request, res: Response) {
-    const user: OutputUserType | null = req.user;
+    const user = req.user;
     if (!user) {
       res.sendStatus(401);
       return;
     }
+
     const userData = {
       email: user.email,
       login: user.login,
       id: user.id,
     };
-    return res.status(200).send(userData);
+
+    res.status(200).send(userData);
+    return;
   }
+
   async confirmRegistration(req: Request, res: Response) {
-    const result: ConfirmEmailType = await this.AuthService.confirmEmail(
-      req.body.code
-    );
+    const result = await this.AuthService.confirmEmail(req.body.code);
     if (result.result === 204) {
       res.sendStatus(204);
       return;
-    } else {
-      return res
-        .status(400)
-        .send({ errorsMessages: [{ message: result.message, field: "code" }] });
     }
+
+    if (result.result === 500) {
+      res
+        .status(500)
+        .send({ errorsMessages: [{ message: result.message, field: "code" }] });
+      return;
+    }
+    res
+      .status(400)
+      .send({ errorsMessages: [{ message: result.message, field: "code" }] });
+    return;
   }
+
   async registrationUser(req: Request, res: Response) {
-    const userData = {
+    const userData: CreateUserAccountDataType = {
       login: req.body.login,
       email: req.body.email,
       password: req.body.password,
     };
-    const registrationResult: OutputUserType | null =
+
+    const registrationResult =
       await this.AuthService.createUserByRegistration(userData);
 
     if (!registrationResult) {
       res.sendStatus(400);
       return;
-    } else {
-      res.sendStatus(204);
-      return;
     }
+    res.sendStatus(204);
+    return;
   }
+
   async registartionEmailResending(req: Request, res: Response) {
-    const result: ResendEmailType = await this.AuthService.resendEmail(
+    const result = await this.AuthService.registartionEmailResending(
       req.body.email
     );
     if (result.result === 204) {
@@ -155,25 +168,28 @@ export class AuthController {
       });
     }
   }
+
   async passwordRecovery(req: Request, res: Response) {
     await this.AuthService.sendPasswordRecoveryCode(req.body.email);
     res.sendStatus(204);
     return;
   }
+
   async updateNewPassword(req: Request, res: Response) {
-    const result: ResendEmailType =
+    const result =
       await this.AuthService.confirPasswordRecoveryCodeAndUpdatePassword(
         req.body.newPassword,
         req.body.recoveryCode
       );
+
     if (result.result === 204) {
       res.sendStatus(204);
       return;
-    } else {
-      res.status(400).send({
-        errorsMessages: [{ message: result.message, field: "recoveryCode" }],
-      });
-      return;
     }
+
+    res.status(400).send({
+      errorsMessages: [{ message: result.message, field: "recoveryCode" }],
+    });
+    return;
   }
 }

@@ -12,16 +12,6 @@ export type RequestTypeWithQueryBlogId<Q, P> = Request<P, {}, {}, Q>;
 
 export type RequestTypeWithQueryPostId<Q, P> = Request<P, {}, {}, Q>;
 
-export class ErrorType {
-  constructor(public errorsMessages: ErorMessageType[]) {}
-}
-export class ErorMessageType {
-  constructor(
-    public field: string,
-    public message: string
-  ) {}
-}
-
 export type Params = {
   id: string;
 };
@@ -53,6 +43,7 @@ export class ConfirmEmailType {
     public message: string
   ) {}
 }
+
 export class ResendEmailType {
   constructor(
     public result: number,

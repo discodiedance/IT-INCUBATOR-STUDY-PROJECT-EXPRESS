@@ -1,16 +1,16 @@
 import { Router } from "express";
 import { authController } from "./composition-root";
-import { authValidation } from "../middlewares/auth/auth-validation";
+import { authTokenMiddleware } from "../features/application/middlewares/auth/auth-access-token-middleware";
+import { authRefreshTokenMiddleware } from "../features/application/middlewares/auth/auth-refresh-token-middleware";
+import { registrationMiddleware } from "../features/application/middlewares/auth/registration-middleware";
+import { customRateLimitiMiddleware } from "../features/application/middlewares/security/ip-url-date-middleware";
+import { authValidation } from "../features/application/validators/auth/auth-validation";
 import {
   userCodeValidation,
+  userValidation,
   userEmailValidation,
   userPasswordUpdateValidation,
-  userValidation,
-} from "../middlewares/user/user-validation";
-import { authTokenMiddleware } from "../middlewares/auth/auth-access-token-middleware";
-import { registrationMiddleware } from "../middlewares/auth/registration-middleware";
-import { authRefreshTokenMiddleware } from "../middlewares/auth/auth-refresh-token-middleware";
-import { customRateLimitiMiddleware } from "../middlewares/security/ip-url-date-middleware";
+} from "../features/application/validators/user/user-validation";
 
 export const authRoute = Router({});
 

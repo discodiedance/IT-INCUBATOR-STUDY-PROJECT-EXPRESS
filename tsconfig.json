@@ -8,7 +8,9 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.test.ts"],
@@ -19,7 +21,7 @@
     "src/controllers/blog-controller.ts",
     "src/controllers/comment-controller.ts",
     "src/controllers/post-controller.ts",
-    "src/controllers/security-controller.ts",
+    "src/controllers/device-controller.ts",
     "src/controllers/user-controller.ts"
   ]
 }

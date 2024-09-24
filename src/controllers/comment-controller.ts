@@ -1,118 +1,130 @@
 import { Response } from "express";
+import { inject, injectable } from "inversify";
 
-import { CommentRepository } from "../repositories/comment-repository";
-import { QueryCommentRepository } from "../repositories/query-repository/query-comment-repository";
+import { CommentService } from "../features/application/services/comment-service";
+import { LikeService } from "../features/application/services/like-service";
 
-import { JwtService } from "../aplication/jwt-service";
-import { CommentService } from "../domain/comment-service";
-import { LikeService } from "../domain/like-service";
-
-import { InputLikeBody, UpdateCommentData } from "../types/comment/input";
 import {
-  OutputCommentType,
-  OutputCommentTypeWithStatus,
-} from "../types/comment/output";
+  InputLikeDataType,
+  InputUpdateCommentDataType,
+} from "../types/comment/input";
 import {
   RequestWithParams,
   Params,
   RequestWithBodyAndParams,
   CommentIdParams,
 } from "../types/common";
-import { InputUpdateCommentLikeData } from "../types/like/input";
 import { OutputUserType } from "../types/user/output";
+import { JwtService } from "../features/application/services/jwt-service";
+import { CommentRepository } from "../features/infrastructure/repositories/comment-repository";
+import { QueryCommentRepository } from "../features/infrastructure/repositories/query-repository/query-comment-repository";
+import { UpdateCommentLikeData } from "../types/comment-likes/comment-likes-dto";
 
+@injectable()
 export class CommentController {
   constructor(
-    protected CommentService: CommentService,
-    protected LikeService: LikeService,
-    protected JwtService: JwtService,
+    @inject(CommentService) protected CommentService: CommentService,
+    @inject(LikeService) protected LikeService: LikeService,
+    @inject(JwtService) protected JwtService: JwtService,
+    @inject(QueryCommentRepository)
     protected QueryCommentRepository: QueryCommentRepository,
-    protected CommentRepository: CommentRepository
+    @inject(CommentRepository) protected CommentRepository: CommentRepository
   ) {}
+
   async getComment(req: RequestWithParams<Params>, res: Response) {
-    const commentId: string = req.params.id;
+    const commentId = req.params.id;
     if (!req.headers.authorization) {
-      const comment: OutputCommentType | null =
-        await this.QueryCommentRepository.getCommentById(commentId);
-      if (!comment) {
-        res.sendStatus(404);
-        return;
-      }
-      res.status(200).send(comment);
-      return;
-    } else {
-      const userId = await this.JwtService.getUserIdByJWTToken(
-        req.headers.authorization.split(" ")[1]
-      );
-      const comment: OutputCommentTypeWithStatus | null =
-        await this.QueryCommentRepository.getCommentByIdWithStatus(
-          commentId,
-          userId
+      const comment =
+        await this.QueryCommentRepository.getMappedCommentByCommentId(
+          commentId
         );
+
       if (!comment) {
         res.sendStatus(404);
         return;
       }
+
       res.status(200).send(comment);
       return;
     }
-  }
-  async putLike(
-    req: RequestWithBodyAndParams<CommentIdParams, InputLikeBody>,
-    res: Response
-  ) {
-    const comment: OutputCommentTypeWithStatus | null =
-      await this.QueryCommentRepository.getCommentByIdWithStatus(
-        req.params.commentId,
-        req.user!.id
+
+    const userId = await this.JwtService.getUserIdByJWTToken(
+      req.headers.authorization.split(" ")[1]
+    );
+
+    const comment =
+      await this.QueryCommentRepository.getCommentByCommentIdWithStatus(
+        commentId,
+        userId
       );
+
     if (!comment) {
       res.sendStatus(404);
       return;
     }
-    const updateCommentLikeData: InputUpdateCommentLikeData = {
+    res.status(200).send(comment);
+    return;
+  }
+  async putLike(
+    req: RequestWithBodyAndParams<CommentIdParams, InputLikeDataType>,
+    res: Response
+  ) {
+    const comment =
+      await this.QueryCommentRepository.getCommentByCommentIdWithStatus(
+        req.params.commentId,
+        req.user!.id
+      );
+
+    if (!comment) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const updateCommentLikeData: UpdateCommentLikeData = {
       comment,
       likeStatus: req.body.likeStatus,
       parentId: req.user!.id,
     };
 
-    const likeResult: boolean = await this.LikeService.updateCommentLike(
+    const likeResult = await this.LikeService.updateCommentLike(
       updateCommentLikeData
     );
+
     if (!likeResult) {
       res.sendStatus(400);
       return;
     }
+
     res.sendStatus(204);
     return;
   }
+
   async updateComment(
-    req: RequestWithBodyAndParams<CommentIdParams, UpdateCommentData>,
+    req: RequestWithBodyAndParams<CommentIdParams, InputUpdateCommentDataType>,
     res: Response
   ) {
     const user = req.user as OutputUserType;
-    const content: UpdateCommentData = req.body;
-    const commentId: string = req.params.commentId;
-    const comment: OutputCommentType | null =
-      await this.QueryCommentRepository.getCommentById(commentId);
+    const content = req.body;
+    const commentId = req.params.commentId;
+    const comment =
+      await this.CommentRepository.getCommentByCommentId(commentId);
 
     if (!comment) {
       res.sendStatus(404);
       return;
     }
 
-    const checkedUser: boolean | null =
-      await this.CommentService.checkCredentials(comment, user);
+    const checkedUser = await this.CommentService.checkCredentials(
+      comment,
+      user
+    );
 
     if (!checkedUser) {
       res.sendStatus(403);
       return;
     }
 
-    const status: boolean = await this.CommentService.updateComment(
-      content,
-      commentId
-    );
+    const status = await this.CommentService.updateComment(comment, content);
     if (!status) {
       return null;
     }
@@ -120,19 +132,23 @@ export class CommentController {
     res.sendStatus(204);
     return;
   }
+
   async deleteComment(req: RequestWithParams<CommentIdParams>, res: Response) {
     const user = req.user as OutputUserType;
-    const commentId: string = req.params.commentId;
+    const commentId = req.params.commentId;
 
-    const comment: OutputCommentType | null =
-      await this.QueryCommentRepository.getCommentById(commentId);
+    const comment =
+      await this.CommentRepository.getCommentByCommentId(commentId);
 
     if (!comment) {
       res.sendStatus(404);
       return;
     }
-    const checkedUser: boolean | null =
-      await this.CommentService.checkCredentials(comment, user);
+
+    const checkedUser = await this.CommentService.checkCredentials(
+      comment,
+      user
+    );
 
     if (!checkedUser) {
       res.sendStatus(403);
@@ -140,7 +156,6 @@ export class CommentController {
     }
 
     await this.CommentRepository.deleteComment(commentId);
-
     return res.sendStatus(204);
   }
 }

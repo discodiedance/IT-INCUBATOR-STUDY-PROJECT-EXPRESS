@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { securityController } from "./composition-root";
-import { deviceMiddleware } from "../middlewares/security/device-login-middleware";
-import { authRefreshTokenMiddleware } from "../middlewares/auth/auth-refresh-token-middleware";
+import { authRefreshTokenMiddleware } from "../features/application/middlewares/auth/auth-refresh-token-middleware";
+import { deviceMiddleware } from "../features/application/middlewares/security/device-login-middleware";
 
 export const securityRoute = Router({});
 

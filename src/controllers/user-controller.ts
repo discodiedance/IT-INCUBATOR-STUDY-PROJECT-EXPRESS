@@ -1,9 +1,7 @@
 import { Response } from "express";
+import { inject, injectable } from "inversify";
 
-import { UserRepostitory } from "../repositories/user-repository";
-import { QueryUserRepository } from "../repositories/query-repository/query-user-repository";
-
-import { UserService } from "../domain/user-service";
+import { UserService } from "../features/application/services/user-service";
 
 import {
   RequestTypeWithQuery,
@@ -11,21 +9,31 @@ import {
   RequestWithParams,
   Params,
 } from "../types/common";
-import { SortDataUserType, InputUserType } from "../types/user/input";
-import { OutputUserType } from "../types/user/output";
+import {
+  InputCreateUserAccountDataType,
+  InputUserSortDataUserType,
+} from "../types/user/input";
+import { QueryUserRepository } from "../features/infrastructure/repositories/query-repository/query-user-repository";
+import { UserRepository } from "../features/infrastructure/repositories/user-repository";
+import {
+  CreateUserAccountDataType,
+  UserSortDataUserType,
+} from "../types/user/user-dto";
 
+@injectable()
 export class UserController {
   constructor(
-    protected UserRepostitory: UserRepostitory,
-    protected UserService: UserService,
+    @inject(UserRepository) protected UserRepository: UserRepository,
+    @inject(UserService) protected UserService: UserService,
+    @inject(QueryUserRepository)
     protected QueryUserRepository: QueryUserRepository
   ) {}
 
   async getAllUsers(
-    req: RequestTypeWithQuery<SortDataUserType>,
+    req: RequestTypeWithQuery<InputUserSortDataUserType>,
     res: Response
   ) {
-    const sortData = {
+    const sortData: UserSortDataUserType = {
       sortBy: req.query.sortBy,
       sortDirection: req.query.sortDirection,
       pageNumber: req.query.pageNumber,
@@ -33,19 +41,36 @@ export class UserController {
       searchLoginTerm: req.query.searchLoginTerm,
       searchEmailTerm: req.query.searchEmailTerm,
     };
+
     const users = await this.QueryUserRepository.getAllUsers(sortData);
 
-    res.send(users);
+    res.status(200).send(users);
     return;
   }
-  async createUser(req: RequestWithBody<InputUserType>, res: Response) {
-    const user: OutputUserType = await this.UserService.createUser(req.body);
+
+  async createUser(
+    req: RequestWithBody<InputCreateUserAccountDataType>,
+    res: Response
+  ) {
+    const inputUserData: CreateUserAccountDataType = {
+      login: req.body.login,
+      password: req.body.password,
+      email: req.body.email,
+    };
+
+    const user = await this.UserService.createUser(inputUserData);
+
+    if (!user) {
+      res.sendStatus(500);
+      return;
+    }
     res.status(201).send(user);
     return;
   }
+
   async deleteUser(req: RequestWithParams<Params>, res: Response) {
-    const id: string = req.params.id;
-    const status: boolean = await this.UserRepostitory.deleteUser(id);
+    const id = req.params.id;
+    const status = await this.UserRepository.deleteUser(id);
 
     if (!status) {
       res.sendStatus(404);
