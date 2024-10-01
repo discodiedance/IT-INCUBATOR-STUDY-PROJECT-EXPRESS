@@ -3,10 +3,13 @@ import { CommentRepository } from "../../infrastructure/repositories/comment-rep
 import { CommentDocumentType } from "../../../types/comment/comment-entities";
 import { OutputUserType } from "../../../types/user/output";
 import { UpdateCommentDataType } from "../../../types/comment/comment-dto";
+import { CommentLikesRepository } from "../../infrastructure/repositories/comment-likes-repository";
 
 @injectable()
 export class CommentService {
   constructor(
+    @inject(CommentLikesRepository)
+    protected CommentLikesRepository: CommentLikesRepository,
     @inject(CommentRepository) protected CommentRepository: CommentRepository
   ) {}
 

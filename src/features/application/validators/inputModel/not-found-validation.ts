@@ -9,7 +9,8 @@ export const notFoundValidation = (
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.sendStatus(404);
+    res.sendStatus(404);
+    return;
   }
   return next();
 };

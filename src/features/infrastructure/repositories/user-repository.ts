@@ -1,5 +1,4 @@
 import { injectable } from "inversify";
-
 import { UserModel } from "../../domain/entities/user-entity";
 import { UserDocumentType } from "../../../types/user/user-enitities";
 
@@ -12,16 +11,6 @@ export class UserRepository {
   async deleteUser(id: string): Promise<boolean> {
     const result = await UserModel.deleteOne({ id: id });
     return !!result.deletedCount;
-  }
-
-  async getUserByLogin(login: string): Promise<UserDocumentType | null> {
-    const user = await UserModel.findOne({
-      "accountData.login": login,
-    });
-    if (!user) {
-      return null;
-    }
-    return user;
   }
 
   async getUserByEmail(email: string): Promise<UserDocumentType | null> {

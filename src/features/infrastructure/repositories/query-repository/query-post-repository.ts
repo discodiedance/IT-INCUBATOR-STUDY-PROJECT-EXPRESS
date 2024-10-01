@@ -2,23 +2,30 @@ import { injectable } from "inversify";
 
 import { PostDocumentType } from "../../../../types/post/post-entities";
 
-import { OutputPostType } from "../../../../types/post/output";
+import {
+  OutputPostType,
+  OutputPostTypeWithStatus,
+} from "../../../../types/post/output";
 import { CommentModel } from "../../../domain/entities/comment-enitity";
 import { PostModel } from "../../../domain/entities/post-entity";
 
 import { CommentSortDataType } from "../../../../types/comment/comment-dto";
 import { PostSortDataType } from "../../../../types/post/post-dto";
-import { commentMapperWithStatus } from "../../../application/mappers/comment/comment-mapper";
+import { commentMapper } from "../../../application/mappers/comment/comment-mapper";
+
 import { postMapper } from "../../../application/mappers/post/post-mapper";
 
 @injectable()
 export class QueryPostRepository {
-  async getAllPosts(sortData: PostSortDataType) {
+  async getAllPostsWithStatus(
+    userId: string | null,
+    sortData: PostSortDataType
+  ) {
     const pageNumber = sortData.pageNumber ?? 1;
     const pageSize = sortData.pageSize ?? 10;
     const sortBy = sortData.sortBy ?? "createdAt";
     const sortDirection = sortData.sortDirection ?? "desc";
-    const blogId = sortData.blogId;
+    const blogId = sortData.blogId ?? null;
 
     let filter = {};
 
@@ -32,7 +39,6 @@ export class QueryPostRepository {
       .sort({ [sortBy]: sortDirection })
       .skip((+pageNumber - 1) * +pageSize)
       .limit(+pageSize);
-
     const totalCount = await PostModel.countDocuments(filter);
 
     const pageCount = Math.ceil(totalCount / +pageSize);
@@ -42,11 +48,11 @@ export class QueryPostRepository {
       page: +pageNumber,
       pageSize: +pageSize,
       totalCount: +totalCount,
-      items: posts.map(postMapper),
+      items: await Promise.all(posts.map((post) => postMapper(post, userId))),
     };
   }
 
-  async getAllComments(userId: string, sortData: CommentSortDataType) {
+  async getAllComments(userId: string | null, sortData: CommentSortDataType) {
     const sortDirection = sortData.sortDirection ?? "desc";
     const sortBy = sortData.sortBy ?? "createdAt";
     const pageNumber = sortData.pageNumber ?? 1;
@@ -76,7 +82,7 @@ export class QueryPostRepository {
       pageSize: +pageSize,
       totalCount: +totalCount,
       items: await Promise.all(
-        comments.map((comment) => commentMapperWithStatus(comment, userId))
+        comments.map((comment) => commentMapper(comment, userId))
       ),
     };
   }
@@ -88,6 +94,20 @@ export class QueryPostRepository {
     if (!post) {
       return null;
     }
-    return postMapper(post);
+    return postMapper(post, null);
+  }
+
+  async getMappedPostByPostIdWithStatus(
+    postId: string,
+    userId: string | null
+  ): Promise<OutputPostTypeWithStatus | null> {
+    const post: PostDocumentType | null = await PostModel.findOne({
+      id: postId,
+    });
+
+    if (!post) {
+      return null;
+    }
+    return await postMapper(post, userId);
   }
 }

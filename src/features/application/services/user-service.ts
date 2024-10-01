@@ -1,7 +1,5 @@
 import { inject, injectable } from "inversify";
-
 import bcrypt from "bcrypt";
-
 import { OutputUserType } from "../../../types/user/output";
 import { UserModel } from "../../domain/entities/user-entity";
 import { UserRepository } from "../../infrastructure/repositories/user-repository";
@@ -11,6 +9,7 @@ import {
   CreateUserDataType,
 } from "../../../types/user/user-dto";
 import { userMapper } from "../mappers/user/user-mapper";
+import { UserDocumentType } from "../../../types/user/user-enitities";
 
 @injectable()
 export class UserService {
@@ -46,7 +45,10 @@ export class UserService {
     return userMapper(createdUser);
   }
 
-  async checkCredentials(loginOrEmail: string, password: string) {
+  async checkCredentials(
+    loginOrEmail: string,
+    password: string
+  ): Promise<UserDocumentType | null> {
     const user = await this.UserRepository.getUserByLoginOrEmail(loginOrEmail);
 
     if (!user) {

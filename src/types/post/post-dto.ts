@@ -7,7 +7,7 @@ export class UpdatePostDataType {
   ) {}
 }
 
-export class CreatePostTypeDataType {
+export class CreatePostDataType {
   constructor(
     public title: string,
     public shortDescription: string,
@@ -35,6 +35,15 @@ export class PostDBType {
     public content: string,
     public blogId: string,
     public blogName: string,
-    public createdAt: string
+    public createdAt: string,
+    public likesInfo: {
+      likesCount: number;
+      dislikesCount: number;
+    },
+    public newestLikes: {
+      addedAt: string;
+      userId: string;
+      login: string;
+    }[]
   ) {}
 }

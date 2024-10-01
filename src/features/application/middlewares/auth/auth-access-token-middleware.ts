@@ -21,7 +21,7 @@ export const authTokenMiddleware = async (
     res.sendStatus(401);
     return;
   }
-  const foundedUser = await queryUserRepository.getUserByUserId(userId);
+  const foundedUser = await queryUserRepository.getMappedUserByUserId(userId);
   if (!foundedUser) {
     res.sendStatus(401);
     return;
@@ -36,6 +36,7 @@ export const authTokenForGetRequests = async (
   next: NextFunction
 ) => {
   if (!req.headers.authorization) {
+    req.user = null;
     return next();
   } else {
     const accessToken = req.headers.authorization.split(" ")[1];
@@ -45,70 +46,12 @@ export const authTokenForGetRequests = async (
       res.sendStatus(401);
       return;
     }
-    const foundedUser = await queryUserRepository.getUserByUserId(userId);
+    const foundedUser = await queryUserRepository.getMappedUserByUserId(userId);
     if (!foundedUser) {
       res.sendStatus(401);
       return;
     }
     req.user = foundedUser;
   }
-  next();
+  return next();
 };
-
-// injectable();
-// export class AuthTokenMiddleware {
-//   constructor(
-//     @inject(JwtService) protected JwtService: JwtService,
-//     @inject(QueryUserRepository)
-//     protected QueryUserRepository: QueryUserRepository
-//   ) {}
-
-//   async authTokenMiddleware(req: Request, res: Response, next: NextFunction) {
-//     if (!req.headers.authorization) {
-//       res.sendStatus(401);
-//       return;
-//     }
-
-//     const accessToken = req.headers.authorization.split(" ")[1];
-
-//     const userId = await this.JwtService.getUserIdByJWTToken(accessToken);
-//     if (!userId) {
-//       res.sendStatus(401);
-//       return;
-//     }
-//     const foundedUser: OutputUserType | null =
-//       await this.QueryUserRepository.getUserById(userId);
-//     if (!foundedUser) {
-//       res.sendStatus(401);
-//       return;
-//     }
-//     req.user = foundedUser;
-//     return next();
-//   }
-
-//   async authTokenForGetRequets(
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-//   ) {
-//     if (!req.headers.authorization) {
-//       return next();
-//     } else {
-//       const accessToken = req.headers.authorization.split(" ")[1];
-
-//       const userId = await this.JwtService.getUserIdByJWTToken(accessToken);
-//       if (!userId) {
-//         res.sendStatus(401);
-//         return;
-//       }
-//       const foundedUser: OutputUserType | null =
-//         await this.QueryUserRepository.getUserById(userId);
-//       if (!foundedUser) {
-//         res.sendStatus(401);
-//         return;
-//       }
-//       req.user = foundedUser;
-//     }
-//     next();
-//   }
-// }

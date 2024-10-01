@@ -25,7 +25,7 @@ export class UserSortDataUserType {
   ) {}
 }
 
-export class UserAccountType {
+class UserAccountType {
   constructor(
     public email: string,
     public login: string,
@@ -34,7 +34,7 @@ export class UserAccountType {
   ) {}
 }
 
-export class EmailConfirmationType {
+class EmailConfirmationType {
   constructor(
     public confirmationCode: string,
     public expirationDate: Date,
@@ -42,7 +42,7 @@ export class EmailConfirmationType {
   ) {}
 }
 
-export class PasswordRecoveryType {
+class PasswordRecoveryType {
   constructor(
     public recoveryCode: string,
     public expirationDate: Date | null

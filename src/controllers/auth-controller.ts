@@ -5,7 +5,6 @@ import { SecurityService } from "../features/application/services/security-servi
 import { UserService } from "../features/application/services/user-service";
 import { InputLoginOrEmailType } from "../types/auth/input";
 import { RequestWithBody } from "../types/common";
-
 import { JwtService } from "../features/application/services/jwt-service";
 import { CreateUserAccountDataType } from "../types/user/user-dto";
 
@@ -162,11 +161,11 @@ export class AuthController {
     if (result.result === 204) {
       res.sendStatus(204);
       return;
-    } else {
-      return res.status(400).send({
-        errorsMessages: [{ message: result.message, field: "email" }],
-      });
     }
+    res.status(400).send({
+      errorsMessages: [{ message: result.message, field: "email" }],
+    });
+    return;
   }
 
   async passwordRecovery(req: Request, res: Response) {

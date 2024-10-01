@@ -1,15 +1,13 @@
 import mongoose from "mongoose";
-
 import {
   CommentLikesDBMethodsType,
   CommentLikesModelFullType,
-} from "../../../types/comment-likes/comment-likes-entities";
-
+} from "../../../types/likes/comment-likes/comment-likes-entities";
 import { ObjectId } from "mongodb";
 import {
   CommentLikesDBType,
   CreateCommentLikeData,
-} from "../../../types/comment-likes/comment-likes-dto";
+} from "../../../types/likes/comment-likes/comment-likes-dto";
 
 export const CommentLikesSchema = new mongoose.Schema<
   CommentLikesDBType,
@@ -63,7 +61,6 @@ CommentLikesSchema.method(
   "updateLikeStatus",
   function updateLikeStatus(status: "None" | "Like" | "Dislike") {
     this.status = status;
-    return true;
   }
 );
 

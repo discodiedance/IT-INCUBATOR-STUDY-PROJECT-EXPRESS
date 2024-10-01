@@ -5,6 +5,7 @@ import {
   authTokenMiddleware,
 } from "../features/application/middlewares/auth/auth-access-token-middleware";
 import {
+  commentIdValidation,
   commentLikeValidation,
   commentValidation,
 } from "../features/application/validators/comment/comment-validation";
@@ -13,6 +14,7 @@ export const commentRoute = Router({});
 
 commentRoute.get(
   "/:id",
+  commentIdValidation(),
   authTokenForGetRequests,
   commentController.getComment.bind(commentController)
 );

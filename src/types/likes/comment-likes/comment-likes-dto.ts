@@ -1,4 +1,4 @@
-import { OutputCommentType } from "../comment/output";
+import { OutputCommentType } from "../../comment/output";
 
 export class CreateCommentLikeData {
   constructor(

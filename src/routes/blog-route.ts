@@ -6,6 +6,7 @@ import {
   blogValidation,
 } from "../features/application/validators/blog/blog-validation";
 import { postBlogIdValidation } from "../features/application/validators/post/post-validation";
+import { authTokenForGetRequests } from "../features/application/middlewares/auth/auth-access-token-middleware";
 
 export const blogRoute = Router({});
 
@@ -15,6 +16,7 @@ blogRoute.get("/:id", blogController.getBlogByBlogId.bind(blogController));
 
 blogRoute.get(
   "/:blogId/posts",
+  authTokenForGetRequests,
   allPostsForBlogByIdValidation(),
   blogController.getAllPostsFromBlog.bind(blogController)
 );

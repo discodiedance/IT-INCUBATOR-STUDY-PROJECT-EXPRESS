@@ -1,9 +1,7 @@
 import { inject, injectable } from "inversify";
-
 import { PostService } from "./post-service";
-
 import { OutputBlogType } from "../../../types/blog/output";
-import { OutputPostType } from "../../../types/post/output";
+import { OutputPostTypeWithStatus } from "../../../types/post/output";
 import { BlogModel } from "../../domain/entities/blog-entity";
 import { QueryBlogRepository } from "../../infrastructure/repositories/query-repository/query-blog-repository";
 import { BlogRepository } from "../../infrastructure/repositories/blog-repository";
@@ -13,6 +11,7 @@ import {
   UpdateBlogDataType,
 } from "../../../types/blog/blog-dto";
 import { blogMapper } from "../mappers/blog/blog-mapper";
+import { CreatePostDataType } from "../../../types/post/post-dto";
 
 @injectable()
 export class BlogService {
@@ -30,25 +29,9 @@ export class BlogService {
   }
 
   async createPostToBlog(
-    blogId: string,
-    postData: {
-      title: string;
-      shortDescription: string;
-      content: string;
-    }
-  ): Promise<OutputPostType | null> {
-    const blog = await this.BlogRepository.getBlogByBlogId(blogId);
-
-    if (!blog) {
-      return null;
-    }
-
-    const post = await this.PostService.createPost({
-      ...postData,
-      blogId,
-      blogName: blog.name,
-    });
-
+    createPostToBlogData: CreatePostDataType
+  ): Promise<OutputPostTypeWithStatus> {
+    const post = await this.PostService.createPost(createPostToBlogData);
     return post;
   }
 

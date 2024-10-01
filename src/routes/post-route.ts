@@ -8,20 +8,38 @@ import { authMiddleware } from "../features/application/middlewares/auth/auth-ba
 import { commentCreationValidation } from "../features/application/validators/comment/comment-validation";
 import {
   allCommentsForPostByIdValidation,
+  postIdValidation,
+  postLikeValidation,
   postValidation,
 } from "../features/application/validators/post/post-validation";
 
 export const postRoute = Router({});
 
-postRoute.get("/", postController.getAllPosts.bind(postController));
+postRoute.get(
+  "/",
+  authTokenForGetRequests,
+  postController.getAllPosts.bind(postController)
+);
 
-postRoute.get("/:id", postController.getPost.bind(postController));
+postRoute.get(
+  "/:id",
+  postIdValidation(),
+  authTokenForGetRequests,
+  postController.getPost.bind(postController)
+);
 
 postRoute.get(
   "/:postId/comments",
-  authTokenForGetRequests,
   allCommentsForPostByIdValidation(),
+  authTokenForGetRequests,
   postController.getAllCommentsFromPost.bind(postController)
+);
+
+postRoute.put(
+  "/:postId/like-status",
+  authTokenMiddleware,
+  postLikeValidation(),
+  postController.putLike.bind(postController)
 );
 
 postRoute.post(

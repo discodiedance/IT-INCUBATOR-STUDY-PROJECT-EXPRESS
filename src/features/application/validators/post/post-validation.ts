@@ -6,8 +6,20 @@ import {
 } from "../blog/blog-validation";
 import { notFoundValidation } from "../../validators/inputModel/not-found-validation";
 import { queryPostRepository } from "../../../../routes/composition-root";
+import { likeValidation } from "../like/like-validation";
 
 export const postIdinParamsValidation = param("postId")
+  .isString()
+  .trim()
+  .custom(async (value) => {
+    const post = await queryPostRepository.getMappedPostByPostId(value);
+    if (!post) {
+      throw new Error("Incorrect value");
+    }
+  })
+  .withMessage("Incorrect value");
+
+export const commentIdParamsForGetCommentValidation = param("id")
   .isString()
   .trim()
   .custom(async (value) => {
@@ -50,10 +62,22 @@ export const postValidation = () => [
 ];
 
 export const postBlogIdValidation = () => [
+  blogIdInParamsValidation,
+  notFoundValidation,
   titleValidation,
   shortDescriptionValidation,
   contentValidation,
   inputModelValidation,
-  blogIdInParamsValidation,
+];
+
+export const postLikeValidation = () => [
+  likeValidation,
+  inputModelValidation,
+  postIdinParamsValidation,
+  notFoundValidation,
+];
+
+export const postIdValidation = () => [
+  commentIdParamsForGetCommentValidation,
   notFoundValidation,
 ];

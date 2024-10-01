@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
-
 import { OutputUserType } from "../../../types/user/output";
 import {
   CommentModelFullType,
   CommentDBMethodsType,
 } from "../../../types/comment/comment-entities";
-
 import { ObjectId } from "mongodb";
 import {
   CommentDBType,
@@ -64,46 +62,40 @@ CommentSchema.method(
 CommentSchema.method(
   "updateComment",
   function updateComment(content: UpdateCommentDataType) {
-    return (this.content = content.content);
+    this.content = content.content;
   }
 );
 
 CommentSchema.method(
   "removeLikeAddDislikeCounter",
   function removeLikeAddDislikeCounter() {
-    this.likesInfo.likesCount - 1;
-    this.likesInfo.dislikesCount + 1;
-    return true;
+    this.likesInfo.likesCount -= 1;
+    this.likesInfo.dislikesCount += 1;
   }
 );
 
 CommentSchema.method(
   "removeDislikeAddLikeCounter",
   function removeLikeAddDislikeCounter() {
-    this.likesInfo.likesCount - 1;
-    this.likesInfo.dislikesCount + 1;
-    return true;
+    this.likesInfo.likesCount -= 1;
+    this.likesInfo.dislikesCount += 1;
   }
 );
 
 CommentSchema.method("removeLikeCounter", function removeLikeCounter() {
-  this.likesInfo.likesCount - 1;
-  return true;
+  this.likesInfo.likesCount -= 1;
 });
 
 CommentSchema.method("removeDislikeCounter", function removeDislikeCounter() {
-  this.likesInfo.dislikesCount - 1;
-  return true;
+  this.likesInfo.dislikesCount -= 1;
 });
 
 CommentSchema.method("addLikeCounter", function addLikeCounter() {
-  this.likesInfo.likesCount + 1;
-  return true;
+  this.likesInfo.likesCount += 1;
 });
 
 CommentSchema.method("addDislikeCounter", function addDislikeCounter() {
-  this.likesInfo.dislikesCount + 1;
-  return true;
+  this.likesInfo.dislikesCount += 1;
 });
 
 export const CommentModel = mongoose.model<CommentDBType, CommentModelFullType>(

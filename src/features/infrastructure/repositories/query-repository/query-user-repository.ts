@@ -58,7 +58,7 @@ export class QueryUserRepository {
     };
   }
 
-  async getUserByUserId(userId: string): Promise<OutputUserType | null> {
+  async getMappedUserByUserId(userId: string): Promise<OutputUserType | null> {
     const user: UserDocumentType | null = await UserModel.findOne({
       id: userId,
     });

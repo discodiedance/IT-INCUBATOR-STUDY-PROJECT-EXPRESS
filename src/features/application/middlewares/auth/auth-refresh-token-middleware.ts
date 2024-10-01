@@ -39,7 +39,7 @@ export const authRefreshTokenMiddleware = async (
     return;
   }
 
-  const userData = await queryUserRepository.getUserByUserId(userId);
+  const userData = await queryUserRepository.getMappedUserByUserId(userId);
   if (!userData) {
     res.sendStatus(401);
     return;

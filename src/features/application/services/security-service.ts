@@ -1,6 +1,4 @@
 import { inject, injectable } from "inversify";
-
-import { InputCreateDeviceDataType } from "../../../types/security/input";
 import { QuerySecurityRepository } from "../../infrastructure/repositories/query-repository/query-security-repository";
 import { SecurityRepository } from "../../infrastructure/repositories/security-repository";
 import { JwtService } from "./jwt-service";

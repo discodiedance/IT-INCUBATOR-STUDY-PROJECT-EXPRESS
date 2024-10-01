@@ -1,5 +1,4 @@
 import { injectable } from "inversify";
-
 import { PostDocumentType } from "../../../types/post/post-entities";
 import { PostModel } from "../../domain/entities/post-entity";
 
@@ -18,6 +17,7 @@ export class PostRepository {
     const post = await PostModel.findOne({
       id: postId,
     });
+
     if (!post) {
       return null;
     }

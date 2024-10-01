@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
-
 import { SecurityService } from "../features/application/services/security-service";
-
 import { RequestWithParams, Params } from "../types/common";
-
 import { JwtService } from "../features/application/services/jwt-service";
 import { QuerySecurityRepository } from "../features/infrastructure/repositories/query-repository/query-security-repository";
 import { SecurityRepository } from "../features/infrastructure/repositories/security-repository";
@@ -40,7 +37,8 @@ export class SecurityController {
       res.sendStatus(401);
       return;
     }
-    return res.sendStatus(204);
+    res.sendStatus(204);
+    return;
   }
 
   async terminateSessionById(req: RequestWithParams<Params>, res: Response) {

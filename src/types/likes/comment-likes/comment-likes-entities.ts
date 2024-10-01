@@ -5,7 +5,7 @@ export type CommentLikesDBMethodsType = {
   isLikeDataEqualsLike: () => boolean;
   isLikeDataEqualsDislike: () => boolean;
   isLikeDataEqualsNone: () => boolean;
-  updateLikeStatus: (status: "None" | "Like" | "Dislike") => boolean;
+  updateLikeStatus: (status: "None" | "Like" | "Dislike") => void;
 };
 
 type CommentLikesModelWithMethodsType = Model<

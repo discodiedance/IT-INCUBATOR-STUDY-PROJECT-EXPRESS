@@ -1,8 +1,6 @@
 import { Response } from "express";
 import { inject, injectable } from "inversify";
-
 import { UserService } from "../features/application/services/user-service";
-
 import {
   RequestTypeWithQuery,
   RequestWithBody,
@@ -69,8 +67,7 @@ export class UserController {
   }
 
   async deleteUser(req: RequestWithParams<Params>, res: Response) {
-    const id = req.params.id;
-    const status = await this.UserRepository.deleteUser(id);
+    const status = await this.UserRepository.deleteUser(req.params.id);
 
     if (!status) {
       res.sendStatus(404);

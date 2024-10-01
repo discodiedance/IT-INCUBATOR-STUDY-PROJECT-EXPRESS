@@ -175,7 +175,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const commentCount =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser1.id
         );
@@ -199,7 +199,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const commentCount =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser1.id
         );
@@ -223,7 +223,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const commentCount =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser1.id
         );
@@ -247,7 +247,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const commentCount =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser1.id
         );
@@ -271,7 +271,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const commentCount =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser2.id
         );
@@ -295,7 +295,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const commentCount =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser2.id
         );
@@ -319,7 +319,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const commentCount =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser2.id
         );
@@ -343,7 +343,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const comment =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           "null"
         );
@@ -368,7 +368,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const comment =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           "null"
         );
@@ -393,7 +393,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const comment =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           "null"
         );
@@ -418,7 +418,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const comment =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser3.id
         );
@@ -443,7 +443,7 @@ describe("Mongoose integration", () => {
           testComment1Id
         );
       const comment =
-        await queryCommentRepository.getCommentByCommentIdWithStatus(
+        await queryCommentRepository.getMappedCommentByCommentIdWithStatus(
           testComment1Id,
           testUser3.id
         );

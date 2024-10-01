@@ -1,13 +1,12 @@
 import { inject, injectable } from "inversify";
-
 import { CommentRepository } from "../../infrastructure/repositories/comment-repository";
 import { CommentLikesRepository } from "../../infrastructure/repositories/comment-likes-repository";
 import { CommentLikesModel } from "../../domain/entities/commen-likes-entity";
 import { QueryCommentRepository } from "../../infrastructure/repositories/query-repository/query-comment-repository";
-import { UpdateCommentLikeData } from "../../../types/comment-likes/comment-likes-dto";
+import { UpdateCommentLikeData } from "../../../types/likes/comment-likes/comment-likes-dto";
 
 @injectable()
-export class LikeService {
+export class CommentLikesService {
   constructor(
     @inject(QueryCommentRepository)
     protected QueryCommentRepository: QueryCommentRepository,

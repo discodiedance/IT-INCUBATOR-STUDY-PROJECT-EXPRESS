@@ -33,6 +33,7 @@
     "testuser": "jest ./__tests__/e2e/user-api.tests.ts --runInBand",
     "testblog": "jest ./__tests__/e2e/blog-api.tests.ts --runInBand",
     "testpost": "jest ./__tests__/e2e/post-api.tests.ts --runInBand",
+    "testpostlikes": "jest ./__tests__/e2e/post-likes-api.tests.ts --runInBand",
     "testauth": "jest ./__tests__/e2e/auth-api.tests.ts --runInBand",
     "testcomment": "jest ./__tests__/e2e/comment-api.tests.ts --runInBand",
     "testcommentlikes": "jest ./__tests__/e2e/comment-likes-api.tests.ts --runInBand",

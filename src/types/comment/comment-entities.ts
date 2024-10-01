@@ -1,7 +1,5 @@
 import { Model, HydratedDocument } from "mongoose";
-
 import { OutputUserType } from "../user/output";
-
 import {
   CommentDBType,
   CreateCommentDataType,
@@ -11,12 +9,12 @@ import {
 export type CommentDBMethodsType = {
   isCommentatorIdAndLoginEqual: (user: OutputUserType) => boolean;
   updateComment: (content: UpdateCommentDataType) => void;
-  removeLikeAddDislikeCounter: () => boolean;
-  removeDislikeAddLikeCounter: () => boolean;
-  removeLikeCounter: () => boolean;
-  removeDislikeCounter: () => boolean;
-  addLikeCounter: () => boolean;
-  addDislikeCounter: () => boolean;
+  removeLikeAddDislikeCounter: () => void;
+  removeDislikeAddLikeCounter: () => void;
+  removeLikeCounter: () => void;
+  removeDislikeCounter: () => void;
+  addLikeCounter: () => void;
+  addDislikeCounter: () => void;
 };
 
 type CommentModelWithMethodsType = Model<
@@ -26,7 +24,7 @@ type CommentModelWithMethodsType = Model<
 >;
 
 type CommentModelStaticType = Model<CommentDBType> & {
-  createComment(newPost: CreateCommentDataType): CommentDocumentType;
+  createComment(newComment: CreateCommentDataType): CommentDocumentType;
 };
 
 export type CommentModelFullType = CommentModelWithMethodsType &

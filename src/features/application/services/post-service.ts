@@ -1,10 +1,7 @@
 import { inject, injectable } from "inversify";
-
-import { OutputPostType } from "../../../types/post/output";
-
+import { OutputPostTypeWithStatus } from "../../../types/post/output";
 import { OutputCommentType } from "../../../types/comment/output";
 import { PostRepository } from "../../infrastructure/repositories/post-repository";
-
 import { PostModel } from "../../domain/entities/post-entity";
 import { CommentModel } from "../../domain/entities/comment-enitity";
 import { CommentRepository } from "../../infrastructure/repositories/comment-repository";
@@ -14,10 +11,10 @@ import {
   CreateCommentToPostDataType,
 } from "../../../types/comment/comment-dto";
 import {
-  CreatePostTypeDataType,
+  CreatePostDataType,
   UpdatePostDataType,
 } from "../../../types/post/post-dto";
-import { commentMapperWithStatus } from "../mappers/comment/comment-mapper";
+import { commentMapper } from "../mappers/comment/comment-mapper";
 import { postMapper } from "../mappers/post/post-mapper";
 
 @injectable()
@@ -28,11 +25,11 @@ export class PostService {
   ) {}
 
   async createPost(
-    inputPostData: CreatePostTypeDataType
-  ): Promise<OutputPostType> {
+    inputPostData: CreatePostDataType
+  ): Promise<OutputPostTypeWithStatus> {
     const createdPost = PostModel.createPost(inputPostData);
     await this.PostRepository.save(createdPost);
-    return postMapper(createdPost);
+    return postMapper(createdPost, null);
   }
 
   async createComment(
@@ -43,10 +40,7 @@ export class PostService {
     if (!comment) {
       return null;
     }
-    return await commentMapperWithStatus(
-      createdComment,
-      newComment.commentatorInfo.userId
-    );
+    return await commentMapper(createdComment, null);
   }
 
   async createCommentToPost(

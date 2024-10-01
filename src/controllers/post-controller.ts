@@ -1,8 +1,6 @@
 import { Response } from "express";
 import { inject, injectable } from "inversify";
-
 import { PostService } from "../features/application/services/post-service";
-
 import { InputCommentDataType } from "../types/comment/input";
 import {
   RequestTypeWithQuery,
@@ -26,19 +24,31 @@ import {
   CommentSortDataType,
   CreateCommentToPostDataType,
 } from "../types/comment/comment-dto";
-import { PostSortDataType, UpdatePostDataType } from "../types/post/post-dto";
+import {
+  CreatePostDataType,
+  PostSortDataType,
+  UpdatePostDataType,
+} from "../types/post/post-dto";
 import { BlogRepository } from "../features/infrastructure/repositories/blog-repository";
+import { CreatePostLikeData } from "../types/likes/post-likes/post-likes-dto";
+import { PostLikesService } from "../features/application/services/post-likes-service";
+import { InputLikeDataType } from "../types/likes/input";
+import { JwtService } from "../features/application/services/jwt-service";
+import { CommentRepository } from "../features/infrastructure/repositories/comment-repository";
 
 @injectable()
 export class PostController {
   constructor(
+    @inject(CommentRepository) protected CommentRepository: CommentRepository,
+    @inject(PostLikesService) protected PostLikesService: PostLikesService,
     @inject(BlogRepository) protected BlogRepository: BlogRepository,
     @inject(PostService) protected PostService: PostService,
     @inject(QueryBlogRepository)
     protected QueryBlogRepository: QueryBlogRepository,
     @inject(PostRepository) protected PostRepository: PostRepository,
     @inject(QueryPostRepository)
-    protected QueryPostRepository: QueryPostRepository
+    protected QueryPostRepository: QueryPostRepository,
+    @inject(JwtService) protected JwtService: JwtService
   ) {}
 
   async getAllPosts(
@@ -52,20 +62,39 @@ export class PostController {
       sortDirection: req.query.sortDirection,
     };
 
-    const posts = await this.QueryPostRepository.getAllPosts(sortData);
-
-    res.send(posts);
+    if (req.user) {
+      const posts = await this.QueryPostRepository.getAllPostsWithStatus(
+        req.user.id,
+        sortData
+      );
+      res.status(200).send(posts);
+      return;
+    }
+    const posts = await this.QueryPostRepository.getAllPostsWithStatus(
+      null,
+      sortData
+    );
+    res.status(200).send(posts);
     return;
   }
 
   async getPost(req: RequestWithParams<Params>, res: Response) {
-    const id = req.params.id;
-    const post = await this.QueryPostRepository.getMappedPostByPostId(id);
+    const postId = req.params.id;
 
-    if (!post) {
-      res.sendStatus(404);
+    if (req.user) {
+      const post =
+        await this.QueryPostRepository.getMappedPostByPostIdWithStatus(
+          postId,
+          req.user.id
+        );
+      res.status(200).send(post);
       return;
     }
+
+    const post = await this.QueryPostRepository.getMappedPostByPostIdWithStatus(
+      postId,
+      null
+    );
     res.status(200).send(post);
     return;
   }
@@ -82,21 +111,19 @@ export class PostController {
       postId: req.params.postId,
     };
 
-    if (!req.headers.authorization) {
+    if (req.user) {
       const foundComments = await this.QueryPostRepository.getAllComments(
-        "",
+        req.user.id,
         sortData
       );
       res.status(200).send(foundComments);
       return;
     }
 
-    const userId = req.user!.id;
     const foundComments = await this.QueryPostRepository.getAllComments(
-      userId,
+      null,
       sortData
     );
-
     res.status(200).send(foundComments);
     return;
   }
@@ -112,10 +139,15 @@ export class PostController {
       return;
     }
 
-    const post = await this.PostService.createPost({
-      ...req.body,
+    const createPostData: CreatePostDataType = {
+      title: req.body.title,
+      shortDescription: req.body.shortDescription,
+      content: req.body.content,
+      blogId: req.body.blogId,
       blogName: blog.name,
-    });
+    };
+
+    const post = await this.PostService.createPost(createPostData);
 
     if (!post) {
       res.sendStatus(500);
@@ -178,8 +210,42 @@ export class PostController {
       blogId: req.body.blogId,
     };
 
-    await this.PostService.updatePost(post, updateData);
-    return res.sendStatus(204);
+    const updatedPost = await this.PostService.updatePost(post, updateData);
+
+    if (!updatedPost) {
+      res.sendStatus(500);
+      return;
+    }
+    res.sendStatus(204);
+    return;
+  }
+
+  async putLike(
+    req: RequestWithBodyAndParams<PostIdParams, InputLikeDataType>,
+    res: Response
+  ) {
+    const post = await this.PostRepository.getPostByPostId(req.params.postId);
+    if (!post) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const createPostLikeData: CreatePostLikeData = {
+      post,
+      likeStatus: req.body.likeStatus,
+      parentId: req.user!.id,
+      parentLogin: req.user!.login,
+    };
+
+    const likeResult =
+      await this.PostLikesService.updatePostLike(createPostLikeData);
+    if (!likeResult) {
+      res.sendStatus(400);
+      return;
+    }
+
+    res.sendStatus(204);
+    return;
   }
 
   async deletePost(req: RequestWithParams<Params>, res: Response) {
@@ -189,6 +255,7 @@ export class PostController {
       res.sendStatus(404);
       return;
     }
-    return res.sendStatus(204);
+    res.sendStatus(204);
+    return;
   }
 }

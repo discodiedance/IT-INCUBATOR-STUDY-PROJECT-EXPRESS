@@ -190,7 +190,7 @@ export class AuthService {
   }
 
   async updateRefreshTokens(deviceId: string, userId: string) {
-    const user = await this.QueryUserRepository.getUserByUserId(userId);
+    const user = await this.QueryUserRepository.getMappedUserByUserId(userId);
     if (!user) {
       return null;
     }
