@@ -2,7 +2,6 @@ import { injectable } from "inversify";
 
 import { OutputBlogType } from "../../../../types/blog/output";
 import { BlogModel } from "../../../domain/entities/blog-entity";
-import { BlogDocumentType } from "../../../../types/blog/blog-entities";
 import { BlogSortDataType } from "../../../../types/blog/blog-dto";
 import { blogMapper } from "../../../application/mappers/blog/blog-mapper";
 

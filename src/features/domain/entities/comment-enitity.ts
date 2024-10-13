@@ -76,9 +76,9 @@ CommentSchema.method(
 
 CommentSchema.method(
   "removeDislikeAddLikeCounter",
-  function removeLikeAddDislikeCounter() {
-    this.likesInfo.likesCount -= 1;
-    this.likesInfo.dislikesCount += 1;
+  function removeDislikeAddLikeCounter() {
+    this.likesInfo.likesCount += 1;
+    this.likesInfo.dislikesCount -= 1;
   }
 );
 
